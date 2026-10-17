@@ -1,0 +1,21 @@
+{
+  "name": "Cassete — um diário de escuta",
+  "short_name": "Cassete",
+  "description": "Um diário de escuta, não de streams.",
+  "lang": "pt-BR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#17161A",
+  "theme_color": "#17161A",
+  "orientation": "portrait",
+  "categories": ["music", "social", "lifestyle"],
+  "icons": [
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Meu diário", "url": "./#/diario" },
+    { "name": "Buscar", "url": "./#/buscar" }
+  ]
+}
