@@ -226,6 +226,27 @@ router.get('/recent', requireAuth, (req, res) => {
   res.json({ entries, nextCursor: rows.length === limit ? rows[rows.length - 1].id : null });
 });
 
+// nota da comunidade pra um disco (usado no "disco do dia": a pessoa só vê
+// depois de dar a dela). ?since=<ISO> conta quantas notas vieram desde então.
+router.get('/item-stats', requireAuth, (req, res) => {
+  const itemId = cleanString(req.query.itemId, 100);
+  if(!itemId) return res.status(400).json({ error: 'faltou o disco.' });
+  const rows = db.prepare('SELECT rating, COUNT(*) n FROM diary_entries WHERE item_id = ? GROUP BY rating').all(itemId);
+  const dist = [0, 0, 0, 0, 0];
+  rows.forEach(r => { if(r.rating >= 1 && r.rating <= 5) dist[r.rating - 1] = r.n; });
+  const count = dist.reduce((s, n) => s + n, 0);
+  const avg = count ? dist.reduce((s, n, i) => s + n * (i + 1), 0) / count : null;
+
+  let since = null;
+  const sinceDate = req.query.since ? new Date(String(req.query.since)) : null;
+  if(sinceDate && !isNaN(sinceDate)) since = sinceDate.toISOString().slice(0, 19).replace('T', ' ');
+  const today = since
+    ? db.prepare('SELECT COUNT(DISTINCT user_id) n FROM diary_entries WHERE item_id = ? AND created_at >= ?').get(itemId, since).n
+    : count;
+
+  res.json({ count, avg: avg === null ? null : Math.round(avg * 10) / 10, dist, today });
+});
+
 router.get('/user/:username', optionalAuth, (req, res) => {
   const user = findUserByUsername(req.params.username);
   if(!user) return res.status(404).json({ error: 'pessoa não encontrada.' });

@@ -49,6 +49,115 @@
   :root[data-theme="light"] .rv-detail-hint{color:#2F5E53;}
   :root[data-theme="light"] .rv-time, :root[data-theme="light"] .conv-time, :root[data-theme="light"] .playlist-track-no, :root[data-theme="light"] .entry .date{opacity:0.75;}
 
+  /* ---------- DISCO DO DIA ---------- */
+  .daily-card{background:linear-gradient(180deg,#F3E6C4 0%,#ECE7DD 55%);}
+  .daily-badge{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    background:var(--rust);color:#F3ECDA;padding:6px 14px;border-radius:20px;margin-bottom:12px;
+    box-shadow:0 4px 14px rgba(176,81,47,.35);
+  }
+  .feed-card.daily-card{height:auto;min-height:calc(100vh - 212px);padding:22px 20px 112px;justify-content:flex-start;}
+  .feed-card.daily-card .fc-disc{width:min(60vw,240px);margin-bottom:12px;}
+  .feed-card.daily-card.rated .fc-disc{width:min(42vw,160px);margin-bottom:8px;}
+  .feed-card.daily-card.rated .fc-artist{margin-bottom:10px;}
+  .daily-card .fc-eyebrow{margin-bottom:10px;}
+  .daily-card .fc-artist{margin-bottom:14px;}
+  .daily-cta{
+    font-family:'Anton',sans-serif;font-size:20px;letter-spacing:.04em;text-transform:uppercase;
+    background:#17161A;color:#F3ECDA;border:none;border-radius:30px;padding:14px 34px;cursor:pointer;
+    box-shadow:0 8px 22px rgba(0,0,0,.25);animation:dailyPulse 2.2s ease-in-out infinite;
+  }
+  @keyframes dailyPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.04);}}
+  @media (prefers-reduced-motion: reduce){ .daily-cta{animation:none;} }
+  .daily-hint{font-family:'JetBrains Mono',monospace;font-size:11px;color:#4A4239;margin-top:12px;text-align:center;max-width:300px;line-height:1.5;}
+  .daily-foot{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#4A4239;}
+  .daily-streak{color:#9A3E1E;font-weight:600;}
+  .daily-next b{font-variant-numeric:tabular-nums;color:#17161A;}
+  .daily-reveal{width:min(300px,82vw);display:flex;flex-direction:column;align-items:center;}
+  .daily-scores{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
+  .daily-scores > div{background:rgba(23,22,26,.06);border-radius:10px;padding:8px 10px;text-align:center;}
+  .daily-score-k{font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:#4A4239;}
+  .daily-score-v{font-family:'Anton',sans-serif;font-size:20px;color:#8A6420;margin-top:2px;}
+  .daily-score-v .off{color:rgba(23,22,26,.18);}
+  .daily-dist{width:100%;margin-top:10px;}
+  .daily-dist-row{display:grid;grid-template-columns:26px 1fr 24px;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#4A4239;padding:1.5px 0;}
+  .daily-dist-row b{text-align:right;font-weight:500;}
+  .daily-dist-track{height:7px;}
+  .daily-dist-fill{height:100%;min-width:2px;background:#9A8F7C;border-radius:0 4px 4px 0;}
+  .daily-dist-row.mine .daily-dist-fill{background:#8A6420;}
+  .daily-dist-row.mine{color:#17161A;font-weight:600;}
+  .daily-verdict{font-family:'Spectral',serif;font-style:italic;font-size:14px;margin-top:8px;color:#17161A;}
+  .daily-share{margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;background:none;border:1px solid rgba(23,22,26,.35);color:#17161A;border-radius:20px;padding:8px 16px;cursor:pointer;}
+
+  /* ---------- CONQUISTAS ---------- */
+  .badges-card{max-width:420px;border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:26px;}
+  .badges-head{display:flex;justify-content:space-between;align-items:baseline;}
+  .badges-count{font-family:'Anton',sans-serif;font-size:18px;}
+  .badges-next{font-size:13px;color:var(--ink-soft);margin:6px 0 14px;line-height:1.45;}
+  .badges-next b{color:var(--ink);}
+  .badges-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 8px;}
+  .badge{display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;min-width:0;}
+  .badge-icon{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--paper-dim);border:1px solid var(--line);filter:grayscale(1);opacity:.45;}
+  .badge.on .badge-icon{filter:none;opacity:1;background:radial-gradient(circle at 35% 30%,#F2D58E,#C79A46);border-color:#C79A46;box-shadow:0 4px 12px rgba(199,154,70,.3);}
+  .badge-name{font-size:10.5px;line-height:1.2;color:var(--ink-soft);}
+  .badge.on .badge-name{color:var(--ink);font-weight:600;}
+  .badge-bar{width:70%;height:3px;border-radius:2px;background:var(--line);overflow:hidden;}
+  .badge-bar div{height:100%;background:var(--chart-bar,#C79A46);}
+  .badge-pop{
+    position:fixed;left:50%;top:16px;z-index:3000;transform:translate(-50%,-140%);
+    display:flex;align-items:center;gap:14px;max-width:min(92vw,380px);
+    background:#17161A;color:#F3ECDA;border:1px solid #C79A46;border-radius:16px;padding:12px 18px 12px 12px;
+    box-shadow:0 14px 40px rgba(0,0,0,.45);transition:transform .45s cubic-bezier(.2,1.4,.4,1);
+  }
+  .badge-pop.show{transform:translate(-50%,0);}
+  .badge-pop-icon{width:52px;height:52px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:26px;background:radial-gradient(circle at 35% 30%,#F2D58E,#C79A46);}
+  .badge-pop-k{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#E2B24C;}
+  .badge-pop-n{font-family:'Anton',sans-serif;font-size:19px;text-transform:uppercase;line-height:1.1;margin-top:2px;}
+  .badge-pop-d{font-size:12px;color:#B5AFA2;margin-top:2px;}
+
+  /* ---------- RETROSPECTIVA ---------- */
+  .wrapped-entry{
+    display:flex;align-items:center;gap:14px;width:100%;max-width:420px;margin:0 0 22px;padding:14px 16px;
+    border:none;border-radius:14px;cursor:pointer;text-align:left;color:#F3ECDA;font:inherit;
+    background:linear-gradient(120deg,#B0512F,#C79A46 55%,#4C8577);box-shadow:0 10px 26px rgba(176,81,47,.3);
+  }
+  .wrapped-entry b{font-family:'Anton',sans-serif;font-weight:400;font-size:17px;text-transform:uppercase;letter-spacing:.02em;}
+  .wrapped-entry span span{font-size:12.5px;opacity:.9;}
+  .wrapped-entry-icon{width:42px;height:42px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:rgba(23,22,26,.25);font-size:16px;}
+  .wrapped-overlay{position:fixed;inset:0;z-index:2500;background:#0B0A0D;color:#F3ECDA;}
+  .w-bars{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);left:12px;right:12px;display:flex;gap:4px;z-index:3;}
+  .w-bar{flex:1;height:3px;border-radius:2px;background:rgba(243,236,218,.25);overflow:hidden;}
+  .w-bar div{height:100%;width:0;background:#F3ECDA;}
+  .w-bar.done div{width:100%;}
+  .w-bar.now div{animation:wBar 5s linear forwards;}
+  .w-bar.now:last-child div{animation-duration:.4s;}
+  @keyframes wBar{to{width:100%;}}
+  .w-close{position:absolute;top:calc(env(safe-area-inset-top,0px) + 26px);right:12px;z-index:4;background:none;border:none;color:#F3ECDA;font-size:22px;cursor:pointer;padding:8px;}
+  .w-nav{position:absolute;top:0;bottom:0;width:35%;z-index:2;background:none;border:none;cursor:pointer;}
+  .w-nav.prev{left:0;} .w-nav.next{right:0;width:65%;}
+  .w-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:70px 28px;text-align:center;}
+  .w-stage.w1{background:radial-gradient(circle at 50% 30%,#B0512F,#2a120a 70%);}
+  .w-stage.w2{background:radial-gradient(circle at 30% 20%,#4C8577,#0f201c 70%);}
+  .w-stage.w3{background:radial-gradient(circle at 70% 30%,#6B4FA0,#160f22 70%);}
+  .w-stage.w4{background:radial-gradient(circle at 50% 70%,#C79A46,#251b0a 70%);}
+  .w-stage.w5{background:radial-gradient(circle at 50% 35%,#3C6459,#0b1412 72%);}
+  .w-stage.w6{background:conic-gradient(from 210deg at 50% 45%,#B0512F,#C79A46,#4C8577,#6B4FA0,#B0512F);}
+  .w-stage.w6::before{content:'';position:absolute;inset:0;background:rgba(11,10,13,.45);}
+  .w-content{position:relative;z-index:3;max-width:460px;animation:wIn .55s cubic-bezier(.2,1,.3,1);}
+  @keyframes wIn{from{opacity:0;transform:translateY(24px) scale(.97);}to{opacity:1;transform:none;}}
+  @media (prefers-reduced-motion: reduce){ .w-content{animation:none;} .w-bar.now div{animation:none;width:100%;} }
+  .w-k{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.85;margin-bottom:18px;}
+  .w-big{font-family:'Anton',sans-serif;font-size:clamp(110px,34vw,190px);line-height:.9;}
+  .w-t{font-family:'Anton',sans-serif;font-size:28px;text-transform:uppercase;margin-top:6px;}
+  .w-name{font-family:'Anton',sans-serif;font-size:clamp(40px,12vw,68px);line-height:1;text-transform:uppercase;word-break:break-word;}
+  .w-name.sm{font-size:clamp(28px,8vw,42px);margin-top:18px;}
+  .w-s{font-family:'Spectral',serif;font-style:italic;font-size:18px;opacity:.9;margin-top:14px;line-height:1.4;}
+  .w-stars{font-size:34px;color:#F2D58E;letter-spacing:4px;margin-top:6px;}
+  .w-stars span{color:rgba(243,236,218,.25);}
+  .w-icon{font-size:84px;margin-bottom:10px;}
+  .w-disc{width:min(78vw,300px);aspect-ratio:298/188;border-radius:10px;margin:0 auto;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.5);}
+  .w-share{position:relative;z-index:5;margin-top:28px;font-family:'Anton',sans-serif;font-size:18px;letter-spacing:.04em;text-transform:uppercase;background:#F3ECDA;color:#17161A;border:none;border-radius:30px;padding:14px 28px;cursor:pointer;}
+
   /* ---------- QUERO OUVIR ---------- */
   .later-block{margin:0 0 26px;border:1px solid var(--line);border-radius:10px;padding:14px 16px 6px;background:var(--paper-dim);}
   .later-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
@@ -1901,6 +2010,7 @@ async function loadDiaryFromServer(){
     diary = [];
   }
   await loadListenLater();
+  checkNewBadges();
 }
 
 // ---------- QUERO OUVIR ----------
@@ -2127,6 +2237,529 @@ function statsCardHtml(){
       <div class="stats-sub">suas notas</div>
       ${byRating.map(([r, n]) => bar('★'.repeat(r), n, maxRating, `${r} ${r === 1 ? 'estrela' : 'estrelas'}: ${n}`)).join('')}
     </div>
+  `;
+}
+
+// ============================================================
+// DISCO DO DIA — todo mundo recebe o mesmo disco no mesmo dia (como o
+// Wordle). Você dá sua nota e só depois vê a da comunidade; acertar dias
+// seguidos vira uma sequência própria.
+// ============================================================
+const DAILY_EPOCH = new Date(2026, 0, 1);
+function dayIndex(d = new Date()){
+  const a = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  return Math.round((a - DAILY_EPOCH) / 86400000);
+}
+let dailyPoolCache = null;
+// ordem embaralhada fixa (a mesma pra todo mundo) dos discos curados do app
+function dailyPool(){
+  if(dailyPoolCache) return dailyPoolCache;
+  const pool = [...catalog, ...singles].map(i => i.id).sort((a, b) => a - b);
+  let seed = 20260101;
+  const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  for(let i = pool.length - 1; i > 0; i--){
+    const j = Math.floor(rand() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return (dailyPoolCache = pool);
+}
+function dailyItemFor(d = new Date()){
+  const pool = dailyPool();
+  const idx = ((dayIndex(d) % pool.length) + pool.length) % pool.length;
+  return getItem(pool[idx]);
+}
+function dailyNumber(d = new Date()){ return dayIndex(d) + 1; }
+function sameDay(a, b){ return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
+function dailyEntryFor(d = new Date()){
+  const item = dailyItemFor(d);
+  return item ? diary.find(e => e.itemId === item.id && sameDay(new Date(e.date), d)) : null;
+}
+function isTodaysDaily(itemId){
+  const item = dailyItemFor();
+  return !!item && item.id === itemId;
+}
+// dias seguidos avaliando o disco do dia (hoje ainda em aberto não quebra)
+function computeDailyStreak(){
+  let streak = 0;
+  const d = new Date();
+  if(!dailyEntryFor(d)) d.setDate(d.getDate() - 1);
+  while(dailyEntryFor(d)){ streak++; d.setDate(d.getDate() - 1); }
+  return streak;
+}
+function dailyPlayedCount(){
+  const days = new Set();
+  diary.forEach(e => {
+    const d = new Date(e.date);
+    const item = dailyItemFor(d);
+    if(item && item.id === e.itemId) days.add(d.toDateString());
+  });
+  return days.size;
+}
+
+let dailyStats = null;          // { itemId, count, avg, dist, today }
+let dailyStatsLoading = false;
+let dailyCountdownTimer = null;
+let dailyPreviewTried = new Set();
+
+async function loadDailyStats(force = false){
+  const item = dailyItemFor();
+  if(!item || !currentUser || dailyStatsLoading) return;
+  if(!force && dailyStats && dailyStats.itemId === item.id) return;
+  dailyStatsLoading = true;
+  try{
+    const midnight = new Date(); midnight.setHours(0, 0, 0, 0);
+    const s = await apiFetch(`/diary/item-stats?itemId=${encodeURIComponent(String(item.id))}&since=${encodeURIComponent(midnight.toISOString())}`);
+    dailyStats = { itemId: item.id, ...s };
+  }catch(e){ /* sem a nota da comunidade agora — o card mostra só a sua */ }
+  dailyStatsLoading = false;
+  refreshDailyCard();
+}
+
+// os discos curados não têm prévia própria — busca um trecho no iTunes
+async function ensureDailyPreview(item){
+  if(!item || hasPreview(item) || dailyPreviewTried.has(item.id)) return;
+  dailyPreviewTried.add(item.id);
+  try{
+    const results = await itunesSearchJSONP(`${item.artist} ${item.title}`, 'song');
+    const hit = results.find(r => r.previewUrl);
+    if(hit){ item.previewUrl = hit.previewUrl; refreshDailyCard(); }
+  }catch(e){ /* sem prévia — o card funciona igual */ }
+}
+
+function countdownText(){
+  const now = new Date();
+  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  const s = Math.max(0, Math.floor((next - now) / 1000));
+  const p = (n) => String(n).padStart(2, '0');
+  return `${p(Math.floor(s / 3600))}:${p(Math.floor(s / 60) % 60)}:${p(s % 60)}`;
+}
+
+function dailyCardInner(){
+  const item = dailyItemFor();
+  if(!item) return '';
+  const entry = dailyEntryFor();
+  const streak = computeDailyStreak();
+  const st = dailyStats && dailyStats.itemId === item.id ? dailyStats : null;
+  const othersToday = st ? Math.max(0, st.today - (entry ? 1 : 0)) : 0;
+
+  const reveal = entry ? `
+    <div class="daily-reveal">
+      <div class="daily-scores">
+        <div><div class="daily-score-k">sua nota</div><div class="daily-score-v">${'★'.repeat(entry.rating)}<span class="off">${'★'.repeat(5 - entry.rating)}</span></div></div>
+        <div><div class="daily-score-k">comunidade</div><div class="daily-score-v">${st && st.avg ? `★ ${st.avg.toFixed(1)}` : '—'}</div></div>
+      </div>
+      ${st && st.count ? `
+        <div class="daily-dist" role="img" aria-label="${escapeHtml(st.dist.map((n, i) => `${i + 1} estrela${i ? 's' : ''}: ${n}`).join(', '))}">
+          ${[5, 4, 3, 2, 1].map(r => {
+            const n = st.dist[r - 1];
+            const max = Math.max(...st.dist, 1);
+            return `<div class="daily-dist-row ${r === entry.rating ? 'mine' : ''}" title="${r} estrela${r > 1 ? 's' : ''}: ${n}"><span>${r}★</span><div class="daily-dist-track"><div class="daily-dist-fill" style="width:${Math.round(n / max * 100)}%"></div></div><b>${n}</b></div>`;
+          }).join('')}
+        </div>
+        <div class="daily-verdict">${dailyVerdict(entry.rating, st.avg)}</div>
+      ` : ''}
+      <div class="daily-foot">
+        ${streak ? `<span class="daily-streak">🔥 ${streak} ${streak === 1 ? 'dia seguido' : 'dias seguidos'}</span>` : ''}
+        <span class="daily-next">próximo disco em <b id="dailyCountdown">${countdownText()}</b></span>
+      </div>
+      <button type="button" class="daily-share" id="dailyShareBtn">compartilhar minha nota</button>
+    </div>
+  ` : `
+    <button type="button" class="daily-cta" id="dailyRateBtn">★ dar minha nota</button>
+    <div class="daily-hint">a nota da comunidade só aparece depois da sua 👀${othersToday ? ` · <b>${othersToday}</b> ${othersToday === 1 ? 'pessoa já avaliou' : 'pessoas já avaliaram'} hoje` : ''}</div>
+    <div class="daily-foot">
+      ${streak ? `<span class="daily-streak">🔥 ${streak} ${streak === 1 ? 'dia' : 'dias'} — não perca hoje!</span>` : ''}
+      <span class="daily-next">acaba em <b id="dailyCountdown">${countdownText()}</b></span>
+    </div>
+  `;
+
+  return `
+    <div class="daily-badge">☀️ disco do dia #${dailyNumber()}</div>
+    <div class="fc-eyebrow">todo mundo ouve o mesmo disco hoje</div>
+    <div class="fc-disc daily-disc" style="${discGradient(item)}" id="dailyDisc">
+      <div class="hole"></div>
+      <div class="tape-name">${escapeHtml(item.title)}</div>
+      <div class="fc-eq"><span></span><span></span><span></span></div>
+      ${hasPreview(item) ? `<button class="fc-disc-spotify" id="dailyPlayBtn" aria-label="Ouvir um trecho">${PLAY_ICON_SVG}</button>` : ''}
+    </div>
+    <div class="fc-artist">${escapeHtml(item.artist)} · ${escapeHtml(String(item.year || ''))}</div>
+    ${reveal}
+  `;
+}
+
+function dailyVerdict(mine, avg){
+  if(!avg) return '';
+  const diff = mine - avg;
+  if(Math.abs(diff) < 0.5) return 'você pensa igual à maioria 🤝';
+  if(diff >= 1.5) return 'você amou mais que quase todo mundo 💛';
+  if(diff > 0) return 'você gostou mais que a média';
+  if(diff <= -1.5) return 'opinião polêmica: você foi bem mais duro 🌶️';
+  return 'você foi mais exigente que a média';
+}
+
+function dailyCardHtml(){
+  if(!currentUser || !dailyItemFor()) return '';
+  return `<div class="feed-card daily-card ${dailyEntryFor() ? 'rated' : ''}" id="dailyCard">${dailyCardInner()}</div>`;
+}
+
+let dailyAudio = null;
+function bindDailyCard(){
+  const card = document.getElementById('dailyCard');
+  if(!card) return;
+  const item = dailyItemFor();
+  card.addEventListener('click', (e) => {
+    if(e.target.closest('button')) return;
+    openItemDetail(item.id);
+  });
+  const rate = document.getElementById('dailyRateBtn');
+  if(rate) rate.addEventListener('click', () => openDrawer(item.id));
+  const share = document.getElementById('dailyShareBtn');
+  if(share) share.addEventListener('click', () => {
+    const entry = dailyEntryFor();
+    const st = dailyStats && dailyStats.itemId === item.id ? dailyStats : null;
+    const line = `disco do dia #${dailyNumber()} · minha nota ${entry ? entry.rating : '-'}/5${st && st.avg ? ` · comunidade ${st.avg.toFixed(1)}` : ''}`;
+    shareSongCard(item, entry ? entry.rating : 0, share, { note: entry && entry.note ? entry.note : line, username: currentUser && currentUser.username });
+  });
+  const play = document.getElementById('dailyPlayBtn');
+  if(play) play.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const disc = document.getElementById('dailyDisc');
+    if(dailyAudio && !dailyAudio.paused){ dailyAudio.pause(); return; }
+    stopFeedAutoplay();
+    dailyAudio = new Audio(item.previewUrl);
+    dailyAudio.addEventListener('play', () => { disc && disc.classList.add('spinning'); play.innerHTML = PAUSE_ICON_SVG; });
+    const stop = () => { disc && disc.classList.remove('spinning'); play.innerHTML = PLAY_ICON_SVG; };
+    dailyAudio.addEventListener('pause', stop);
+    dailyAudio.addEventListener('ended', stop);
+    dailyAudio.play().catch(stop);
+  });
+
+  clearInterval(dailyCountdownTimer);
+  dailyCountdownTimer = setInterval(() => {
+    const el = document.getElementById('dailyCountdown');
+    if(!el){ clearInterval(dailyCountdownTimer); return; }
+    el.textContent = countdownText();
+    if(el.textContent === '00:00:00'){ dailyStats = null; setTimeout(renderFeed, 1500); }
+  }, 1000);
+
+  ensureDailyPreview(item);
+  loadDailyStats();
+}
+
+function refreshDailyCard(){
+  const card = document.getElementById('dailyCard');
+  if(!card) return;
+  card.innerHTML = dailyCardInner();
+  card.classList.toggle('rated', !!dailyEntryFor());
+  const fresh = card.cloneNode(true); // tira os listeners antigos
+  card.replaceWith(fresh);
+  bindDailyCard();
+}
+
+// ============================================================
+// CONQUISTAS — metas com barra de progresso; ao desbloquear aparece um
+// aviso comemorando (uma vez por conquista, por conta)
+// ============================================================
+function computeBadges(){
+  const total = diary.length;
+  const reviews = diary.filter(e => e.note).length;
+  const items = diary.map(e => getItem(e.itemId)).filter(Boolean);
+  const genres = new Set(items.map(a => a.genre).filter(g => g && g !== 'Música')).size;
+  const artistCounts = {};
+  items.forEach(a => { if(a.artist) artistCounts[a.artist] = (artistCounts[a.artist] || 0) + 1; });
+  const topArtist = Math.max(0, ...Object.values(artistCounts));
+  const hours = diary.map(e => new Date(e.date).getHours());
+  const owl = hours.filter(h => h < 5).length;
+  const early = hours.filter(h => h >= 5 && h < 8).length;
+  const honest = diary.filter(e => e.rating <= 2).length;
+  const perfect = diary.filter(e => e.rating === 5).length;
+  const following = currentUser ? (currentUser.following || []).length : 0;
+  const followers = currentUser ? (currentUser.followers || []).length : 0;
+  const streak = computeStreak();
+  const best = Math.max(streak, bestStreakEver());
+  const daily = dailyPlayedCount();
+  const favs = currentUser ? (currentUser.favorites || []).length : 0;
+  const B = (id, icon, name, desc, value, goal) => ({ id, icon, name, desc, value: Math.min(value, goal), goal, unlocked: value >= goal });
+  return [
+    B('first', '📼', 'Primeira fita', 'registre sua primeira escuta', total, 1),
+    B('ten', '🎞️', 'Colecionador', '10 escutas no diário', total, 10),
+    B('fifty', '🗄️', 'Estante cheia', '50 escutas no diário', total, 50),
+    B('hundred', '🏛️', 'Acervo', '100 escutas no diário', total, 100),
+    B('critic', '✍️', 'Crítico', 'escreva 5 resenhas', reviews, 5),
+    B('poet', '📜', 'Poeta das resenhas', 'escreva 25 resenhas', reviews, 25),
+    B('explorer', '🧭', 'Explorador', 'ouça 5 estilos diferentes', genres, 5),
+    B('globe', '🌍', 'Ouvido do mundo', 'ouça 10 estilos diferentes', genres, 10),
+    B('fan', '💿', 'Fã de carteirinha', '5 escutas do mesmo artista', topArtist, 5),
+    B('week', '🔥', 'Semana em chamas', '7 dias seguidos registrando', best, 7),
+    B('month', '🌙', 'Mês inteiro', '30 dias seguidos registrando', best, 30),
+    B('daily3', '☀️', 'Ritual diário', 'avalie 3 discos do dia', daily, 3),
+    B('daily30', '🌞', 'Viciado no disco do dia', 'avalie 30 discos do dia', daily, 30),
+    B('owl', '🦉', 'Coruja', 'registre algo entre 0h e 5h', owl, 1),
+    B('early', '🐓', 'Madrugador', 'registre algo entre 5h e 8h', early, 1),
+    B('honest', '🌶️', 'Sincerão', 'dê 1 ou 2 estrelas 3 vezes', honest, 3),
+    B('heart', '💛', 'Coração mole', 'dê 5 estrelas 10 vezes', perfect, 10),
+    B('social', '🤝', 'Social', 'siga 5 pessoas', following, 5),
+    B('popular', '⭐', 'Popular', 'tenha 10 seguidores', followers, 10),
+    B('top4', '🏆', 'Meus 4', 'escolha seus 4 favoritos', favs, 4),
+  ];
+}
+
+// maior sequência que a pessoa já teve (não só a atual)
+function bestStreakEver(){
+  const days = [...new Set(diary.map(e => { const d = new Date(e.date); return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); }))].sort((a, b) => a - b);
+  let best = 0, run = 0, prev = null;
+  days.forEach(t => {
+    run = prev !== null && Math.round((t - prev) / 86400000) === 1 ? run + 1 : 1;
+    best = Math.max(best, run);
+    prev = t;
+  });
+  return best;
+}
+
+function badgesKey(){ return currentUser ? `cassete_badges_${currentUser.username}` : null; }
+// avisa das conquistas novas. Na primeira vez num aparelho, só marca as que já
+// existiam como vistas (sem soltar 10 avisos de uma vez).
+function checkNewBadges(){
+  const key = badgesKey();
+  if(!key) return;
+  const unlocked = computeBadges().filter(b => b.unlocked);
+  let seen;
+  try{ seen = JSON.parse(localStorage.getItem(key)); }catch(e){ seen = null; }
+  const save = () => { try{ localStorage.setItem(key, JSON.stringify(unlocked.map(b => b.id))); }catch(e){} };
+  if(!Array.isArray(seen)){ save(); return; }
+  const fresh = unlocked.filter(b => !seen.includes(b.id));
+  save();
+  fresh.forEach((b, i) => setTimeout(() => showBadgeUnlock(b), 600 + i * 3200));
+}
+
+function showBadgeUnlock(b){
+  const el = document.createElement('div');
+  el.className = 'badge-pop';
+  el.setAttribute('role', 'status');
+  el.innerHTML = `<div class="badge-pop-icon">${b.icon}</div><div><div class="badge-pop-k">conquista desbloqueada</div><div class="badge-pop-n">${escapeHtml(b.name)}</div><div class="badge-pop-d">${escapeHtml(b.desc)}</div></div>`;
+  document.body.appendChild(el);
+  if(navigator.vibrate) try{ navigator.vibrate([30, 40, 30]); }catch(e){}
+  requestAnimationFrame(() => el.classList.add('show'));
+  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 500); }, 3000);
+}
+
+function badgesHtml(){
+  const list = computeBadges();
+  const done = list.filter(b => b.unlocked).length;
+  const next = list.filter(b => !b.unlocked).sort((a, b) => (b.value / b.goal) - (a.value / a.goal))[0];
+  return `
+    <div class="badges-card">
+      <div class="badges-head">
+        <span class="stats-sub" style="margin:0;">conquistas</span>
+        <span class="badges-count">${done}/${list.length}</span>
+      </div>
+      ${next ? `<div class="badges-next">quase lá: <b>${next.icon} ${escapeHtml(next.name)}</b> — ${escapeHtml(next.desc)} (${next.value}/${next.goal})</div>` : '<div class="badges-next">você desbloqueou tudo. lenda. 👑</div>'}
+      <div class="badges-grid">
+        ${list.map(b => `
+          <div class="badge ${b.unlocked ? 'on' : ''}" title="${escapeHtml(`${b.name} — ${b.desc} (${b.value}/${b.goal})`)}">
+            <div class="badge-icon">${b.icon}</div>
+            <div class="badge-name">${escapeHtml(b.name)}</div>
+            ${b.unlocked ? '' : `<div class="badge-bar"><div style="width:${Math.round(b.value / b.goal * 100)}%"></div></div>`}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// RETROSPECTIVA — "stories" em tela cheia com o seu mês (ou tudo, se o
+// mês tiver pouca coisa), terminando na sua personalidade musical
+// ============================================================
+function wrappedData(){
+  const now = new Date();
+  let entries = diary.filter(e => { const d = new Date(e.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); });
+  let period = now.toLocaleDateString('pt-BR', { month: 'long' });
+  let periodLabel = `de ${period}`;
+  if(entries.length < 3){ entries = diary.slice(); periodLabel = 'até agora'; period = 'até agora'; }
+  if(!entries.length) return null;
+  const items = entries.map(e => ({ e, a: getItemSafe(e.itemId) }));
+  const count = (key) => {
+    const m = {};
+    items.forEach(({ a }) => { const k = a[key]; if(k && k !== 'Música') m[k] = (m[k] || 0) + 1; });
+    return Object.entries(m).sort((x, y) => y[1] - x[1]);
+  };
+  const artists = count('artist');
+  const genres = count('genre');
+  const avg = entries.reduce((s, e) => s + e.rating, 0) / entries.length;
+  const best = [...items].sort((x, y) => y.e.rating - x.e.rating || y.e.date - x.e.date)[0];
+  const reviews = entries.filter(e => e.note).length;
+  const night = entries.filter(e => { const h = new Date(e.date).getHours(); return h >= 22 || h < 5; }).length;
+  const days = new Set(entries.map(e => new Date(e.date).toDateString())).size;
+  const topShare = artists.length ? artists[0][1] / entries.length : 0;
+
+  let persona;
+  if(entries.length >= 4 && avg >= 4.3) persona = { name: 'Coração Mole', icon: '💛', desc: 'você encontra algo pra amar em quase tudo que ouve.' };
+  else if(entries.length >= 4 && avg <= 2.8) persona = { name: 'Crítico Implacável', icon: '🌶️', desc: 'sua nota 5 é rara — e por isso vale ouro.' };
+  else if(genres.length >= 5) persona = { name: 'Explorador Sonoro', icon: '🧭', desc: 'você pula de estilo em estilo sem medo.' };
+  else if(topShare >= 0.4 && entries.length >= 4) persona = { name: 'Fã de Carteirinha', icon: '💿', desc: `${artists[0][0]} mora no seu coração (e no seu diário).` };
+  else if(reviews / entries.length >= 0.6) persona = { name: 'Poeta das Resenhas', icon: '📜', desc: 'você não só ouve: você escreve sobre o que sente.' };
+  else if(night / entries.length >= 0.4) persona = { name: 'Coruja Musical', icon: '🦉', desc: 'suas melhores escutas acontecem de madrugada.' };
+  else persona = { name: 'Ouvinte de Alma', icon: '🎧', desc: 'você ouve com atenção — do jeito que a música merece.' };
+
+  return { entries, items, period, periodLabel, artists, genres, avg, best, reviews, days, persona };
+}
+
+let wrappedState = null;
+function openWrapped(){
+  const data = wrappedData();
+  if(!data){ showToast('registre algumas escutas primeiro — sua retrospectiva sai delas.', true); return; }
+  const top = data.artists[0];
+  const slides = [
+    { cls: 'w1', html: `<div class="w-k">sua retrospectiva ${escapeHtml(data.periodLabel)}</div><div class="w-big">${data.entries.length}</div><div class="w-t">${data.entries.length === 1 ? 'fita registrada' : 'fitas registradas'}</div><div class="w-s">em ${data.days} ${data.days === 1 ? 'dia' : 'dias'} de escuta</div>` },
+    top ? { cls: 'w2', html: `<div class="w-k">quem mais tocou na sua fita</div><div class="w-name">${escapeHtml(top[0])}</div><div class="w-s">${top[1]} ${top[1] === 1 ? 'escuta' : 'escutas'}${data.artists[1] ? ` · depois vem ${escapeHtml(data.artists[1][0])}` : ''}</div>` } : null,
+    data.genres.length ? { cls: 'w3', html: `<div class="w-k">seu som ${escapeHtml(data.periodLabel)}</div><div class="w-name">${escapeHtml(data.genres[0][0])}</div><div class="w-s">${data.genres.length} ${data.genres.length === 1 ? 'estilo' : 'estilos'} no total${data.genres[1] ? `, com ${escapeHtml(data.genres[1][0])} em segundo` : ''}</div>` } : null,
+    { cls: 'w4', html: `<div class="w-k">sua nota média</div><div class="w-big">${data.avg.toFixed(1)}</div><div class="w-stars">${'★'.repeat(Math.round(data.avg))}<span>${'★'.repeat(5 - Math.round(data.avg))}</span></div><div class="w-s">${data.reviews} ${data.reviews === 1 ? 'resenha escrita' : 'resenhas escritas'}</div>` },
+    { cls: 'w5', html: `<div class="w-k">a fita que mais te pegou</div><div class="fc-disc w-disc" style="${discGradient(data.best.a)}"><div class="hole"></div><div class="tape-name">${escapeHtml(data.best.a.title)}</div></div><div class="w-name sm">${escapeHtml(data.best.a.title)}</div><div class="w-s">${escapeHtml(data.best.a.artist)} · ${'★'.repeat(data.best.e.rating)}</div>` },
+    { cls: 'w6', html: `<div class="w-k">sua personalidade musical</div><div class="w-icon">${data.persona.icon}</div><div class="w-name">${escapeHtml(data.persona.name)}</div><div class="w-s">${escapeHtml(data.persona.desc)}</div><button type="button" class="w-share" id="wrappedShareBtn">compartilhar nos stories</button>` },
+  ].filter(Boolean);
+
+  closeWrapped();
+  const ov = document.createElement('div');
+  ov.className = 'wrapped-overlay';
+  ov.id = 'wrappedOverlay';
+  ov.setAttribute('role', 'dialog');
+  ov.setAttribute('aria-label', 'Sua retrospectiva');
+  ov.innerHTML = `
+    <div class="w-bars">${slides.map(() => '<div class="w-bar"><div></div></div>').join('')}</div>
+    <button type="button" class="w-close" aria-label="Fechar">✕</button>
+    <div class="w-stage"></div>
+    <button type="button" class="w-nav prev" aria-label="Anterior"></button>
+    <button type="button" class="w-nav next" aria-label="Próximo"></button>
+  `;
+  document.body.appendChild(ov);
+  wrappedState = { slides, i: 0, timer: null, data, ov };
+  ov.querySelector('.w-close').addEventListener('click', closeWrapped);
+  ov.querySelector('.w-nav.prev').addEventListener('click', () => goWrapped(wrappedState.i - 1));
+  ov.querySelector('.w-nav.next').addEventListener('click', () => goWrapped(wrappedState.i + 1));
+  document.addEventListener('keydown', wrappedKeys);
+  goWrapped(0);
+}
+function wrappedKeys(e){
+  if(!wrappedState) return;
+  if(e.key === 'Escape') closeWrapped();
+  if(e.key === 'ArrowRight') goWrapped(wrappedState.i + 1);
+  if(e.key === 'ArrowLeft') goWrapped(wrappedState.i - 1);
+}
+function goWrapped(i){
+  const s = wrappedState;
+  if(!s) return;
+  if(i >= s.slides.length) return; // fica no último (com o botão de compartilhar)
+  s.i = Math.max(0, i);
+  const slide = s.slides[s.i];
+  const stage = s.ov.querySelector('.w-stage');
+  stage.className = `w-stage ${slide.cls}`;
+  stage.innerHTML = `<div class="w-content">${slide.html}</div>`;
+  s.ov.querySelectorAll('.w-bar').forEach((b, k) => {
+    b.classList.toggle('done', k < s.i);
+    b.classList.toggle('now', k === s.i);
+  });
+  clearTimeout(s.timer);
+  if(s.i < s.slides.length - 1) s.timer = setTimeout(() => goWrapped(s.i + 1), 5000);
+  const share = stage.querySelector('#wrappedShareBtn');
+  if(share) share.addEventListener('click', (e) => { e.stopPropagation(); shareWrapped(share); });
+}
+function closeWrapped(){
+  if(!wrappedState) return;
+  clearTimeout(wrappedState.timer);
+  wrappedState.ov.remove();
+  wrappedState = null;
+  document.removeEventListener('keydown', wrappedKeys);
+}
+
+async function generateWrappedShareCard(data){
+  await ensureCardFonts();
+  const { canvas, ctx } = newCard();
+  const W = CARD_W;
+  const hue = data.best ? hueForItem(data.best.a) : 30;
+  drawStoryBackground(ctx, hue, 0.36);
+  drawStoryHeader(ctx, `retrospectiva ${data.periodLabel}${currentUser ? ` · @${currentUser.username}` : ''}`);
+  ctx.textAlign = 'center';
+  ctx.font = '150px sans-serif';
+  ctx.fillText(data.persona.icon, W / 2, 460);
+  ctx.fillStyle = 'rgba(236,231,221,0.7)';
+  ctx.font = '600 28px "JetBrains Mono", monospace';
+  ctx.letterSpacing = '4px';
+  ctx.fillText('MINHA PERSONALIDADE MUSICAL', W / 2, 545);
+  ctx.letterSpacing = '0px';
+  ctx.fillStyle = '#F3ECDA';
+  const n = fitLines(ctx, data.persona.name.toUpperCase(), s => `400 ${s}px "Anton", sans-serif`, 140, 80, W - 140, 2);
+  let y = 595;
+  n.lines.forEach(l => { y += n.size * 1.02; ctx.fillText(l, W / 2, y); });
+  ctx.fillStyle = 'rgba(236,231,221,0.8)';
+  const d = fitLines(ctx, data.persona.desc, s => `italic 400 ${s}px "Spectral", serif`, 42, 32, W - 220, 2);
+  d.lines.forEach(l => { y += d.size * 1.4; ctx.fillText(l, W / 2, y + 20); });
+
+  // três números em "cartões"
+  y += 120;
+  const tiles = [
+    [String(data.entries.length), 'fitas'],
+    [data.avg.toFixed(1), 'nota média'],
+    [String(data.days), data.days === 1 ? 'dia' : 'dias'],
+  ];
+  const tw = 260, gap = 30, tx = W / 2 - (tw * 3 + gap * 2) / 2;
+  tiles.forEach(([v, k], i) => {
+    const x = tx + i * (tw + gap);
+    ctx.fillStyle = 'rgba(236,231,221,0.08)';
+    ctxRoundRect(ctx, x, y, tw, 190, 26); ctx.fill();
+    ctx.fillStyle = '#F3ECDA';
+    ctx.font = '400 84px "Anton", sans-serif';
+    ctx.fillText(v, x + tw / 2, y + 110);
+    ctx.fillStyle = 'rgba(236,231,221,0.65)';
+    ctx.font = '400 24px "JetBrains Mono", monospace';
+    ctx.fillText(k.toUpperCase(), x + tw / 2, y + 156);
+  });
+  y += 270;
+  ctx.textAlign = 'left';
+  const rows = [
+    ['ARTISTA Nº 1', data.artists[0] ? data.artists[0][0] : '—'],
+    ['ESTILO Nº 1', data.genres[0] ? data.genres[0][0] : '—'],
+    ['A FITA DO PERÍODO', data.best ? data.best.a.title : '—'],
+  ];
+  rows.forEach(([k, v]) => {
+    ctx.fillStyle = '#E2B24C';
+    ctx.font = '600 24px "JetBrains Mono", monospace';
+    ctx.fillText(k, 130, y);
+    ctx.fillStyle = '#F3ECDA';
+    const f = fitLines(ctx, v, s => `600 ${s}px "Spectral", serif`, 46, 30, W - 260, 1);
+    ctx.fillText(f.lines[0], 130, y + 56);
+    y += 128;
+  });
+  drawStoryFooter(ctx, 'descubra a sua · grátis');
+  return cardToBlob(canvas);
+}
+
+async function shareWrapped(btn){
+  if(!wrappedState) return;
+  btn.disabled = true;
+  clearTimeout(wrappedState.timer);
+  try{
+    const blob = await generateWrappedShareCard(wrappedState.data);
+    await shareImageBlob(blob, {
+      filename: 'cassete-retrospectiva.png',
+      shareTitle: 'Minha retrospectiva no Cassete',
+      shareText: `${wrappedState.data.persona.icon} minha personalidade musical: ${wrappedState.data.persona.name} — e a sua? via Cassete`,
+    });
+  }catch(e){
+    showToast('não deu pra gerar a imagem agora.', true);
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+function wrappedEntryHtml(){
+  if(!diary.length) return '';
+  const data = wrappedData();
+  return `
+    <button type="button" class="wrapped-entry" id="wrappedOpenBtn">
+      <span class="wrapped-entry-icon">▶</span>
+      <span><b>sua retrospectiva ${escapeHtml(data.periodLabel)}</b><br><span>descubra sua personalidade musical</span></span>
+    </button>
   `;
 }
 
@@ -3660,7 +4293,7 @@ function renderFeed(){
   const items = full
     .slice()
     .sort((x,y)=> (personalScore(y).total + trendingScore(y.id)) - (personalScore(x).total + trendingScore(x.id)));
-  scroll.innerHTML = items.map((a, i) => {
+  scroll.innerHTML = dailyCardHtml() + items.map((a, i) => {
     const stats = communityStatsFor(a.id);
     const logged = diary.some(e => e.itemId === a.id);
     const ps = personalScore(a);
@@ -3702,7 +4335,8 @@ function renderFeed(){
     btn.addEventListener('click', ()=> openDrawer(parseItemId(btn.dataset.id)));
   });
 
-  scroll.querySelectorAll('.feed-card').forEach(card=>{
+  bindDailyCard();
+  scroll.querySelectorAll('.feed-card:not(.daily-card)').forEach(card=>{
     card.addEventListener('click', (e)=>{
       if(e.target.closest('.fc-rail') || e.target.closest('.fc-disc-spotify') || e.target.closest('.fc-preview')) return;
       openItemDetail(parseItemId(card.dataset.itemId));
@@ -3975,7 +4609,8 @@ function renderReviewsList(){
       const r = reviewsList[idx];
       if(!r) return;
       const item = getItem(r.itemId);
-      shareSongCard(item, r.rating, btn);
+      const author = r.__own ? (currentUser && currentUser.username) : (r.__real ? r.username : (reviewers[r.user] || {}).name);
+      shareSongCard(item, r.rating, btn, { note: r.text, username: author });
     });
   });
   body.querySelectorAll('.rv-report-btn').forEach(btn=>{
@@ -4558,115 +5193,474 @@ function drawCassetteBody(ctx, x, y, w, h, hue){
   return { labelX, labelY, labelW, labelH };
 }
 
-async function generateSongShareCard({ title, artist, rating, hue }){
-  const canvas = document.createElement('canvas');
-  const W = 1080, H = 1350;
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
+// ================= Cards de compartilhamento (formato Story 9:16) =================
+// Todos usam a mesma foto de fita do app (na cor da faixa, com o nome escrito
+// à mão no rótulo), o mesmo cabeçalho e o mesmo selo do app no rodapé.
+const CARD_W = 1080, CARD_H = 1920;
 
-  drawCardBackground(ctx, W, H, hue);
+// o canvas não espera a fonte da web chegar — sem isso o título saía em Arial
+async function ensureCardFonts(){
+  if(!document.fonts || !document.fonts.load) return;
+  try{
+    await Promise.all([
+      document.fonts.load('400 100px "Anton"'),
+      document.fonts.load('700 80px "Caveat"'),
+      document.fonts.load('600 30px "JetBrains Mono"'),
+      document.fonts.load('400 30px "JetBrains Mono"'),
+      document.fonts.load('italic 400 40px "Spectral"'),
+      document.fonts.load('600 40px "Spectral"'),
+    ]);
+  }catch(e){ /* sem a fonte, cai na do sistema — ainda gera o card */ }
+}
 
-  // wordmark do app no topo
-  ctx.fillStyle = '#ECE7DD';
-  ctx.textAlign = 'center';
-  ctx.font = '700 42px "Anton", sans-serif';
-  ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 12;
-  ctx.fillText('C A S S E T E', W / 2, 100);
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = '#B5AFA2';
-  ctx.font = '22px "JetBrains Mono", monospace';
-  ctx.fillText('um diário de escuta, não de streams', W / 2, 136);
-
-  const { labelX, labelY, labelW } = drawCassetteBody(ctx, W * 0.09, 312, W * 0.82, 690, hue);
-
-  ctx.fillStyle = '#17161A';
-  ctx.textAlign = 'center';
-  ctx.font = '700 44px "Anton", sans-serif';
-  const titleLines = wrapCanvasText(ctx, title.toUpperCase(), labelW - 60).slice(0, 2);
-  titleLines.forEach((l, i)=> ctx.fillText(l, W/2, labelY + 88 + i * 52));
-
-  ctx.font = '600 28px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#6b5f4a';
-  ctx.fillText(artist, W/2, labelY + 88 + titleLines.length * 52 + 42);
-
-  if(rating){
-    ctx.font = '36px sans-serif';
-    ctx.fillStyle = '#B0812E';
-    ctx.fillText('★'.repeat(rating) + '☆'.repeat(5-rating), W/2, labelY + 88 + titleLines.length * 52 + 96);
+let cassettePhotoPromise = null;
+function loadCassettePhoto(){
+  if(!cassettePhotoPromise){
+    cassettePhotoPromise = new Promise((resolve) => {
+      const raw = getComputedStyle(document.documentElement).getPropertyValue('--cassette-photo');
+      const m = raw.match(/url\(["']?(data:[^"')]+)["']?\)/);
+      if(!m){ resolve(null); return; }
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+      img.src = m[1];
+    });
   }
+  return cassettePhotoPromise;
+}
 
-  drawAppCTA(ctx, W, H - 96);
-  ctx.fillStyle = 'rgba(236,231,221,0.4)';
-  ctx.font = '16px "JetBrains Mono", monospace';
-  ctx.fillText('dados via iTunes Search API', W/2, H - 30);
+function newCard(){
+  const canvas = document.createElement('canvas');
+  canvas.width = CARD_W; canvas.height = CARD_H;
+  return { canvas, ctx: canvas.getContext('2d') };
+}
 
+function cardToBlob(canvas){
   return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
 }
 
-async function generatePlaylistShareCard({ tracks, label, hue }){
-  const rowH = 66;
-  const headH = 352;
-  const footH = 130;
-  const W = 1080;
-  const H = headH + Math.min(tracks.length, 12) * rowH + footH;
-  const canvas = document.createElement('canvas');
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
+// fundo: degradê na cor da faixa + um brilho atrás do objeto principal + grão
+function drawStoryBackground(ctx, hue, glowY = 0.33){
+  const W = CARD_W, H = CARD_H;
+  const g = ctx.createLinearGradient(0, 0, W * 0.4, H);
+  g.addColorStop(0, `hsl(${hue}deg,38%,20%)`);
+  g.addColorStop(0.45, `hsl(${hue}deg,22%,10%)`);
+  g.addColorStop(1, '#09080B');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
 
-  drawCardBackground(ctx, W, H, hue);
+  const glow = ctx.createRadialGradient(W / 2, H * glowY, 20, W / 2, H * glowY, W * 0.75);
+  glow.addColorStop(0, `hsla(${hue},70%,55%,0.32)`);
+  glow.addColorStop(1, `hsla(${hue},70%,55%,0)`);
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
 
+  for(let i = 0; i < 2600; i++){
+    ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.035})`;
+    ctx.fillRect(Math.random() * W, Math.random() * H, 1.5, 1.5);
+  }
+}
+
+// cabeçalho: marca do app + uma linha de contexto (quem/quando)
+function drawStoryHeader(ctx, kicker){
+  const W = CARD_W;
   ctx.textAlign = 'center';
   ctx.fillStyle = '#ECE7DD';
-  ctx.font = '700 40px "Anton", sans-serif';
-  ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 12;
-  ctx.fillText('C A S S E T E', W / 2, 84);
-  ctx.shadowBlur = 0;
+  ctx.font = '400 54px "Anton", sans-serif';
+  ctx.letterSpacing = '14px';
+  ctx.fillText('CASSETE', W / 2 + 7, 150);
+  ctx.letterSpacing = '0px';
+  if(kicker){
+    ctx.font = '600 26px "JetBrains Mono", monospace';
+    const w = ctx.measureText(kicker).width + 48;
+    ctx.fillStyle = 'rgba(236,231,221,0.10)';
+    ctxRoundRect(ctx, W / 2 - w / 2, 184, w, 50, 25);
+    ctx.fill();
+    ctx.fillStyle = '#D9C9A3';
+    ctx.fillText(kicker, W / 2, 218);
+  }
+}
 
-  // fitinha decorativa no topo com as bobinas
-  drawCassetteBody(ctx, W * 0.28, 108, W * 0.44, 140, hue);
+// rodapé: selo do app (o "call to action" de quem vê o story)
+function drawStoryFooter(ctx, line){
+  const W = CARD_W, H = CARD_H;
+  const pillW = 560, pillH = 88, y = H - 190;
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 8;
+  const pg = ctx.createLinearGradient(0, y, 0, y + pillH);
+  pg.addColorStop(0, '#DDB563'); pg.addColorStop(1, '#B0812E');
+  ctx.fillStyle = pg;
+  ctxRoundRect(ctx, W / 2 - pillW / 2, y, pillW, pillH, pillH / 2);
+  ctx.fill();
+  ctx.restore();
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#17161A';
+  ctx.font = '400 38px "Anton", sans-serif';
+  ctx.fillText('CASSETE.NETLIFY.APP', W / 2, y + 57);
+  ctx.fillStyle = 'rgba(236,231,221,0.62)';
+  ctx.font = '400 24px "JetBrains Mono", monospace';
+  ctx.fillText(line || 'seu diário de música · grátis', W / 2, y + pillH + 52);
+}
 
-  ctx.fillStyle = '#ECE7DD';
-  ctx.font = '700 34px "Anton", sans-serif';
-  ctx.fillText(`PLAYLIST ${label.toUpperCase()}`, W / 2, 304);
+// texto que encolhe até caber em maxLines linhas de largura maxWidth
+function fitLines(ctx, text, fontFor, startSize, minSize, maxWidth, maxLines){
+  for(let size = startSize; size >= minSize; size -= 4){
+    ctx.font = fontFor(size);
+    const lines = wrapCanvasText(ctx, text, maxWidth);
+    if(lines.length <= maxLines && lines.every(l => ctx.measureText(l).width <= maxWidth)) return { lines, size };
+  }
+  ctx.font = fontFor(minSize);
+  const lines = wrapCanvasText(ctx, text, maxWidth).slice(0, maxLines);
+  const last = lines.length - 1;
+  while(ctx.measureText(lines[last] + '…').width > maxWidth && lines[last].length > 1) lines[last] = lines[last].slice(0, -1);
+  if(wrapCanvasText(ctx, text, maxWidth).length > maxLines) lines[last] += '…';
+  return { lines, size: minSize };
+}
 
-  ctx.textAlign = 'left';
-  const shown = tracks.slice(0, 12);
-  shown.forEach((t, i)=>{
-    const rowY = headH + i * rowH;
-    if(i % 2 === 0){
-      ctx.fillStyle = 'rgba(255,255,255,0.03)';
-      ctx.fillRect(50, rowY, W - 100, rowH);
-    }
-    const y = rowY + rowH * 0.62;
+// a fita da foto do app, na cor da faixa, levemente torta, com o nome à mão
+async function drawPhotoCassette(ctx, cx, cy, w, hue, angleDeg, handwritten){
+  const img = await loadCassettePhoto();
+  const SRC = { x: 22, y: 30, w: 858, h: 542 }; // a fita dentro da foto de 900x600
+  const h = w * SRC.h / SRC.w;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(angleDeg * Math.PI / 180);
+  ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 60; ctx.shadowOffsetY = 34;
+  ctx.fillStyle = '#111';
+  ctxRoundRect(ctx, -w / 2, -h / 2, w, h, w * 0.03);
+  ctx.fill();
+  ctx.shadowColor = 'transparent';
+  ctx.save();
+  ctxRoundRect(ctx, -w / 2, -h / 2, w, h, w * 0.03);
+  ctx.clip();
+  if(img){
+    // mesmo filtro das fitas do app (o Safari ignora ctx.filter — fica na cor original)
+    if('filter' in ctx) ctx.filter = `hue-rotate(${hue}deg) saturate(1.5) contrast(1.05) brightness(1.03)`;
+    ctx.drawImage(img, SRC.x, SRC.y, SRC.w, SRC.h, -w / 2, -h / 2, w, h);
+    ctx.filter = 'none';
+  } else {
+    ctx.fillStyle = `hsl(${hue}deg,30%,20%)`;
+    ctx.fillRect(-w / 2, -h / 2, w, h);
+  }
+  ctx.restore();
 
-    ctx.fillStyle = '#D9A63C';
-    ctx.font = '700 26px "JetBrains Mono", monospace';
-    ctx.fillText(String(i+1).padStart(2,'0'), 74, y);
-
-    ctx.fillStyle = '#F3ECDA';
-    ctx.font = '600 30px "Spectral", serif';
-    let title = t.item.title;
-    if(ctx.measureText(title).width > 620){
-      while(ctx.measureText(title + '…').width > 620 && title.length > 0){ title = title.slice(0, -1); }
-      title += '…';
-    }
-    ctx.fillText(title, 138, y - 12);
-
-    ctx.fillStyle = '#9a9284';
-    ctx.font = '21px "JetBrains Mono", monospace';
-    ctx.fillText(t.item.artist, 138, y + 16);
-  });
-
-  if(tracks.length > 12){
-    ctx.fillStyle = '#9a9284';
-    ctx.font = '20px "JetBrains Mono", monospace';
+  if(handwritten){
+    ctx.save();
+    ctx.translate(w * 0.075, -h * 0.265);
+    ctx.rotate(-2 * Math.PI / 180);
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.fillStyle = '#16110A';
     ctx.textAlign = 'center';
-    ctx.fillText(`+ ${tracks.length - 12} faixas`, W/2, headH + 12 * rowH + 30);
+    const fit = fitLines(ctx, handwritten, s => `700 ${s}px "Caveat", cursive`, Math.round(w * 0.075), Math.round(w * 0.04), w * 0.5, 2);
+    const lh = fit.size * 0.95;
+    fit.lines.forEach((l, i) => ctx.fillText(l, 0, (i - (fit.lines.length - 1) / 2) * lh + fit.size * 0.32));
+    ctx.restore();
+  }
+  ctx.restore();
+  return h;
+}
+
+// estrelas desenhadas (o caractere ★ muda de tamanho/forma entre aparelhos)
+function drawStars(ctx, cx, cy, rating, size, color = '#E2B24C'){
+  const gap = size * 0.28, total = 5 * size + 4 * gap;
+  for(let i = 0; i < 5; i++){
+    const x = cx - total / 2 + i * (size + gap) + size / 2;
+    ctx.beginPath();
+    for(let k = 0; k < 10; k++){
+      const r = k % 2 === 0 ? size / 2 : size / 4.6;
+      const a = -Math.PI / 2 + k * Math.PI / 5;
+      ctx.lineTo(x + Math.cos(a) * r, cy + Math.sin(a) * r);
+    }
+    ctx.closePath();
+    if(i < rating){ ctx.fillStyle = color; ctx.fill(); }
+    else { ctx.strokeStyle = 'rgba(236,231,221,0.35)'; ctx.lineWidth = 3; ctx.stroke(); }
+  }
+}
+
+function cardDate(d = new Date()){
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' }).replace('.', '');
+}
+
+// card de uma música/álbum (com nota e resenha, se tiver)
+async function generateSongShareCard({ title, artist, rating, hue, note, username, typeLabel: kind, year, genre }){
+  await ensureCardFonts();
+  const { canvas, ctx } = newCard();
+  const W = CARD_W;
+  drawStoryBackground(ctx, hue, 0.30);
+  drawStoryHeader(ctx, username ? `@${username} registrou · ${cardDate()}` : `ouvindo agora · ${cardDate()}`);
+
+  const tapeH = await drawPhotoCassette(ctx, W / 2, 590, 900, hue, -3, title);
+  let y = 590 + tapeH / 2 + 110;
+
+  ctx.textAlign = 'center';
+  const eyebrow = [kind, year, genre].filter(Boolean).join(' · ').toUpperCase();
+  if(eyebrow){
+    ctx.fillStyle = '#E2B24C';
+    ctx.font = '600 26px "JetBrains Mono", monospace';
+    ctx.letterSpacing = '3px';
+    ctx.fillText(eyebrow, W / 2, y);
+    ctx.letterSpacing = '0px';
+    y += 30;
   }
 
-  drawAppCTA(ctx, W, H - footH/2 + 8);
+  ctx.fillStyle = '#F3ECDA';
+  const t = fitLines(ctx, title.toUpperCase(), s => `400 ${s}px "Anton", sans-serif`, 104, 60, W - 160, 2);
+  t.lines.forEach(l => { y += t.size * 1.02; ctx.fillText(l, W / 2, y); });
 
-  return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  ctx.fillStyle = 'rgba(236,231,221,0.78)';
+  const a = fitLines(ctx, artist || '', s => `italic 400 ${s}px "Spectral", serif`, 46, 30, W - 200, 1);
+  y += a.size + 22;
+  ctx.fillText(a.lines[0] || '', W / 2, y);
+
+  if(rating){
+    y += 82;
+    drawStars(ctx, W / 2, y - 18, rating, 62);
+  }
+
+  if(note){
+    y += 70;
+    const boxX = 90, boxW = W - 180;
+    ctx.font = 'italic 400 38px "Spectral", serif';
+    const q = fitLines(ctx, `“${note}”`, s => `italic 400 ${s}px "Spectral", serif`, 40, 30, boxW - 90, 5);
+    const lh = q.size * 1.38;
+    const boxH = q.lines.length * lh + 70;
+    const room = CARD_H - 300 - y;
+    if(boxH <= room){
+      ctx.fillStyle = 'rgba(236,231,221,0.07)';
+      ctxRoundRect(ctx, boxX, y, boxW, boxH, 26);
+      ctx.fill();
+      ctx.fillStyle = '#EDE6D6';
+      ctx.font = `italic 400 ${q.size}px "Spectral", serif`;
+      q.lines.forEach((l, i) => ctx.fillText(l, W / 2, y + 52 + i * lh + q.size * 0.3));
+    }
+  }
+
+  drawStoryFooter(ctx, 'registre o que você ouve · grátis');
+  return cardToBlob(canvas);
+}
+
+// playlist do período: fita com o nome do período escrito à mão + faixas
+async function generatePlaylistShareCard({ tracks, label, hue, username }){
+  await ensureCardFonts();
+  const { canvas, ctx } = newCard();
+  const W = CARD_W;
+  drawStoryBackground(ctx, hue, 0.2);
+  drawStoryHeader(ctx, username ? `a fita de @${username}` : cardDate());
+
+  const tapeH = await drawPhotoCassette(ctx, W / 2, 470, 640, hue, -2.5, `playlist ${label}`);
+  let y = 470 + tapeH / 2 + 90;
+
+  const shown = tracks.slice(0, 10);
+  const rowH = shown.length > 8 ? 92 : 104;
+  ctx.textAlign = 'left';
+  shown.forEach((tr, i) => {
+    const rowY = y + i * rowH;
+    ctx.fillStyle = '#E2B24C';
+    ctx.font = '400 50px "Anton", sans-serif';
+    ctx.fillText(String(i + 1).padStart(2, '0'), 110, rowY + 50);
+    ctx.fillStyle = '#F3ECDA';
+    const tl = fitLines(ctx, tr.item.title, s => `600 ${s}px "Spectral", serif`, 38, 28, 760, 1);
+    ctx.fillText(tl.lines[0], 210, rowY + 28);
+    ctx.fillStyle = 'rgba(236,231,221,0.6)';
+    const al = fitLines(ctx, tr.item.artist || '', s => `400 ${s}px "JetBrains Mono", monospace`, 24, 18, 760, 1);
+    ctx.fillText(al.lines[0] || '', 210, rowY + 66);
+    if(i < shown.length - 1){
+      ctx.fillStyle = 'rgba(236,231,221,0.08)';
+      ctx.fillRect(110, rowY + rowH - 12, W - 220, 2);
+    }
+  });
+  if(tracks.length > shown.length){
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(236,231,221,0.6)';
+    ctx.font = '400 26px "JetBrains Mono", monospace';
+    ctx.fillText(`+ ${tracks.length - shown.length} faixas na fita`, W / 2, y + shown.length * rowH + 30);
+  }
+
+  drawStoryFooter(ctx, 'monte a sua fita · grátis');
+  return cardToBlob(canvas);
+}
+
+// "recibo" das escutas do período (a trend dos recibos de música)
+async function generateReceiptShareCard({ tracks, label, username }){
+  await ensureCardFonts();
+  const { canvas, ctx } = newCard();
+  const W = CARD_W, H = CARD_H;
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, '#C79A46'); bg.addColorStop(1, '#8E6526');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  const shown = tracks.slice(0, 12);
+  const pX = 150, pW = W - 300, pY = 150;
+  const pH = 470 + shown.length * 62 + 170 + 200;
+  const mono = (s, wgt = 400) => `${wgt} ${s}px "JetBrains Mono", monospace`;
+
+  // papel térmico com borda serrilhada embaixo
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.35)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 18;
+  ctx.fillStyle = '#FBF8F1';
+  ctx.beginPath();
+  ctx.moveTo(pX, pY);
+  ctx.lineTo(pX + pW, pY);
+  ctx.lineTo(pX + pW, pY + pH);
+  const teeth = 26, tw = pW / teeth;
+  for(let i = teeth; i > 0; i--){
+    ctx.lineTo(pX + (i - 0.5) * tw, pY + pH + 18);
+    ctx.lineTo(pX + (i - 1) * tw, pY + pH);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  const ink = '#1E1A16';
+  const cx = W / 2;
+  let y = pY + 92;
+  ctx.fillStyle = ink;
+  ctx.textAlign = 'center';
+  ctx.font = '400 64px "Anton", sans-serif';
+  ctx.letterSpacing = '8px';
+  ctx.fillText('CASSETE', cx + 4, y);
+  ctx.letterSpacing = '0px';
+  y += 44;
+  ctx.font = mono(22);
+  ctx.fillText('RECIBO DE ESCUTA', cx, y);
+  y += 54;
+  ctx.textAlign = 'left';
+  ctx.font = mono(22);
+  ctx.fillText(`CLIENTE: @${(username || 'ouvinte').toUpperCase()}`, pX + 50, y);
+  y += 34;
+  ctx.fillText(`PERÍODO: ${label.toUpperCase()}`, pX + 50, y);
+  y += 34;
+  ctx.fillText(`EMITIDO: ${cardDate().toUpperCase()}`, pX + 50, y);
+  y += 30;
+
+  const dash = (yy) => { ctx.font = mono(22); ctx.textAlign = 'center'; ctx.fillText('-'.repeat(52), cx, yy); };
+  dash(y + 12); y += 54;
+  ctx.textAlign = 'left'; ctx.font = mono(20, 600);
+  ctx.fillText('QTD  ITEM', pX + 50, y);
+  ctx.textAlign = 'right';
+  ctx.fillText('NOTA', pX + pW - 50, y);
+  y += 20;
+  dash(y + 8); y += 46;
+
+  shown.forEach((tr, i) => {
+    ctx.textAlign = 'left';
+    ctx.font = mono(22, 600);
+    ctx.fillText(String(i + 1).padStart(2, '0'), pX + 50, y);
+    const tl = fitLines(ctx, tr.item.title.toUpperCase(), s => mono(s, 600), 22, 16, pW - 330, 1);
+    ctx.fillText(tl.lines[0], pX + 120, y);
+    ctx.font = mono(17);
+    const al = fitLines(ctx, tr.item.artist || '', s => mono(s), 17, 14, pW - 330, 1);
+    ctx.fillText(al.lines[0] || '', pX + 120, y + 25);
+    ctx.textAlign = 'right';
+    ctx.font = mono(22, 600);
+    const r = tr.entry ? tr.entry.rating : 0;
+    ctx.fillText(r ? `${r}/5` : '-', pX + pW - 50, y);
+    y += 62;
+  });
+
+  dash(y - 14); y += 28;
+  const total = tracks.length;
+  const rated = tracks.filter(tr => tr.entry && tr.entry.rating);
+  const avg = rated.length ? (rated.reduce((s, tr) => s + tr.entry.rating, 0) / rated.length).toFixed(1) : '-';
+  const artists = new Set(tracks.map(tr => tr.item.artist)).size;
+  [['TOTAL DE ESCUTAS', String(total)], ['ARTISTAS', String(artists)], ['NOTA MÉDIA', avg]].forEach(([k, v]) => {
+    ctx.textAlign = 'left'; ctx.font = mono(24, 600); ctx.fillText(k, pX + 50, y);
+    ctx.textAlign = 'right'; ctx.fillText(v, pX + pW - 50, y);
+    y += 40;
+  });
+  dash(y - 6); y += 40;
+
+  // código de barras de enfeite (fixo por pessoa+período, não muda a cada toque)
+  let seed = 0;
+  for(const ch of `${username}${label}${total}`) seed = (seed * 31 + ch.charCodeAt(0)) >>> 0;
+  const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  let bx = pX + 90;
+  while(bx < pX + pW - 90){
+    const bw = 2 + Math.floor(rand() * 5);
+    ctx.fillRect(bx, y, bw, 90);
+    bx += bw + 2 + Math.floor(rand() * 5);
+  }
+  y += 140;
+  ctx.textAlign = 'center';
+  ctx.font = mono(22);
+  ctx.fillText('OBRIGADO POR OUVIR ♥', cx, y);
+
+  drawStoryFooter(ctx, 'gere o seu recibo · grátis');
+  return cardToBlob(canvas);
+}
+
+async function generateStreakShareCard(streak, tier){
+  await ensureCardFonts();
+  const { canvas, ctx } = newCard();
+  const W = CARD_W;
+  drawStoryBackground(ctx, 30, 0.38);
+  drawStoryHeader(ctx, currentUser ? `@${currentUser.username} · ${cardDate()}` : cardDate());
+
+  const cx = W / 2, cy = 760, R = 360;
+  if(tier.glow){
+    const glow = ctx.createRadialGradient(cx, cy, R * 0.6, cx, cy, R * 1.5);
+    glow.addColorStop(0, `${tier.c1}66`);
+    glow.addColorStop(1, `${tier.c1}00`);
+    ctx.fillStyle = glow;
+    ctx.beginPath(); ctx.arc(cx, cy, R * 1.5, 0, Math.PI * 2); ctx.fill();
+  }
+  const ring = ctx.createConicGradient ? ctx.createConicGradient(0, cx, cy) : ctx.createLinearGradient(cx - R, cy - R, cx + R, cy + R);
+  ring.addColorStop(0, tier.c1); ring.addColorStop(0.5, tier.c2); ring.addColorStop(1, tier.c1);
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 60; ctx.shadowOffsetY = 26;
+  ctx.fillStyle = ring;
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(0,0,0,0.13)';
+  ctx.lineWidth = 2;
+  for(let rr = R * 0.34; rr < R * 0.94; rr += 13){ ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI * 2); ctx.stroke(); }
+  const shine = ctx.createLinearGradient(cx - R, cy - R, cx + R, cy + R);
+  shine.addColorStop(0.35, 'rgba(255,255,255,0)'); shine.addColorStop(0.5, 'rgba(255,255,255,0.16)'); shine.addColorStop(0.65, 'rgba(255,255,255,0)');
+  ctx.fillStyle = shine;
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+  ctx.save();
+  ctx.shadowColor = 'rgba(0,0,0,0.35)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 8;
+  ctx.fillStyle = '#F3ECDA';
+  ctx.beginPath(); ctx.arc(cx, cy, R * 0.34, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#17161A';
+  const numSize = String(streak).length > 2 ? 96 : 130;
+  ctx.font = `400 ${numSize}px "Anton", sans-serif`;
+  ctx.fillText(String(streak), cx, cy + numSize * 0.36);
+
+  ctx.fillStyle = '#F3ECDA';
+  ctx.font = '400 92px "Anton", sans-serif';
+  ctx.fillText(`${streak} ${streak === 1 ? 'DIA' : 'DIAS'} SEGUIDOS`, cx, cy + R + 150);
+  ctx.fillStyle = 'rgba(236,231,221,0.75)';
+  ctx.font = 'italic 400 40px "Spectral", serif';
+  ctx.fillText(`${tier.icon} registrando o que eu ouço, todo dia`, cx, cy + R + 215);
+
+  const milestones = [7, 30, 100, 365];
+  const next = milestones.find(m => m > streak);
+  const barY = cy + R + 300;
+  if(next){
+    const prev = [...milestones].reverse().find(m => m <= streak) || 0;
+    const pct = Math.max(0.05, (streak - prev) / (next - prev));
+    const barW = 680, barH = 24, barX = W / 2 - barW / 2;
+    ctx.fillStyle = 'rgba(255,255,255,0.10)';
+    ctxRoundRect(ctx, barX, barY, barW, barH, barH / 2); ctx.fill();
+    const fg = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+    fg.addColorStop(0, tier.c2); fg.addColorStop(1, tier.c1);
+    ctx.fillStyle = fg;
+    ctxRoundRect(ctx, barX, barY, Math.max(barH, barW * pct), barH, barH / 2); ctx.fill();
+    ctx.fillStyle = 'rgba(236,231,221,0.7)';
+    ctx.font = '600 26px "JetBrains Mono", monospace';
+    ctx.fillText(`próximo marco: ${next} dias · faltam ${next - streak}`, W / 2, barY + 80);
+  } else {
+    ctx.fillStyle = '#F2D06B';
+    ctx.font = '600 28px "JetBrains Mono", monospace';
+    ctx.fillText('todos os marcos conquistados', W / 2, barY + 30);
+  }
+
+  drawStoryFooter(ctx, 'quanto tempo você aguenta? · grátis');
+  return cardToBlob(canvas);
 }
 
 async function shareImageBlob(blob, { filename, shareTitle, shareText }){
@@ -4695,12 +5689,15 @@ async function shareImageBlob(blob, { filename, shareTitle, shareText }){
   showToast('imagem baixada — abra o Instagram/WhatsApp e poste manualmente.');
 }
 
-async function shareSongCard(item, rating, btn){
+async function shareSongCard(item, rating, btn, { note, username } = {}){
   if(!item) return;
   if(btn) btn.disabled = true;
   try{
     const hue = hueForItem(item);
-    const blob = await generateSongShareCard({ title: item.title, artist: item.artist, rating: rating || 0, hue });
+    const blob = await generateSongShareCard({
+      title: item.title, artist: item.artist, rating: rating || 0, hue, note, username,
+      typeLabel: typeLabel(item), year: item.year ? String(item.year) : '', genre: item.genre && item.genre !== 'Música' ? item.genre : '',
+    });
     await shareImageBlob(blob, {
       filename: 'cassete.png',
       shareTitle: `${item.title} — ${item.artist}`,
@@ -4880,7 +5877,7 @@ async function submitComment(idx){
 
 function renderDiary(){
   const body = document.getElementById('diary-body');
-  const laterHtml = currentUser ? listenLaterHtml() : '';
+  const laterHtml = currentUser ? (diary.length >= 3 ? wrappedEntryHtml().replace('id="wrappedOpenBtn"', 'id="wrappedOpenBtnDiary"') : '') + listenLaterHtml() : '';
   if(diary.length === 0){
     body.innerHTML = laterHtml + `<div class="empty">seu diário tá vazio — vá em <b>Pra Você</b> e registre sua primeira escuta.</div>`;
     bindListenLater(body);
@@ -4918,6 +5915,8 @@ function renderDiary(){
   }).join('') + `</div>`;
 
   bindListenLater(body);
+  const wrappedDiaryBtn = document.getElementById('wrappedOpenBtnDiary');
+  if(wrappedDiaryBtn) wrappedDiaryBtn.addEventListener('click', openWrapped);
   body.querySelectorAll('.diary-edit-btn').forEach(btn=>{
     btn.addEventListener('click', ()=> startEditDiaryEntry(Number(btn.dataset.id)));
   });
@@ -4996,109 +5995,6 @@ function renderStreakDisc(){
   `;
 }
 
-async function generateStreakShareCard(streak, tier){
-  const W = 1080, H = 1350;
-  const canvas = document.createElement('canvas');
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
-  const hue = 30;
-
-  drawCardBackground(ctx, W, H, hue);
-
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#ECE7DD';
-  ctx.font = '700 40px "Anton", sans-serif';
-  ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 12;
-  ctx.fillText('C A S S E T E', W/2, 110);
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = '#B5AFA2';
-  ctx.font = '22px "JetBrains Mono", monospace';
-  ctx.fillText('sequência de escuta', W/2, 148);
-
-  // disco grande no centro, com anel em degradê e brilho se aplicável
-  const cx = W/2, cy = 560, R = 320;
-  if(tier.glow){
-    const glow = ctx.createRadialGradient(cx, cy, R*0.6, cx, cy, R*1.45);
-    glow.addColorStop(0, `${tier.c1}55`);
-    glow.addColorStop(1, `${tier.c1}00`);
-    ctx.fillStyle = glow;
-    ctx.beginPath(); ctx.arc(cx, cy, R*1.45, 0, Math.PI*2); ctx.fill();
-  }
-  const ringGrad = ctx.createConicGradient ? ctx.createConicGradient(0, cx, cy) : null;
-  if(ringGrad){
-    ringGrad.addColorStop(0, tier.c1); ringGrad.addColorStop(0.5, tier.c2); ringGrad.addColorStop(1, tier.c1);
-    ctx.fillStyle = ringGrad;
-  } else {
-    const lg = ctx.createLinearGradient(cx-R, cy-R, cx+R, cy+R);
-    lg.addColorStop(0, tier.c1); lg.addColorStop(1, tier.c2);
-    ctx.fillStyle = lg;
-  }
-  ctx.save();
-  ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 18;
-  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.fill();
-  ctx.restore();
-
-  // grooves (sulcos concêntricos, efeito vinil)
-  ctx.strokeStyle = 'rgba(0,0,0,0.12)';
-  ctx.lineWidth = 2;
-  for(let rr = R*0.32; rr < R*0.92; rr += 14){
-    ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI*2); ctx.stroke();
-  }
-
-  // centro claro com o número
-  ctx.save();
-  ctx.shadowColor = 'rgba(0,0,0,0.35)'; ctx.shadowBlur = 20; ctx.shadowOffsetY = 8;
-  ctx.fillStyle = '#F3ECDA';
-  ctx.beginPath(); ctx.arc(cx, cy, R*0.32, 0, Math.PI*2); ctx.fill();
-  ctx.restore();
-
-  ctx.fillStyle = '#17161A';
-  ctx.font = '700 96px "Anton", sans-serif';
-  ctx.fillText(String(streak), cx, cy + 32);
-
-  ctx.font = '46px sans-serif';
-  ctx.fillText(tier.icon, cx, cy - R*0.32 - 26);
-
-  ctx.fillStyle = '#ECE7DD';
-  ctx.font = '700 34px "Anton", sans-serif';
-  ctx.fillText(`${streak} ${tier.label === 'lendário' ? 'DIAS · LENDÁRIO' : 'DIAS SEGUIDOS'}`, cx, cy + R + 70);
-
-  // barra de progresso até o próximo marco (7 / 30 / 100 / 365 dias)
-  const milestones = [7, 30, 100, 365];
-  const next = milestones.find(m => m > streak);
-  if(next){
-    const prev = [...milestones].reverse().find(m => m <= streak) || 0;
-    const pct = Math.max(0.04, (streak - prev) / (next - prev));
-    const barW = 560, barH = 20, barX = W/2 - barW/2, barY = cy + R + 128;
-
-    ctx.fillStyle = 'rgba(255,255,255,0.09)';
-    ctxRoundRect(ctx, barX, barY, barW, barH, barH/2);
-    ctx.fill();
-
-    const fillGrad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
-    fillGrad.addColorStop(0, tier.c2);
-    fillGrad.addColorStop(1, tier.c1);
-    ctx.fillStyle = fillGrad;
-    ctxRoundRect(ctx, barX, barY, Math.max(barH, barW * pct), barH, barH/2);
-    ctx.fill();
-
-    ctx.fillStyle = '#B5AFA2';
-    ctx.font = '600 21px "JetBrains Mono", monospace';
-    ctx.fillText(`próximo marco: ${next} dias · faltam ${next - streak}`, W/2, barY + barH + 38);
-  } else {
-    ctx.fillStyle = '#F2D06B';
-    ctx.font = '600 22px "JetBrains Mono", monospace';
-    ctx.fillText('todos os marcos conquistados', W/2, cy + R + 150);
-  }
-
-  drawAppCTA(ctx, W, H - 96);
-  ctx.fillStyle = 'rgba(236,231,221,0.4)';
-  ctx.font = '16px "JetBrains Mono", monospace';
-  ctx.fillText('registre suas escutas todo dia e mantenha sua sequência', W/2, H - 30);
-
-  return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-}
-
 async function shareStreak(btn){
   const streak = computeStreak();
   const tier = streakTier(streak);
@@ -5168,6 +6064,7 @@ function renderPlaylistForPeriod(days){
       }).join('')}
       <div class="playlist-actions-row">
         <button id="playlistShareBtn" type="button">compartilhar playlist</button>
+        <button id="playlistReceiptBtn" type="button">🧾 recibo</button>
       </div>
     </div>
   `;
@@ -5178,6 +6075,18 @@ function renderPlaylistForPeriod(days){
 
   const shareBtn = document.getElementById('playlistShareBtn');
   if(shareBtn) shareBtn.addEventListener('click', ()=> sharePlaylist(tracks, label, shareBtn));
+  const receiptBtn = document.getElementById('playlistReceiptBtn');
+  if(receiptBtn) receiptBtn.addEventListener('click', async ()=>{
+    receiptBtn.disabled = true;
+    try{
+      const blob = await generateReceiptShareCard({ tracks, label, username: currentUser && currentUser.username });
+      await shareImageBlob(blob, { filename: 'cassete-recibo.png', shareTitle: `Meu recibo de escuta ${label}`, shareText: `🧾 meu recibo de escuta ${label} no Cassete` });
+    }catch(e){
+      showToast('não deu pra gerar o recibo agora.', true);
+    }finally{
+      receiptBtn.disabled = false;
+    }
+  });
 }
 
 function togglePlaylistPreview(idx, tracks){
@@ -5210,7 +6119,7 @@ async function sharePlaylist(tracks, label, btn){
   if(btn) btn.disabled = true;
   try{
     const hue = tracks.length ? hueForItem(tracks[0].item) : 30;
-    const blob = await generatePlaylistShareCard({ tracks, label, hue });
+    const blob = await generatePlaylistShareCard({ tracks, label, hue, username: currentUser && currentUser.username });
     await shareImageBlob(blob, {
       filename: 'cassete-playlist.png',
       shareTitle: `Playlist ${label} no Cassete`,
@@ -5412,6 +6321,7 @@ async function renderProfile(){
       </div>
     ` : ''}
     ${renderStreakDisc()}
+    ${wrappedEntryHtml()}
     <div class="account-card">
       <div class="ac-avatar-row">
         <div class="ac-avatar" id="acAvatar" style="${currentUser.avatar ? `background-image:url(${currentUser.avatar})` : ''}">${currentUser.avatar ? '' : currentUser.username[0].toUpperCase()}</div>
@@ -5483,6 +6393,8 @@ async function renderProfile(){
 
     ${statsCardHtml()}
 
+    ${badgesHtml()}
+
     <div class="field-label" style="margin-bottom:12px;">estante</div>
     <div class="shelf">
       ${diary.length ? [...diary].sort((x,y)=>y.date-x.date).map((e, idx)=>{
@@ -5519,6 +6431,8 @@ async function renderProfile(){
 
   hydrateArt([lastAlbum, ...diary.map(e => getItem(e.itemId))].filter(Boolean));
   bindFavorites(body);
+  const wrappedBtn = document.getElementById('wrappedOpenBtn');
+  if(wrappedBtn) wrappedBtn.addEventListener('click', openWrapped);
 
   document.getElementById('avatarBtn').addEventListener('click', ()=>{
     document.getElementById('avatarInput').click();
@@ -5996,6 +6910,7 @@ document.getElementById('logBtn').addEventListener('click', async ()=>{
     }
   }
   const streakBefore = computeStreak();
+  const wasDaily = isTodaysDaily(pendingAlbum.id);
   diary.push(localEntry);
   const streakAfter = computeStreak();
   closeDrawer();
@@ -6003,7 +6918,16 @@ document.getElementById('logBtn').addEventListener('click', async ()=>{
   renderProfile();
   renderFeed();
   renderReviews();
-  switchView('diary');
+  if(wasDaily){
+    switchView('foryou');
+    const fs = document.getElementById('feedScroll');
+    if(fs) fs.scrollTo({ top: 0 });
+    loadDailyStats(true);
+    showToast('☀️ nota registrada — veja o que a comunidade achou!');
+  } else {
+    switchView('diary');
+  }
+  checkNewBadges();
   if(streakAfter > streakBefore){
     const milestone = [7, 30, 100, 365].includes(streakAfter);
     showToast(milestone

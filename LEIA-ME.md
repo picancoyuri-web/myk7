@@ -34,6 +34,19 @@ Use um *Persistent Disk* e aponte `DB_PATH` pra ele, senão o banco é apagado a
 O `_redirects` (proxy da API) e o `_headers` (cache) já estão dentro dela — confira se a URL
 do backend no `_redirects` é a do seu serviço no Render.
 
+## Atualização de outubro/2026 (2)
+
+- **Disco do Dia:** todo mundo recebe o mesmo disco no mesmo dia (66 discos curados, ordem fixa).
+  A nota da comunidade (média + distribuição) só aparece depois que você dá a sua; tem contagem
+  regressiva pro próximo, sequência de dias seguidos e trecho pra ouvir (buscado no iTunes).
+- **Conquistas:** 20 metas com barra de progresso (escutas, resenhas, estilos, sequências, disco do
+  dia, coruja/madrugador...). Ao desbloquear, aparece um aviso comemorando.
+- **Retrospectiva:** stories em tela cheia com o seu mês (fitas, artista e estilo nº 1, nota média,
+  a fita do período) terminando na sua personalidade musical — com card pra postar.
+- **Imagens pro Instagram refeitas:** formato Story (1080×1920), com a foto real da fita na cor da
+  faixa e o nome escrito à mão no rótulo, @usuário, resenha e estrelas. Novo card **recibo** das
+  escutas do período (botão 🧾 na playlist). As fontes agora carregam antes de desenhar.
+
 ## Atualização de outubro/2026
 
 ### Novidades
