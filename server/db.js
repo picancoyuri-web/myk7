@@ -201,4 +201,48 @@ CREATE TABLE IF NOT EXISTS spotify_tokens (
 );
 `);
 
+// MOMENTOS: foto + a música que estava tocando naquela hora. A foto fica em
+// base64 como as outras e sai por URL com cache (/api/posts/:id/photo).
+db.exec(`
+CREATE TABLE IF NOT EXISTS posts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  photo TEXT NOT NULL,
+  photo_w INTEGER,
+  photo_h INTEGER,
+  caption TEXT,
+  item_id TEXT NOT NULL,
+  item_type TEXT,
+  item_title TEXT NOT NULL,
+  item_artist TEXT,
+  item_genre TEXT,
+  item_year TEXT,
+  item_preview_url TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_posts_user ON posts(user_id, id);
+
+CREATE TABLE IF NOT EXISTS post_likes (
+  post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (post_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS post_comments (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  text TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_post_comments_post ON post_comments(post_id, id);
+`);
+
+// notificação de curtida/comentário num momento aponta pro post
+const notificationColumns = db.prepare("PRAGMA table_info(notifications)").all().map(c => c.name);
+if(!notificationColumns.includes('post_id')){
+  db.exec('ALTER TABLE notifications ADD COLUMN post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE');
+}
+
 module.exports = db;

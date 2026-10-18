@@ -6,7 +6,7 @@ const { cleanString } = require('../utils/validate');
 
 const router = express.Router();
 
-const TARGET_TYPES = new Set(['user', 'entry', 'comment', 'message']);
+const TARGET_TYPES = new Set(['user', 'entry', 'comment', 'message', 'post', 'post_comment']);
 const REASONS = new Set(['spam', 'assedio', 'discurso_de_odio', 'conteudo_impróprio', 'direitos_autorais', 'outro']);
 
 const reportLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 20, message: 'muitas denúncias seguidas — tente de novo mais tarde.' });

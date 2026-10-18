@@ -22,6 +22,7 @@ const creditsRoutes = require('./routes/credits');
 const artistInfoRoutes = require('./routes/artistinfo');
 const reportRoutes = require('./routes/reports');
 const spotifyRoutes = require('./routes/spotify');
+const postRoutes = require('./routes/posts');
 const { checkMemories } = require('./utils/reminders');
 const app = express();
 
@@ -90,6 +91,7 @@ app.use('/api/credits', creditsRoutes);
 app.use('/api/artist-info', artistInfoRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/spotify', spotifyRoutes);
+app.use('/api/posts', postRoutes);
 
 // rota de API que não existe: responde JSON (e não a página HTML do front)
 app.use('/api', (req, res) => {
@@ -127,7 +129,7 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => {
-  console.log(`Cassete backend rodando em http://localhost:${PORT}`);
+  console.log(`MyK7 backend rodando em http://localhost:${PORT}`);
 
   // roda uma vez ao subir o servidor e depois a cada 24h, criando
   // notificações de "memória" pra entradas de diário de 1 ano atrás

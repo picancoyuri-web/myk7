@@ -10,10 +10,12 @@ const router = express.Router();
 const SELECT = `
   SELECT n.*, u.username AS actor_username, u.avatar_v AS actor_avatar_v,
          (u.avatar IS NOT NULL) AS actor_has_avatar,
-         e.item_title AS entry_title, e.item_artist AS entry_artist
+         COALESCE(e.item_title, p.item_title) AS entry_title,
+         COALESCE(e.item_artist, p.item_artist) AS entry_artist
   FROM notifications n
   LEFT JOIN users u ON u.id = n.actor_id
   LEFT JOIN diary_entries e ON e.id = n.entry_id
+  LEFT JOIN posts p ON p.id = n.post_id
 `;
 
 function serializeNotification(row){
@@ -27,6 +29,7 @@ function serializeNotification(row){
     entryId: row.entry_id || null,
     entry: row.entry_title ? { title: row.entry_title, artist: row.entry_artist } : null,
     commentId: row.comment_id || null,
+    postId: row.post_id || null,
     read: !!row.read,
     createdAt: toIso(row.created_at),
   };

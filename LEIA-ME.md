@@ -34,6 +34,28 @@ Use um *Persistent Disk* e aponte `DB_PATH` pra ele, senão o banco é apagado a
 O `_redirects` (proxy da API) e o `_headers` (cache) já estão dentro dela — confira se a URL
 do backend no `_redirects` é a do seu serviço no Render.
 
+## Atualização de outubro/2026 (3) — MyK7
+
+- **Nova identidade MyK7:** logo desenhada em SVG (fita + "My" escrito à mão + "K7"), que segue a
+  cor do tema — clara no escuro, escura e cor de ferrugem no claro. Os carretéis da logo giram
+  enquanto alguma música toca. Ícones do app, favicon, manifest e cards de Story com a marca nova.
+- **Momentos (aba nova):** poste uma foto junto com a música que estava tocando. Filtros (Fita,
+  Desbotado, P&B, Noite), busca da música ou sugestão do que acabou de tocar / do seu diário, legenda.
+  No feed, um toque na foto toca a música, dois toques curtem; "som automático" toca cada momento
+  ao aparecer na tela. Curtidas, comentários, notificações, grade de momentos no perfil e card de
+  Story em polaroid. Rotas novas em `/api/posts` (tabelas `posts`, `post_likes`, `post_comments`
+  — só acrescentam, o banco antigo continua valendo).
+- **Música começa bem mais rápido:** um toca-fitas único reaproveita os `<audio>` do app, já baixa
+  as próximas fitas do feed antes delas aparecerem (~50 ms pra começar, antes 0,3–1,7 s) e destrava
+  o autoplay do iPhone no primeiro toque. O feed de **álbuns agora toca** (antes nunca tocava: o
+  iTunes não manda prévia de álbum — o app busca a faixa mais ouvida dele). O feed começa a buscar
+  junto com o login (antes esperava a sessão), as buscas ficam em cache (navegador 30 min,
+  servidor 6 h) e o servidor do Render é "acordado" logo no primeiro byte da página.
+- **Mais leve:** o `index.html` caiu de 687 KB pra ~400 KB (as imagens em base64 viraram arquivos
+  em cache). O service worker antigo nunca funcionava (era criado via `blob:`); agora é o `sw.js`.
+- Correções: botão de play invisível no tema claro, botões claros sobre fundo claro, sino de
+  notificações caindo de linha no celular, ✕ dos modais fora do lugar.
+
 ## Atualização de outubro/2026 (2)
 
 - **Disco do Dia:** todo mundo recebe o mesmo disco no mesmo dia (66 discos curados, ordem fixa).
