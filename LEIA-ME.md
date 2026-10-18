@@ -24,15 +24,42 @@ com pessoas e escutas de exemplo (login: `voce.ouve` / `cassete123`).
 
 ## Deploy
 
-**Render (backend):** Root Directory `cassete-v2/server` · Build `npm install` · Start `npm start`.
-Variáveis: `JWT_SECRET`, `FRONTEND_ORIGIN=https://cassete.netlify.app`, `DISCOGS_TOKEN`, SMTP (opcional).
-O banco antigo funciona sem perder nada: as mudanças no banco só acrescentam colunas.
+**Render (backend):** Root Directory `server` · Build `npm install` · Start `npm start`.
+Variáveis: `JWT_SECRET`, `FRONTEND_ORIGIN=https://cassete.netlify.app`, `DISCOGS_TOKEN`,
+`SPOTIFY_CLIENT_ID` + `SPOTIFY_CLIENT_SECRET` (opcional) e SMTP (opcional) — todas explicadas em `server/.env.example`.
+O banco antigo funciona sem perder nada: as mudanças no banco só acrescentam colunas e tabelas.
 Use um *Persistent Disk* e aponte `DB_PATH` pra ele, senão o banco é apagado a cada deploy.
 
-**Netlify (frontend):** publique a pasta `cassete-v2/web/`. O `_redirects` (proxy da API) e o
-`_headers` (cache) já estão dentro dela.
+**Netlify (frontend):** Base directory `web` · Publish directory `web` · sem build command.
+O `_redirects` (proxy da API) e o `_headers` (cache) já estão dentro dela — confira se a URL
+do backend no `_redirects` é a do seu serviço no Render.
 
-## O que mudou
+## Atualização de outubro/2026
+
+### Novidades
+- **Quero ouvir:** botão "＋ quero ouvir" na ficha de qualquer disco; a lista fica no topo do Diário,
+  com ★ pra registrar e ✕ pra tirar. Registrar a escuta tira o disco da lista sozinho.
+- **4 favoritos no perfil:** escolha seus 4 discos/músicas (do seu diário ou pelo "♡ favoritar" na
+  ficha). Aparecem também no seu perfil pra quem te visita.
+- **Seus números:** resenhas, artistas, dias ouvindo, escutas por mês, artistas mais registrados e
+  distribuição das suas notas.
+- **Resenhas de todo mundo:** quando acaba o feed de quem você segue, a aba Resenhas continua com as
+  resenhas recentes da comunidade real (antes só apareciam as de exemplo).
+- **Bloquear, denunciar e Spotify funcionando:** os botões já existiam no app, mas as rotas não
+  existiam no servidor. Bloquear desfaz o follow, impede mensagens e esconde a pessoa das listas.
+- **Bio do perfil** agora é salva de verdade (antes o servidor ignorava).
+- No perfil, as configurações da conta foram pro fim, depois do conteúdo.
+
+### Correções
+- Escutas achadas pela busca/feed (iTunes) quebravam o Diário e o Perfil depois de reabrir o app,
+  e a ficha desses discos não abria.
+- Registrar uma escuta com o servidor fora do ar fingia que tinha salvo; agora mostra o erro.
+- Nomes ilegíveis (texto preto no fundo escuro) em Pessoas e Mensagens; vários textos com pouco
+  contraste no tema claro.
+- Títulos, artistas e estilos de outras pessoas agora são escapados no HTML (antes dava pra injetar
+  código num perfil ou resenha).
+
+## O que mudou na v2
 
 ### Frontend
 - **De 1 arquivo de 563 KB para módulos pequenos.** As imagens em base64 saíram do HTML.

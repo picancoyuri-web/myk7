@@ -4,9 +4,10 @@ const db = require('../db');
 const requireAuth = require('../middleware/requireAuth');
 const { serializeUser, serializePublicUser, parseGenres, findUserByUsername: findUser, PUBLIC_COLUMNS } = require('../utils/serialize');
 const { createNotification } = require('../utils/notify');
-const { cleanString, isValidDataImage, escapeLike } = require('../utils/validate');
+const { cleanString, isValidDataImage, escapeLike, cleanItemSnapshot } = require('../utils/validate');
 const { sendDataImage } = require('../utils/image');
 const { cookieOpts } = require('../utils/cookies');
+const { isBlockedEither, notBlockedSql } = require('../utils/blocks');
 
 const router = express.Router();
 
@@ -22,17 +23,17 @@ router.get('/', requireAuth, (req, res) => {
   const search = String(req.query.search || '').trim().slice(0, 50);
   const rows = search
     ? db.prepare(
-        `SELECT ${PUBLIC_COLUMNS} FROM users u WHERE u.username LIKE ? ESCAPE '\\' AND u.id != ? ORDER BY u.username LIMIT 50`
-      ).all(`%${escapeLike(search)}%`, req.user.id)
+        `SELECT ${PUBLIC_COLUMNS} FROM users u WHERE u.username LIKE @q ESCAPE '\\' AND u.id != @me AND ${notBlockedSql('u.id')} ORDER BY u.username LIMIT 50`
+      ).all({ q: `%${escapeLike(search)}%`, me: req.user.id })
     : db.prepare(
-        `SELECT ${PUBLIC_COLUMNS} FROM users u WHERE u.id != ? ORDER BY u.created_at DESC LIMIT 50`
-      ).all(req.user.id);
+        `SELECT ${PUBLIC_COLUMNS} FROM users u WHERE u.id != @me AND ${notBlockedSql('u.id')} ORDER BY u.created_at DESC LIMIT 50`
+      ).all({ me: req.user.id });
   res.json({ users: rows.map(serializePublicUser) });
 });
 
 // precisa vir antes de "/:username" pra "me" não ser tratado como nome de usuário
 router.patch('/me', requireAuth, (req, res) => {
-  const { avatar, nationality, genres } = req.body || {};
+  const { avatar, nationality, genres, bio, favorites } = req.body || {};
   const fields = [];
   const values = [];
 
@@ -46,6 +47,16 @@ router.patch('/me', requireAuth, (req, res) => {
     const n = cleanString(nationality, 60);
     if(!n) return res.status(400).json({ error: 'nacionalidade inválida.' });
     fields.push('nationality = ?'); values.push(n);
+  }
+  if(bio !== undefined){
+    // vazio apaga a bio
+    fields.push('bio = ?'); values.push(cleanString(bio, 160));
+  }
+  if(favorites !== undefined){
+    if(!Array.isArray(favorites)) return res.status(400).json({ error: 'favoritos inválidos.' });
+    const list = favorites.map(cleanItemSnapshot).filter(Boolean);
+    const unique = list.filter((f, i) => list.findIndex(x => x.itemId === f.itemId) === i).slice(0, 4);
+    fields.push('favorites = ?'); values.push(JSON.stringify(unique));
   }
   if(genres !== undefined){
     if(!Array.isArray(genres)) return res.status(400).json({ error: 'estilos inválidos.' });
@@ -82,6 +93,46 @@ router.delete('/me', requireAuth, async (req, res, next) => {
   }
 });
 
+// lista "quero ouvir" da pessoa logada
+function serializeLater(r){
+  return {
+    itemId: r.item_id, type: r.item_type, title: r.item_title, artist: r.item_artist,
+    genre: r.item_genre, year: r.item_year, previewUrl: r.item_preview_url,
+    addedAt: r.created_at ? r.created_at.replace(' ', 'T') + 'Z' : null,
+  };
+}
+
+router.get('/me/listen-later', requireAuth, (req, res) => {
+  const rows = db.prepare('SELECT * FROM listen_later WHERE user_id = ? ORDER BY created_at DESC, rowid DESC LIMIT 300').all(req.user.id);
+  res.json({ items: rows.map(serializeLater) });
+});
+
+router.post('/me/listen-later', requireAuth, (req, res) => {
+  const it = cleanItemSnapshot(req.body);
+  if(!it) return res.status(400).json({ error: 'faltam dados desse disco.' });
+  const count = db.prepare('SELECT COUNT(*) n FROM listen_later WHERE user_id = ?').get(req.user.id).n;
+  if(count >= 300) return res.status(400).json({ error: 'sua lista "quero ouvir" está cheia (300).' });
+  db.prepare(`
+    INSERT OR IGNORE INTO listen_later (user_id, item_id, item_type, item_title, item_artist, item_genre, item_year, item_preview_url)
+    VALUES (?,?,?,?,?,?,?,?)
+  `).run(req.user.id, it.itemId, it.type, it.title, it.artist, it.genre, it.year, it.previewUrl);
+  const row = db.prepare('SELECT * FROM listen_later WHERE user_id = ? AND item_id = ?').get(req.user.id, it.itemId);
+  res.status(201).json({ item: serializeLater(row) });
+});
+
+router.delete('/me/listen-later/:itemId', requireAuth, (req, res) => {
+  db.prepare('DELETE FROM listen_later WHERE user_id = ? AND item_id = ?').run(req.user.id, String(req.params.itemId));
+  res.status(204).end();
+});
+
+// quem a pessoa logada bloqueou
+router.get('/me/blocked', requireAuth, (req, res) => {
+  const rows = db.prepare(
+    `SELECT ${PUBLIC_COLUMNS} FROM blocks b JOIN users u ON u.id = b.blocked_id WHERE b.blocker_id = ? ORDER BY b.created_at DESC`
+  ).all(req.user.id);
+  res.json({ users: rows.map(serializePublicUser) });
+});
+
 router.get('/:username/avatar', (req, res) => {
   const row = db.prepare('SELECT avatar FROM users WHERE username = ? COLLATE NOCASE').get(String(req.params.username));
   if(!row || !row.avatar) return res.status(404).json({ error: 'sem foto.' });
@@ -98,6 +149,7 @@ router.post('/:username/follow', requireAuth, (req, res) => {
   const target = findUser(req.params.username);
   if(!target) return res.status(404).json({ error: 'pessoa não encontrada.' });
   if(target.id === req.user.id) return res.status(400).json({ error: 'você não pode seguir a si mesmo.' });
+  if(isBlockedEither(req.user.id, target.id)) return res.status(403).json({ error: 'não dá pra seguir essa pessoa.' });
 
   const info = db.prepare('INSERT OR IGNORE INTO follows (follower_id, followee_id) VALUES (?,?)').run(req.user.id, target.id);
   if(info.changes > 0){
@@ -112,6 +164,27 @@ router.delete('/:username/follow', requireAuth, (req, res) => {
 
   db.prepare('DELETE FROM follows WHERE follower_id = ? AND followee_id = ?').run(req.user.id, target.id);
   res.json({ user: serializePublicUser(target) });
+});
+
+// bloquear desfaz o follow nos dois sentidos e impede mensagens e novos follows
+router.post('/:username/block', requireAuth, (req, res) => {
+  const target = findUser(req.params.username);
+  if(!target) return res.status(404).json({ error: 'pessoa não encontrada.' });
+  if(target.id === req.user.id) return res.status(400).json({ error: 'você não pode bloquear a si mesmo.' });
+
+  db.transaction(() => {
+    db.prepare('INSERT OR IGNORE INTO blocks (blocker_id, blocked_id) VALUES (?,?)').run(req.user.id, target.id);
+    db.prepare('DELETE FROM follows WHERE (follower_id = ? AND followee_id = ?) OR (follower_id = ? AND followee_id = ?)')
+      .run(req.user.id, target.id, target.id, req.user.id);
+  })();
+  res.status(204).end();
+});
+
+router.delete('/:username/block', requireAuth, (req, res) => {
+  const target = findUser(req.params.username);
+  if(!target) return res.status(404).json({ error: 'pessoa não encontrada.' });
+  db.prepare('DELETE FROM blocks WHERE blocker_id = ? AND blocked_id = ?').run(req.user.id, target.id);
+  res.status(204).end();
 });
 
 // compatibilidade musical entre a pessoa logada e outra pessoa. Combina

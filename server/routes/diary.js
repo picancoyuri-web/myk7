@@ -8,6 +8,7 @@ const { findUserByUsername, avatarUrl, commentPhotoUrl } = require('../utils/ser
 const { sendDataImage } = require('../utils/image');
 const rateLimit = require('../utils/rateLimit');
 const { cleanString, isValidDataImage, isHttpsUrl, cleanSpotifyRef, parseId } = require('../utils/validate');
+const { notBlockedSql } = require('../utils/blocks');
 
 const router = express.Router();
 
@@ -170,6 +171,7 @@ router.post('/', requireAuth, writeLimiter, (req, res) => {
   );
 
   const row = db.prepare('SELECT * FROM diary_entries WHERE id = ?').get(info.lastInsertRowid);
+  db.prepare('DELETE FROM listen_later WHERE user_id = ? AND item_id = ?').run(req.user.id, cleanItemId);
 
   // avisa quem segue essa pessoa que ela registrou uma escuta nova
   const followers = db.prepare('SELECT follower_id FROM follows WHERE followee_id = ?').all(req.user.id);
@@ -197,11 +199,12 @@ router.get('/feed', requireAuth, (req, res) => {
     SELECT e.*, ${AUTHOR_COLUMNS} FROM diary_entries e
     JOIN users u ON u.id = e.user_id
     JOIN follows f ON f.followee_id = e.user_id
-    WHERE f.follower_id = ? AND e.note IS NOT NULL AND e.note != ''
-      ${before ? 'AND e.id < ?' : ''}
+    WHERE f.follower_id = @me AND e.note IS NOT NULL AND e.note != ''
+      AND ${notBlockedSql('e.user_id')}
+      ${before ? 'AND e.id < @before' : ''}
     ORDER BY e.id DESC
-    LIMIT ?
-  `).all(...(before ? [req.user.id, before, limit] : [req.user.id, limit]));
+    LIMIT @limit
+  `).all({ me: req.user.id, before, limit });
   const entries = serializeEntries(rows, req.user.id, { withUser: true });
   res.json({ entries, nextCursor: rows.length === limit ? rows[rows.length - 1].id : null });
 });
@@ -214,10 +217,11 @@ router.get('/recent', requireAuth, (req, res) => {
     SELECT e.*, ${AUTHOR_COLUMNS} FROM diary_entries e
     JOIN users u ON u.id = e.user_id
     WHERE e.note IS NOT NULL AND e.note != ''
-      ${before ? 'AND e.id < ?' : ''}
+      AND ${notBlockedSql('e.user_id')}
+      ${before ? 'AND e.id < @before' : ''}
     ORDER BY e.id DESC
-    LIMIT ?
-  `).all(...(before ? [before, limit] : [limit]));
+    LIMIT @limit
+  `).all({ me: req.user.id, before, limit });
   const entries = serializeEntries(rows, req.user.id, { withUser: true });
   res.json({ entries, nextCursor: rows.length === limit ? rows[rows.length - 1].id : null });
 });

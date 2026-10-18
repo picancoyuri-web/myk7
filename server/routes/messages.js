@@ -5,6 +5,7 @@ const rateLimit = require('../utils/rateLimit');
 const { toIso } = require('../utils/time');
 const { cleanString, parseId } = require('../utils/validate');
 const { findUserByUsername, avatarUrl } = require('../utils/serialize');
+const { isBlockedEither, notBlockedSql } = require('../utils/blocks');
 
 const router = express.Router();
 
@@ -38,7 +39,7 @@ router.get('/', requireAuth, (req, res) => {
       SELECT MAX(id) FROM messages
       WHERE from_id = @me OR to_id = @me
       GROUP BY CASE WHEN from_id = @me THEN to_id ELSE from_id END
-    )
+    ) AND ${notBlockedSql('u.id')}
     ORDER BY m.id DESC
   `).all({ me });
 
@@ -90,6 +91,10 @@ router.post('/:username', requireAuth, sendLimiter, (req, res) => {
   const other = findUserByUsername(req.params.username);
   if(!other) return res.status(404).json({ error: 'pessoa não encontrada.' });
   if(other.id === req.user.id) return res.status(400).json({ error: 'você não pode mandar mensagem pra si mesmo.' });
+
+  if(isBlockedEither(req.user.id, other.id)){
+    return res.status(403).json({ error: 'não dá pra mandar mensagem pra essa pessoa.' });
+  }
 
   const text = cleanString((req.body || {}).text, MESSAGE_MAX);
   if(!text) return res.status(400).json({ error: 'escreva uma mensagem.' });

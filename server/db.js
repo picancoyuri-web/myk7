@@ -127,6 +127,16 @@ if(!userColumns.includes('session_version')){
 
 // versão da foto de perfil — entra na URL da foto (?v=) pra o navegador
 // poder guardar a imagem em cache e mesmo assim pegar a nova quando ela muda
+// biografia curta do perfil
+if(!userColumns.includes('bio')){
+  db.exec('ALTER TABLE users ADD COLUMN bio TEXT');
+}
+
+// os 4 discos favoritos do perfil (JSON com o resumo de cada um)
+if(!userColumns.includes('favorites')){
+  db.exec("ALTER TABLE users ADD COLUMN favorites TEXT NOT NULL DEFAULT '[]'");
+}
+
 if(!userColumns.includes('avatar_v')){
   db.exec('ALTER TABLE users ADD COLUMN avatar_v INTEGER NOT NULL DEFAULT 0');
 }
@@ -149,6 +159,46 @@ CREATE INDEX IF NOT EXISTS idx_users_username_nocase ON users(username COLLATE N
 CREATE INDEX IF NOT EXISTS idx_users_email_nocase ON users(email COLLATE NOCASE);
 CREATE INDEX IF NOT EXISTS idx_messages_unread ON messages(to_id, read_at);
 CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows(follower_id);
+`);
+
+// bloqueios, denúncias e a conexão com o Spotify
+db.exec(`
+CREATE TABLE IF NOT EXISTS blocks (
+  blocker_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  blocked_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (blocker_id, blocked_id)
+);
+CREATE INDEX IF NOT EXISTS idx_blocks_blocked ON blocks(blocked_id);
+
+CREATE TABLE IF NOT EXISTS reports (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  reporter_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  target_type TEXT NOT NULL,
+  target_id TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS listen_later (
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  item_id TEXT NOT NULL,
+  item_type TEXT,
+  item_title TEXT,
+  item_artist TEXT,
+  item_genre TEXT,
+  item_year TEXT,
+  item_preview_url TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (user_id, item_id)
+);
+
+CREATE TABLE IF NOT EXISTS spotify_tokens (
+  user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  access_token TEXT NOT NULL,
+  refresh_token TEXT NOT NULL,
+  expires_at INTEGER NOT NULL -- em ms (Date.now())
+);
 `);
 
 module.exports = db;

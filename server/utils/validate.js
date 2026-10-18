@@ -41,6 +41,24 @@ function parseId(v){
   return Number.isInteger(n) && n > 0 ? n : null;
 }
 
+// resumo de um disco/música vindo do cliente (pra favoritos e "quero ouvir").
+// Devolve null se faltar o essencial.
+function cleanItemSnapshot(it){
+  if(!it || typeof it !== 'object') return null;
+  const itemId = cleanString(it.itemId, 100);
+  const title = cleanString(it.title, 300);
+  if(!itemId || !title) return null;
+  return {
+    itemId,
+    type: cleanString(it.type, 20),
+    title,
+    artist: cleanString(it.artist, 300),
+    genre: cleanString(it.genre, 80),
+    year: cleanString(it.year, 10),
+    previewUrl: isHttpsUrl(it.previewUrl) ? it.previewUrl : null,
+  };
+}
+
 // escapa % e _ pra busca com LIKE tratar o termo como texto literal
 function escapeLike(s){
   return s.replace(/[\\%_]/g, ch => '\\' + ch);
@@ -56,4 +74,5 @@ module.exports = {
   cleanSpotifyRef,
   parseId,
   escapeLike,
+  cleanItemSnapshot,
 };

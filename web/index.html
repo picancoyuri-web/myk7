@@ -45,9 +45,61 @@
      cards de destaque tipo álbum/perfil) — os botões coloridos (mostarda,
      rust, teal) já têm cor de texto fixa própria, então continuam certos
      nos dois temas sem precisar mudar aqui. */
+  :root[data-theme="light"] .rv-stars, :root[data-theme="light"] .stars, :root[data-theme="light"] .si-stars{color:#8A6420;}
+  :root[data-theme="light"] .rv-detail-hint{color:#2F5E53;}
+  :root[data-theme="light"] .rv-time, :root[data-theme="light"] .conv-time, :root[data-theme="light"] .playlist-track-no, :root[data-theme="light"] .entry .date{opacity:0.75;}
+
+  /* ---------- QUERO OUVIR ---------- */
+  .later-block{margin:0 0 26px;border:1px solid var(--line);border-radius:10px;padding:14px 16px 6px;background:var(--paper-dim);}
+  .later-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+  .later-title{font-family:'Anton',sans-serif;font-size:16px;text-transform:uppercase;letter-spacing:.02em;}
+  .later-count{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink-soft);}
+  .later-empty{font-size:13px;color:var(--ink-soft);margin:6px 0 10px;line-height:1.45;}
+  .later-list.shelf .shelf-item{align-items:center;padding:10px 0;}
+  .later-list .shelf-info{cursor:pointer;}
+  .later-actions{display:flex;gap:6px;flex:none;}
+  .later-actions button, .later-more{
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;
+    border:1px solid var(--line);background:none;color:var(--ink);border-radius:16px;padding:7px 10px;cursor:pointer;
+  }
+  .later-actions .later-log{background:var(--mustard);border-color:var(--mustard);color:#15120D;}
+  .later-more{display:block;width:100%;margin:4px 0 10px;}
+
+  /* ---------- 4 FAVORITOS ---------- */
+  .fav-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;max-width:420px;margin-bottom:26px;}
+  .fav-slot{position:relative;display:flex;flex-direction:column;gap:5px;min-width:0;background:none;border:none;padding:0;color:inherit;font:inherit;text-align:left;cursor:pointer;}
+  .fav-slot .disc{border-radius:5px;}
+  .fav-empty{aspect-ratio:298/188;border:1.5px dashed var(--line);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--ink-soft);}
+  .fav-slot:hover .fav-empty{border-color:var(--mustard);color:var(--mustard);}
+  .fav-name{font-size:11.5px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fav-artist{font-size:10.5px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fav-remove{position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;border:2px solid var(--paper);background:var(--rust);color:#F3ECDA;font-size:10px;line-height:1;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;padding:0;}
+  .fav-pick-row{display:flex;align-items:center;gap:12px;width:100%;}
+  .fav-pick-row .shelf-info{min-width:0;}
+
+  /* ---------- SEUS NÚMEROS ---------- */
+  .stats-card{max-width:420px;border:1px solid var(--line);border-radius:10px;padding:16px 16px 12px;margin-bottom:26px;}
+  .stats-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+  .stats-tile .n{font-family:'Anton',sans-serif;font-size:24px;line-height:1;}
+  .stats-tile .l{font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-top:4px;}
+  .stats-sub{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-soft);margin:14px 0 8px;}
+  .bar-row{display:grid;grid-template-columns:minmax(0,96px) 1fr 26px;align-items:center;gap:8px;font-size:12.5px;padding:3px 0;}
+  .bar-row .bl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bar-row .bv{font-family:'JetBrains Mono',monospace;font-size:11px;text-align:right;color:var(--ink-soft);}
+  .bar-track{height:8px;}
+  .bar-fill{height:100%;min-width:2px;background:var(--chart-bar,#C79A46);border-radius:0 4px 4px 0;}
+  .month-chart{display:flex;align-items:flex-end;gap:6px;height:110px;}
+  .month-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;min-width:0;}
+  .month-num{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink-soft);}
+  .month-bar{width:100%;max-width:34px;background:var(--chart-bar,#C79A46);border-radius:4px 4px 0 0;}
+  .month-bar.zero{height:2px !important;background:var(--line);border-radius:1px;}
+  .month-lbl{font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;color:var(--ink-soft);}
+  :root[data-theme="light"]{--chart-bar:#9A6F22;}
+  .stats-empty{font-size:13px;color:var(--ink-soft);margin:0;}
+
   :root[data-theme="light"]{
     --ink:#2A2420;
-    --ink-soft:#6B6155;
+    --ink-soft:#574E43;
     --paper:#F3ECDA;
     --paper-dim:#E8DFC8;
     --line: rgba(42,36,32,0.14);
@@ -196,7 +248,7 @@
   .fc-artist{font-size:14px;opacity:0.8;margin-top:6px;}
   .fc-meta{font-family:'JetBrains Mono',monospace;font-size:10.5px;opacity:0.55;margin-top:8px;letter-spacing:0.04em;}
   .fc-community{
-    margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mustard);
+    margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#7A5618;
     letter-spacing:0.03em;
   }
   .fc-trending{
@@ -217,7 +269,7 @@
   .fc-rail .fc-rail-lbl{font-family:'JetBrains Mono',monospace;font-size:8.5px;opacity:0.6;margin-top:-14px;}
   .fc-hint{
     position:absolute;bottom:16px;left:0;right:0;text-align:center;
-    font-family:'JetBrains Mono',monospace;font-size:10px;opacity:0.4;letter-spacing:0.08em;text-transform:uppercase;
+    font-family:'JetBrains Mono',monospace;font-size:10px;opacity:0.6;letter-spacing:0.08em;text-transform:uppercase;
   }
 
   /* ---------- cards de artista/banda no feed ---------- */
@@ -384,7 +436,7 @@
   .rv-shelf-item:hover .rv-detail-hint{opacity:1;}
   .rv-detail-hint{
     font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:0.05em;
-    color:var(--teal);opacity:0.7;margin-top:4px;transition:opacity .12s ease;
+    color:var(--teal);opacity:0.95;margin-top:4px;transition:opacity .12s ease;
   }
   .rv-detail-hint::before{content:'▸ ';}
 
@@ -514,7 +566,7 @@
   }
   .spotify-connect{
     width:100%;padding:12px;border-radius:8px;border:1px solid #1DB954;background:#1DB954;
-    color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;
+    color:#000;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;cursor:pointer;
   }
   .spotify-connect:hover{background:#1ed760;border-color:#1ed760;}
   .spotify-status{
@@ -1111,7 +1163,7 @@
     display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);
   }
   .person-row:last-child{border-bottom:none;}
-  .person-click{display:flex;align-items:center;gap:14px;flex:1;min-width:0;background:none;border:none;cursor:pointer;text-align:left;padding:0;font-family:inherit;}
+  .person-click{display:flex;align-items:center;gap:14px;flex:1;min-width:0;background:none;border:none;cursor:pointer;text-align:left;padding:0;font-family:inherit;color:inherit;}
   .person-avatar{
     width:46px;height:46px;border-radius:50%;flex:none;
     display:flex;align-items:center;justify-content:center;color:#fff;
@@ -1195,7 +1247,7 @@
   .msg-btn.sm{padding:5px 11px;font-size:9.5px;}
   .conv-row{
     display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);
-    cursor:pointer;background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left;font-family:inherit;
+    cursor:pointer;background:none;border-left:none;border-right:none;border-top:none;width:100%;text-align:left;font-family:inherit;color:inherit;
   }
   .conv-row:last-child{border-bottom:none;}
   .conv-avatar{
@@ -1668,6 +1720,18 @@ const singles = [
 
 const allItems = [...catalog, ...singles];
 function getItem(id){ return allItems.find(i => i.id === id); }
+// mesma coisa, mas nunca devolve undefined — pra tela não quebrar se um
+// disco antigo sumir do catálogo
+function getItemSafe(id){
+  return getItem(id) || { id, title: 'faixa indisponível', artist: '', genre: 'Música', type: 'single', year: '' };
+}
+// resumo do disco que vai pro servidor (favoritos e "quero ouvir")
+function itemSnapshot(item){
+  return {
+    itemId: String(item.id), type: item.type || null, title: item.title, artist: item.artist || null,
+    genre: item.genre || null, year: item.year ? String(item.year) : null, previewUrl: item.previewUrl || null,
+  };
+}
 function parseItemId(v){ return /^-?\d+$/.test(v) ? Number(v) : v; }
 
 /* ---------- ESTILOS MUSICAIS MAIS FAMOSOS (pra cadastro / preferências) ---------- */
@@ -1827,6 +1891,7 @@ async function loadDiaryFromServer(){
   if(!currentUser){ diary = []; return; }
   try{
     const { entries } = await apiFetch('/diary/me');
+    entries.forEach(mergeItemSnapshot);
     diary = entries.map(e => ({
       id: e.id, itemId: parseItemId(e.itemId), itemType: e.itemType,
       rating: e.rating, note: e.note, date: new Date(e.createdAt).getTime(),
@@ -1835,23 +1900,253 @@ async function loadDiaryFromServer(){
   }catch(e){
     diary = [];
   }
+  await loadListenLater();
+}
+
+// ---------- QUERO OUVIR ----------
+let listenLater = [];
+let listenLaterExpanded = false;
+async function loadListenLater(){
+  if(!currentUser){ listenLater = []; return; }
+  try{
+    const { items } = await apiFetch('/users/me/listen-later');
+    items.forEach(mergeItemSnapshot);
+    listenLater = items.map(i => parseItemId(String(i.itemId)));
+  }catch(e){ /* mantém a lista que já tinha */ }
+}
+function isInListenLater(itemId){ return listenLater.includes(itemId); }
+async function toggleListenLater(item, btn){
+  if(!currentUser){ showToast('entre na sua conta pra montar sua lista.', true); return; }
+  const inList = isInListenLater(item.id);
+  if(btn) btn.disabled = true;
+  try{
+    if(inList){
+      await apiFetch(`/users/me/listen-later/${encodeURIComponent(String(item.id))}`, { method: 'DELETE' });
+      listenLater = listenLater.filter(id => id !== item.id);
+      showToast('tirado da sua lista "quero ouvir".');
+    } else {
+      await apiFetch('/users/me/listen-later', { method: 'POST', body: JSON.stringify(itemSnapshot(item)) });
+      listenLater = [item.id, ...listenLater];
+      showToast('guardado em "quero ouvir" — tá no seu diário.');
+    }
+  }catch(e){
+    showToast(e.message || 'não deu pra atualizar sua lista agora.', true);
+  }finally{
+    if(btn) btn.disabled = false;
+  }
+  renderDiary();
+}
+function listenLaterHtml(){
+  const items = listenLater.map(getItem).filter(Boolean);
+  const shown = listenLaterExpanded ? items : items.slice(0, 4);
+  return `
+    <div class="later-block">
+      <div class="later-head">
+        <span class="later-title">Quero ouvir</span>
+        <span class="later-count">${items.length ? `${items.length} ${items.length === 1 ? 'disco' : 'discos'}` : ''}</span>
+      </div>
+      ${items.length ? `
+        <div class="shelf later-list">
+          ${shown.map(a => `
+            <div class="shelf-item">
+              <div class="mini" style="${discGradient(a)}"><div class="h"></div></div>
+              <div class="shelf-info" data-later-open="${escapeHtml(String(a.id))}">
+                <div class="si-title">${escapeHtml(a.title)}</div>
+                <div class="si-artist">${escapeHtml(a.artist)}${a.year ? ' · ' + escapeHtml(String(a.year)) : ''}</div>
+              </div>
+              <div class="later-actions">
+                <button type="button" class="later-log" data-later-log="${escapeHtml(String(a.id))}" aria-label="Registrar ${escapeHtml(a.title)}">★</button>
+                <button type="button" data-later-remove="${escapeHtml(String(a.id))}" aria-label="Tirar ${escapeHtml(a.title)} da lista">✕</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        ${items.length > 4 ? `<button type="button" class="later-more" id="laterMoreBtn">${listenLaterExpanded ? 'mostrar menos' : `ver todos (${items.length})`}</button>` : ''}
+      ` : `<p class="later-empty">guarde aqui o que te indicaram ou o que você quer ouvir com calma — toque em <b>＋ quero ouvir</b> na ficha de qualquer disco.</p>`}
+    </div>
+  `;
+}
+function bindListenLater(root){
+  root.querySelectorAll('[data-later-open]').forEach(el => el.addEventListener('click', ()=> openItemDetail(el.dataset.laterOpen)));
+  root.querySelectorAll('[data-later-log]').forEach(el => el.addEventListener('click', ()=> openDrawer(parseItemId(el.dataset.laterLog))));
+  root.querySelectorAll('[data-later-remove]').forEach(el => el.addEventListener('click', ()=>{
+    const item = getItem(parseItemId(el.dataset.laterRemove));
+    if(item) toggleListenLater(item, el);
+  }));
+  const more = root.querySelector('#laterMoreBtn');
+  if(more) more.addEventListener('click', ()=>{ listenLaterExpanded = !listenLaterExpanded; renderDiary(); });
+}
+
+// ---------- 4 FAVORITOS ----------
+function favoriteIds(){
+  return ((currentUser && currentUser.favorites) || []).map(f => parseItemId(String(f.itemId)));
+}
+async function saveFavorites(items){
+  try{
+    const { user } = await apiFetch('/users/me', {
+      method: 'PATCH',
+      body: JSON.stringify({ favorites: items.map(itemSnapshot) }),
+    });
+    currentUser = user;
+    return true;
+  }catch(e){
+    showToast(e.message || 'não deu pra salvar seus favoritos agora.', true);
+    return false;
+  }
+}
+async function toggleFavorite(item, btn){
+  if(!currentUser){ showToast('entre na sua conta pra escolher seus favoritos.', true); return false; }
+  const ids = favoriteIds();
+  const current = ids.map(getItem).filter(Boolean);
+  let next;
+  if(ids.includes(item.id)){
+    next = current.filter(x => x.id !== item.id);
+  } else {
+    if(current.length >= 4){ showToast('seus 4 favoritos já estão escolhidos — tire um no seu perfil.', true); return false; }
+    next = [...current, item];
+  }
+  if(btn) btn.disabled = true;
+  const ok = await saveFavorites(next);
+  if(btn) btn.disabled = false;
+  if(ok) showToast(ids.includes(item.id) ? 'tirado dos seus favoritos.' : '♥ entrou pros seus 4 favoritos.');
+  return ok;
+}
+function favoritesGridHtml(favs, { editable }){
+  const items = favs.map(f => { mergeItemSnapshot(f); return getItem(parseItemId(String(f.itemId))); }).filter(Boolean);
+  const slots = editable ? [0, 1, 2, 3] : items.map((_, i) => i);
+  return `
+    <div class="fav-grid">
+      ${slots.map(i => {
+        const a = items[i];
+        if(!a) return `<button type="button" class="fav-slot" data-fav-add aria-label="Escolher um favorito"><div class="fav-empty">＋</div><div class="fav-name" style="opacity:.55;">escolher</div></button>`;
+        return `
+          <div class="fav-slot" data-fav-open="${escapeHtml(String(a.id))}" role="button" tabindex="0" aria-label="${escapeHtml(a.title)}">
+            <div class="disc" style="${discGradient(a)}"><div class="hole"></div></div>
+            ${editable ? `<button type="button" class="fav-remove" data-fav-remove="${escapeHtml(String(a.id))}" aria-label="Tirar ${escapeHtml(a.title)} dos favoritos">✕</button>` : ''}
+            <div class="fav-name">${escapeHtml(a.title)}</div>
+            <div class="fav-artist">${escapeHtml(a.artist)}</div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+function bindFavorites(root){
+  root.querySelectorAll('[data-fav-open]').forEach(el => {
+    const open = (e)=>{ if(e.target.closest('[data-fav-remove]')) return; openItemDetail(el.dataset.favOpen); };
+    el.addEventListener('click', open);
+    el.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); open(e); } });
+  });
+  root.querySelectorAll('[data-fav-remove]').forEach(el => el.addEventListener('click', async (e)=>{
+    e.stopPropagation();
+    const item = getItem(parseItemId(el.dataset.favRemove));
+    if(item && await toggleFavorite(item, el)) renderProfile();
+  }));
+  root.querySelectorAll('[data-fav-add]').forEach(el => el.addEventListener('click', openFavoritePicker));
+}
+// escolhe um favorito entre o que a pessoa já registrou no diário
+function openFavoritePicker(){
+  const overlay = document.getElementById('followListOverlay');
+  const title = document.getElementById('followListTitle');
+  const body = document.getElementById('followListBody');
+  const taken = new Set(favoriteIds());
+  const seen = new Set();
+  const options = [...diary].sort((x, y) => y.date - x.date)
+    .map(e => getItem(e.itemId)).filter(a => a && !taken.has(a.id) && !seen.has(a.id) && seen.add(a.id));
+  title.textContent = 'Escolher favorito';
+  body.innerHTML = options.length ? `
+    <p style="font-size:12.5px;color:var(--ink-soft);margin:0 0 10px;">os discos e músicas que você já registrou:</p>
+    <div class="shelf">
+      ${options.map(a => `
+        <button type="button" class="follow-list-row fav-pick-row" data-fav-pick="${escapeHtml(String(a.id))}">
+          <div class="mini" style="${discGradient(a)}"><div class="h"></div></div>
+          <div class="shelf-info"><div class="si-title">${escapeHtml(a.title)}</div><div class="si-artist">${escapeHtml(a.artist)}</div></div>
+        </button>
+      `).join('')}
+    </div>
+  ` : `<p style="font-size:13px;color:var(--ink-soft);">registre algumas escutas primeiro — seus favoritos saem do seu diário. Também dá pra favoritar direto na ficha de qualquer disco (♡).</p>`;
+  overlay.classList.add('active');
+  body.querySelectorAll('[data-fav-pick]').forEach(btn => btn.addEventListener('click', async ()=>{
+    const item = getItem(parseItemId(btn.dataset.favPick));
+    if(item && await toggleFavorite(item, btn)){
+      overlay.classList.remove('active');
+      renderProfile();
+    }
+  }));
+}
+
+// ---------- SEUS NÚMEROS ----------
+function statsCardHtml(){
+  if(!diary.length){
+    return `<div class="stats-card"><div class="stats-sub" style="margin-top:0;">seus números</div><p class="stats-empty">registre suas escutas e aqui aparecem seus artistas mais ouvidos, suas notas e seu ritmo mês a mês.</p></div>`;
+  }
+  const items = diary.map(e => ({ e, a: getItem(e.itemId) })).filter(x => x.a);
+  const artists = {};
+  items.forEach(({ a }) => { if(a.artist) artists[a.artist] = (artists[a.artist] || 0) + 1; });
+  const topArtists = Object.entries(artists).sort((x, y) => y[1] - x[1]).slice(0, 5);
+  const reviews = diary.filter(e => e.note).length;
+  const days = new Set(diary.map(e => new Date(e.date).toDateString())).size;
+  const byRating = [5, 4, 3, 2, 1].map(n => [n, diary.filter(e => e.rating === n).length]);
+  const maxRating = Math.max(...byRating.map(r => r[1]), 1);
+  const maxArtist = topArtists.length ? topArtists[0][1] : 1;
+  const now = new Date();
+  const months = [];
+  for(let i = 5; i >= 0; i--){
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const n = diary.filter(e => { const x = new Date(e.date); return x.getFullYear() === d.getFullYear() && x.getMonth() === d.getMonth(); }).length;
+    months.push({ label: d.toLocaleDateString('pt-BR', { month: 'short' }).replace('.', ''), full: d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }), n });
+  }
+  const maxMonth = Math.max(...months.map(m => m.n), 1);
+  const bar = (label, value, max, tip) => `
+    <div class="bar-row" title="${escapeHtml(tip)}">
+      <span class="bl">${label}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(value / max * 100)}%;"></div></div>
+      <span class="bv">${value}</span>
+    </div>`;
+  return `
+    <div class="stats-card">
+      <div class="stats-sub" style="margin-top:0;">seus números</div>
+      <div class="stats-tiles">
+        <div class="stats-tile"><div class="n">${reviews}</div><div class="l">resenhas</div></div>
+        <div class="stats-tile"><div class="n">${Object.keys(artists).length}</div><div class="l">artistas</div></div>
+        <div class="stats-tile"><div class="n">${days}</div><div class="l">dias ouvindo</div></div>
+      </div>
+      <div class="stats-sub">escutas por mês</div>
+      <div class="month-chart" role="img" aria-label="${escapeHtml(months.map(m => `${m.full}: ${m.n}`).join(', '))}">
+        ${months.map(m => `
+          <div class="month-col" title="${escapeHtml(`${m.full}: ${m.n} ${m.n === 1 ? 'escuta' : 'escutas'}`)}">
+            <span class="month-num">${m.n || ''}</span>
+            <div class="month-bar ${m.n ? '' : 'zero'}" style="height:${Math.round(m.n / maxMonth * 78)}px;"></div>
+            <span class="month-lbl">${m.label}</span>
+          </div>`).join('')}
+      </div>
+      ${topArtists.length ? `
+        <div class="stats-sub">artistas mais registrados</div>
+        ${topArtists.map(([name, n]) => bar(escapeHtml(name), n, maxArtist, `${name}: ${n} ${n === 1 ? 'escuta' : 'escutas'}`)).join('')}
+      ` : ''}
+      <div class="stats-sub">suas notas</div>
+      ${byRating.map(([r, n]) => bar('★'.repeat(r), n, maxRating, `${r} ${r === 1 ? 'estrela' : 'estrelas'}: ${n}`)).join('')}
+    </div>
+  `;
 }
 
 // resenhas de quem a pessoa logada segue (contas reais), pra aparecer
 // misturado com as resenhas da comunidade fictícia na aba "Resenhas"
 function mergeItemSnapshot(e){
   if(!e || !e.title) return;
-  const id = parseItemId(e.itemId);
+  const id = parseItemId(String(e.itemId));
   if(allItems.some(x => x.id === id)) return;
+  const plain = (v) => v == null ? v : String(v).replace(/[<>]/g, '');
   allItems.push({
-    id, type: e.itemType, title: e.title, artist: e.artist,
-    genre: e.genre, year: e.year, sp: e.sp || null, previewUrl: e.previewUrl || null,
+    id, type: e.itemType || e.type, title: plain(e.title), artist: plain(e.artist) || '',
+    genre: plain(e.genre) || 'Música', year: plain(e.year) || '', sp: e.sp || null, previewUrl: e.previewUrl || null,
   });
 }
 let realFeedEntries = [];
 let realFeedCursor = null;
 let realFeedHasMore = true;
 let realFeedLoading = false;
+let realFeedSource = '/diary/feed';
 
 async function fetchRealReviewFeed({reset=false} = {}){
   if(!currentUser){ realFeedEntries = []; realFeedHasMore = false; return realFeedEntries; }
@@ -1859,16 +2154,29 @@ async function fetchRealReviewFeed({reset=false} = {}){
     realFeedEntries = [];
     realFeedCursor = null;
     realFeedHasMore = true;
+    realFeedSource = '/diary/feed';
   }
   if(!realFeedHasMore || realFeedLoading) return realFeedEntries;
   realFeedLoading = true;
   try{
-    const qs = realFeedCursor ? `?before=${realFeedCursor}&limit=20` : '?limit=20';
-    const { entries, nextCursor } = await apiFetch('/diary/feed' + qs);
-    entries.forEach(mergeItemSnapshot);
-    realFeedEntries = realFeedEntries.concat(entries);
-    realFeedCursor = nextCursor;
-    realFeedHasMore = !!nextCursor;
+    // até 2 páginas por vez: se o feed de quem a pessoa segue acabar com
+    // pouca coisa, já completa com as resenhas recentes de todo mundo
+    for(let page = 0; page < 2 && realFeedHasMore; page++){
+      const qs = realFeedCursor ? `?before=${realFeedCursor}&limit=20` : '?limit=20';
+      const { entries, nextCursor } = await apiFetch(realFeedSource + qs);
+      const seen = new Set(realFeedEntries.map(e => e.id));
+      const fresh = entries.filter(e => !seen.has(e.id) && e.username !== currentUser.username && !blockedUsernames.has(e.username));
+      fresh.forEach(mergeItemSnapshot);
+      realFeedEntries = realFeedEntries.concat(fresh);
+      realFeedCursor = nextCursor;
+      realFeedHasMore = !!nextCursor;
+      if(!realFeedHasMore && realFeedSource === '/diary/feed'){
+        realFeedSource = '/diary/recent';
+        realFeedCursor = null;
+        realFeedHasMore = true;
+      }
+      if(realFeedEntries.length >= 10) break;
+    }
   }catch(e){
     // mantém o que já tinha carregado antes da falha
   }
@@ -2230,7 +2538,7 @@ function personMeta(id){
     id, username:u.username, avatar:u.avatar || null, color:'#3C6459',
     sub:u.nationality || '', genres:u.genres || [], nationality:u.nationality,
     followers:u.followerCount || 0, following:u.followingCount || 0,
-    bio:u.bio || '', isReal:true, reviews:realUserDiaryCache.get(id) || []
+    bio:u.bio || '', favorites:u.favorites || [], isReal:true, reviews:realUserDiaryCache.get(id) || []
   };
 }
 
@@ -2403,7 +2711,7 @@ async function renderPersonProfileView(id){
       </div>
       <div class="ac-name">${escapeHtml(p.username)}</div>
       ${p.sub ? `<div class="ac-row">${escapeHtml(p.sub)}</div>` : ''}
-      ${p.genres.length ? `<div class="ac-genres">${p.genres.map(g=>`<span>${g}</span>`).join('')}</div>` : ''}
+      ${p.genres.length ? `<div class="ac-genres">${p.genres.map(g=>`<span>${escapeHtml(g)}</span>`).join('')}</div>` : ''}
       ${p.bio ? `<div class="ac-bio"><span>${escapeHtml(p.bio)}</span></div>` : ''}
     </div>
 
@@ -2421,6 +2729,11 @@ async function renderPersonProfileView(id){
 
     ${(p.isReal && currentUser && p.id !== currentUser.username) ? `<div id="ppCompat" class="compat-card" style="display:none;"></div>` : ''}
 
+    ${p.favorites && p.favorites.length ? `
+      <div class="field-label" style="margin-bottom:12px;">os 4 favoritos de ${escapeHtml(p.username)}</div>
+      ${favoritesGridHtml(p.favorites, { editable: false })}
+    ` : ''}
+
     <div class="turntable">
       <div class="tt-disc ${lastAlbum ? '' : 'paused'}" id="ppTtDisc" style="${lastAlbum ? discGradient(lastAlbum) : ''}">
         <div class="hole"></div>
@@ -2429,8 +2742,8 @@ async function renderPersonProfileView(id){
       </div>
       <div class="tt-text">
         <div class="k">última escuta registrada</div>
-        <div class="v">${lastAlbum ? lastAlbum.title : 'nada ainda'}</div>
-        <div class="v2">${lastAlbum ? lastAlbum.artist : `${escapeHtml(p.username)} não registrou nada ainda`}</div>
+        <div class="v">${lastAlbum ? escapeHtml(lastAlbum.title) : 'nada ainda'}</div>
+        <div class="v2">${lastAlbum ? escapeHtml(lastAlbum.artist) : `${escapeHtml(p.username)} não registrou nada ainda`}</div>
       </div>
       ${lastAlbum && hasPreview(lastAlbum) ? `<div class="disc-preview" id="ppTtPreview"></div>` : ''}
     </div>
@@ -2438,7 +2751,7 @@ async function renderPersonProfileView(id){
     <div class="field-label" style="margin-bottom:12px;">${p.reviews.length ? `músicas que ${escapeHtml(p.username)} já registrou` : 'estante'}</div>
     <div class="shelf">
       ${p.reviews.length ? p.reviews.map((r, idx)=>{
-        const a = getItem(r.itemId);
+        const a = getItemSafe(r.itemId);
         const stars = '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating);
         return `
           <div class="shelf-item">
@@ -2462,6 +2775,7 @@ async function renderPersonProfileView(id){
   hydrateArt([lastAlbum, ...p.reviews.map(r => getItem(r.itemId))].filter(Boolean));
   bindFollowButtons(body);
   bindMessageButtons(body);
+  bindFavorites(body);
 
   if(p.isReal && currentUser && p.id !== currentUser.username){
     loadCompatibility(p.id);
@@ -3352,14 +3666,14 @@ function renderFeed(){
     const ps = personalScore(a);
     let whyTag = '';
     if(!trendingIds.includes(a.id) && ps.total > 0){
-      if(ps.as > 0) whyTag = `porque você curte ${a.artist}`;
-      else if(ps.gs > 0) whyTag = `porque você curte ${a.genre}`;
+      if(ps.as > 0) whyTag = `porque você curte ${escapeHtml(a.artist)}`;
+      else if(ps.gs > 0) whyTag = `porque você curte ${escapeHtml(a.genre)}`;
       else if(ps.favBoost > 0) whyTag = 'no seu estilo favorito';
     }
     return `
     <div class="feed-card" data-item-id="${a.id}">
       ${feedMode === 'trending' ? `<div class="fc-trending">🔥 Em alta · ${escapeHtml(trendCountryForUser())}</div>` : (trendingIds.includes(a.id) ? '<div class="fc-trending">🔥 Em alta</div>' : (whyTag ? `<div class="fc-trending fc-why">✦ ${whyTag}</div>` : ''))}
-      <div class="fc-eyebrow">${typeLabel(a)} · ${a.genre}</div>
+      <div class="fc-eyebrow">${typeLabel(a)} · ${escapeHtml(a.genre)}</div>
       <div class="fc-disc" style="${discGradient(a)}">
         <div class="hole"></div>
         <div class="tape-name">${escapeHtml(a.title)}</div>
@@ -3367,9 +3681,9 @@ function renderFeed(){
         <div class="fc-eq"><span></span><span></span><span></span></div>
         ${hasPreview(a) ? `<button class="fc-disc-spotify" data-act="preview" data-id="${a.id}" id="pvBtn-${a.id}" aria-label="Tocar prévia">${PLAY_ICON_SVG}</button>` : ''}
       </div>
-      <div class="fc-artist">${a.artist}</div>
-      <div class="fc-meta">${a.year}</div>
-      ${stats ? `<div class="fc-community">★ ${stats.avg} · ${stats.count} resenhas</div>` : `<div class="fc-community" style="opacity:.4;">seja o primeiro a resenhar</div>`}
+      <div class="fc-artist">${escapeHtml(a.artist)}</div>
+      <div class="fc-meta">${escapeHtml(String(a.year || ''))}</div>
+      ${stats ? `<div class="fc-community">★ ${stats.avg} · ${stats.count} resenhas</div>` : `<div class="fc-community" style="opacity:.8;">seja o primeiro a resenhar</div>`}
       <div class="fc-rail">
         <div>
           <button data-act="rate" data-id="${a.id}" class="${logged ? 'on' : ''}">★</button>
@@ -3550,7 +3864,7 @@ function renderReviewsList(){
   reviewsList = [...own, ...real, ...all];
 
   body.innerHTML = reviewsList.map((r, idx) => {
-    const item = getItem(r.itemId);
+    const item = getItemSafe(r.itemId);
     const rev = r.__own
       ? {name: currentUser ? currentUser.username : 'você', color:'#B0512F', avatar: currentUser ? currentUser.avatar : null}
       : r.__real
@@ -3899,7 +4213,7 @@ function toggleReviewPreview(idx, itemId){
 
 /* ---------- DETALHES DA MÚSICA (aberto a partir da fita nas resenhas) ---------- */
 function openItemDetail(itemId){
-  const item = getItem(Number(itemId));
+  const item = getItem(parseItemId(String(itemId)));
   if(!item) return;
   const body = document.getElementById('itemDrawerBody');
   const stats = communityStatsFor(item.id);
@@ -3915,12 +4229,14 @@ function openItemDetail(itemId){
     ${hasPreview(item) ? `<button class="item-detail-close-player" id="itemDetailPreviewClose">✕ fechar player</button>` : ''}
     <div class="item-detail-type">${typeLabel(item)}</div>
     <div class="item-detail-artist">${escapeHtml(item.artist)}</div>
-    <div class="item-detail-meta">${item.genre}${item.year ? ' · ' + item.year : ''}</div>
+    <div class="item-detail-meta">${escapeHtml(item.genre)}${item.year ? ' · ' + escapeHtml(String(item.year)) : ''}</div>
     ${stats
       ? `<div class="item-detail-stats">★ ${stats.avg} · ${stats.count} resenhas na comunidade</div>`
       : `<div class="item-detail-stats" style="opacity:.45;">ainda sem resenhas da comunidade</div>`}
     <div class="item-detail-actions">
       <button class="ghost" id="itemDetailLogBtn">★ registrar essa escuta</button>
+      <button class="ghost" id="itemDetailLaterBtn">${isInListenLater(item.id) ? '✓ na lista quero ouvir' : '＋ quero ouvir'}</button>
+      <button class="ghost" id="itemDetailFavBtn">${favoriteIds().includes(item.id) ? '♥ nos seus favoritos' : '♡ favoritar'}</button>
       <button class="ghost" id="itemDetailShareBtn">compartilhar</button>
     </div>
     <div class="item-credits" id="itemCredits">
@@ -3944,6 +4260,19 @@ function openItemDetail(itemId){
 
   const shareBtn = document.getElementById('itemDetailShareBtn');
   if(shareBtn) shareBtn.addEventListener('click', ()=> shareSongCard(item, stats ? Math.round(Number(stats.avg)) : 0, shareBtn));
+
+  const laterBtn = document.getElementById('itemDetailLaterBtn');
+  laterBtn.addEventListener('click', async ()=>{
+    await toggleListenLater(item, laterBtn);
+    laterBtn.textContent = isInListenLater(item.id) ? '✓ na lista quero ouvir' : '＋ quero ouvir';
+  });
+  const favBtn = document.getElementById('itemDetailFavBtn');
+  favBtn.addEventListener('click', async ()=>{
+    if(await toggleFavorite(item, favBtn)){
+      favBtn.textContent = favoriteIds().includes(item.id) ? '♥ nos seus favoritos' : '♡ favoritar';
+      if(document.getElementById('profile').classList.contains('active')) renderProfile();
+    }
+  });
 }
 
 async function loadItemCredits(item){
@@ -4551,15 +4880,17 @@ async function submitComment(idx){
 
 function renderDiary(){
   const body = document.getElementById('diary-body');
+  const laterHtml = currentUser ? listenLaterHtml() : '';
   if(diary.length === 0){
-    body.innerHTML = `<div class="empty">seu diário tá vazio — vá em <b>Pra Você</b> e registre sua primeira escuta.</div>`;
+    body.innerHTML = laterHtml + `<div class="empty">seu diário tá vazio — vá em <b>Pra Você</b> e registre sua primeira escuta.</div>`;
+    bindListenLater(body);
     const activeBtnEmpty = document.querySelector('.playlist-period-btn.on');
     renderPlaylistForPeriod(activeBtnEmpty ? Number(activeBtnEmpty.dataset.days) : 30);
     return;
   }
   const sorted = [...diary].sort((x,y)=> y.date - x.date);
-  body.innerHTML = `<div class="groove">` + sorted.map((e, i) => {
-    const a = getItem(e.itemId);
+  body.innerHTML = laterHtml + `<div class="groove">` + sorted.map((e, i) => {
+    const a = getItemSafe(e.itemId);
     const track = String(sorted.length - i).padStart(2,'0');
     const stars = '★'.repeat(e.rating) + '☆'.repeat(5 - e.rating);
     const d = new Date(e.date);
@@ -4568,8 +4899,8 @@ function renderDiary(){
       <div class="entry" id="diary-entry-${e.id}" data-entry-id="${e.id}">
         <div class="track-no">Side A · Track ${track}</div>
         <div class="entry-head">
-          <span class="t">${a.title}</span>
-          <span class="a">${a.artist}</span>
+          <span class="t">${escapeHtml(a.title)}</span>
+          <span class="a">${escapeHtml(a.artist)}</span>
         </div>
         <div class="entry-display">
           <div class="stars">${stars}</div>
@@ -4586,6 +4917,7 @@ function renderDiary(){
     `;
   }).join('') + `</div>`;
 
+  bindListenLater(body);
   body.querySelectorAll('.diary-edit-btn').forEach(btn=>{
     btn.addEventListener('click', ()=> startEditDiaryEntry(Number(btn.dataset.id)));
   });
@@ -4969,6 +5301,10 @@ async function deleteDiaryEntry(id){
 async function renderProfile(){
   const body = document.getElementById('profile-body');
   currentUser = await loadSession();
+  const profileSub = document.querySelector('#profile .section-sub');
+  if(profileSub) profileSub.textContent = currentUser
+    ? 'sua conta, suas fitas favoritas e seus números'
+    : 'entre ou crie sua conta pra ver seu histórico de escuta';
 
   if(!currentUser){
     body.innerHTML = `
@@ -5061,7 +5397,7 @@ async function renderProfile(){
   const avg = total ? (diary.reduce((s,e)=>s+e.rating,0)/total).toFixed(1) : '—';
   const genreCount = {};
   diary.forEach(e=>{
-    const g = getItem(e.itemId).genre;
+    const g = getItemSafe(e.itemId).genre;
     genreCount[g] = (genreCount[g]||0)+1;
   });
   const topGenre = Object.keys(genreCount).sort((a,b)=>genreCount[b]-genreCount[a])[0] || '—';
@@ -5085,10 +5421,10 @@ async function renderProfile(){
         </div>
         <input type="file" accept="image/*" id="avatarInput" style="display:none">
       </div>
-      <div class="ac-name">${currentUser.username}</div>
-      <div class="ac-row">${currentUser.email}</div>
-      <div class="ac-row">${currentUser.nationality}</div>
-      <div class="ac-genres">${currentUser.genres.map(g=>`<span>${g}</span>`).join('')}</div>
+      <div class="ac-name">${escapeHtml(currentUser.username)}</div>
+      <div class="ac-row">${escapeHtml(currentUser.email)}</div>
+      <div class="ac-row">${escapeHtml(currentUser.nationality || '')}</div>
+      <div class="ac-genres">${currentUser.genres.map(g=>`<span>${escapeHtml(g)}</span>`).join('')}</div>
       <div class="ac-bio" id="acBioDisplay">
         <span>${currentUser.bio ? escapeHtml(currentUser.bio) : '<i style="opacity:0.6;">sem biografia ainda — conte um pouco sobre seu gosto musical.</i>'}</span>
         <button type="button" id="acBioEditBtn" aria-label="Editar biografia">✎</button>
@@ -5121,15 +5457,6 @@ async function renderProfile(){
       <button type="button" class="stat stat-clickable" id="statFollowers"><div class="num">${(currentUser.followers||[]).length}</div><div class="lbl">seguidores</div></button>
       <button type="button" class="stat stat-clickable" id="statFollowing"><div class="num">${(currentUser.following||[]).length}</div><div class="lbl">seguindo</div></button>
     </div>
-    <button class="ghost" id="goPessoasBtn" style="max-width:420px;margin-bottom:10px;">Ver e seguir pessoas</button>
-    <button class="ghost" id="themeToggleBtn" style="max-width:420px;margin-bottom:10px;">
-      ${document.documentElement.getAttribute('data-theme') === 'light' ? '🌙 modo escuro' : '☀️ modo claro'}
-    </button>
-    <button class="ghost" id="changePasswordBtn" style="max-width:420px;margin-bottom:10px;">Trocar senha</button>
-    <button class="ghost" id="logoutBtn" style="max-width:420px;margin-bottom:10px;">Sair</button>
-    <button type="button" id="deleteAccountBtn">excluir minha conta permanentemente</button>
-    <p class="db-note">seus dados de conta ficam salvos num servidor de verdade, com a senha criptografada.</p>
-    <p class="db-note" style="opacity:0.5;">dados de música (títulos, artistas, prévias) fornecidos pela iTunes Search API — Apple Inc.</p>
 
     <div class="turntable">
       <div class="tt-disc ${lastAlbum ? '' : 'paused'}" id="ttDisc" style="${lastAlbum ? discGradient(lastAlbum) : ''}">
@@ -5139,8 +5466,8 @@ async function renderProfile(){
       </div>
       <div class="tt-text">
         <div class="k">tocando agora</div>
-        <div class="v">${lastAlbum ? lastAlbum.title : 'nada ainda'}</div>
-        <div class="v2">${lastAlbum ? lastAlbum.artist : 'registre uma escuta pra começar'}</div>
+        <div class="v">${lastAlbum ? escapeHtml(lastAlbum.title) : 'nada ainda'}</div>
+        <div class="v2">${lastAlbum ? escapeHtml(lastAlbum.artist) : 'registre uma escuta pra começar'}</div>
       </div>
       ${lastAlbum && hasPreview(lastAlbum) ? `<div class="disc-preview" id="ttPreview"></div>` : ''}
     </div>
@@ -5148,20 +5475,25 @@ async function renderProfile(){
     <div class="stat-row">
       <div class="stat"><div class="num">${total}</div><div class="lbl">fitas logadas</div></div>
       <div class="stat"><div class="num">${avg}</div><div class="lbl">nota média</div></div>
-      <div class="stat"><div class="num" style="font-size:18px;padding-top:6px;">${topGenre}</div><div class="lbl">gênero favorito</div></div>
+      <div class="stat"><div class="num" style="font-size:18px;padding-top:6px;">${escapeHtml(topGenre)}</div><div class="lbl">gênero favorito</div></div>
     </div>
+
+    <div class="field-label" style="margin-bottom:12px;">seus 4 favoritos</div>
+    ${favoritesGridHtml(currentUser.favorites || [], { editable: true })}
+
+    ${statsCardHtml()}
 
     <div class="field-label" style="margin-bottom:12px;">estante</div>
     <div class="shelf">
       ${diary.length ? [...diary].sort((x,y)=>y.date-x.date).map((e, idx)=>{
-        const a = getItem(e.itemId);
+        const a = getItemSafe(e.itemId);
         const stars = '★'.repeat(e.rating) + '☆'.repeat(5 - e.rating);
         return `
           <div class="shelf-item">
             <div class="mini" style="${discGradient(a)}"><div class="h"></div>${a.sp ? `<div class="art-sticker" data-art="${a.id}"></div>` : ''}</div>
             <div class="shelf-info">
-              <div class="si-title">${a.title}</div>
-              <div class="si-artist">${a.artist}</div>
+              <div class="si-title">${escapeHtml(a.title)}</div>
+              <div class="si-artist">${escapeHtml(a.artist)}</div>
               <div class="si-stars">${stars}</div>
               ${hasPreview(a) ? `
                 <button class="si-play" data-idx="${idx}" data-id="${a.id}">▶ ouvir ${playLabel(a)}</button>
@@ -5172,9 +5504,21 @@ async function renderProfile(){
         `;
       }).join('') : '<span style="font-size:13px;opacity:.6;">vazia por enquanto</span>'}
     </div>
+
+    <div class="field-label" style="margin:30px 0 12px;">conta</div>
+    <button class="ghost" id="goPessoasBtn" style="max-width:420px;margin-bottom:10px;">Ver e seguir pessoas</button>
+    <button class="ghost" id="themeToggleBtn" style="max-width:420px;margin-bottom:10px;">
+      ${document.documentElement.getAttribute('data-theme') === 'light' ? '🌙 modo escuro' : '☀️ modo claro'}
+    </button>
+    <button class="ghost" id="changePasswordBtn" style="max-width:420px;margin-bottom:10px;">Trocar senha</button>
+    <button class="ghost" id="logoutBtn" style="max-width:420px;margin-bottom:10px;">Sair</button>
+    <button type="button" id="deleteAccountBtn">excluir minha conta permanentemente</button>
+    <p class="db-note">seus dados de conta ficam salvos num servidor de verdade, com a senha criptografada.</p>
+    <p class="db-note" style="opacity:0.5;">dados de música (títulos, artistas, prévias) fornecidos pela iTunes Search API — Apple Inc.</p>
   `;
 
   hydrateArt([lastAlbum, ...diary.map(e => getItem(e.itemId))].filter(Boolean));
+  bindFavorites(body);
 
   document.getElementById('avatarBtn').addEventListener('click', ()=>{
     document.getElementById('avatarInput').click();
@@ -5306,7 +5650,7 @@ async function renderProfile(){
   });
 
   body.querySelectorAll('.si-play').forEach(btn=>{
-    btn.addEventListener('click', ()=> toggleShelfPreview(Number(btn.dataset.idx), Number(btn.dataset.id)));
+    btn.addEventListener('click', ()=> toggleShelfPreview(Number(btn.dataset.idx), parseItemId(btn.dataset.id)));
   });
 
   const ttPlayBtn = document.getElementById('ttPlay');
@@ -5492,8 +5836,8 @@ function renderBuscar(){
         <div class="shelf-item">
           <div class="mini" style="${discGradient(a)}"><div class="h"></div>${a.sp ? `<div class="art-sticker" data-art="${a.id}"></div>` : ''}</div>
           <div class="shelf-info">
-            <div class="si-title">${a.title}</div>
-            <div class="si-artist">${a.artist} · ${typeLabel(a)}${a.year ? ' · ' + a.year : ''}</div>
+            <div class="si-title">${escapeHtml(a.title)}</div>
+            <div class="si-artist">${escapeHtml(a.artist)} · ${typeLabel(a)}${a.year ? ' · ' + escapeHtml(String(a.year)) : ''}</div>
             <div class="si-actions">
               ${hasPreview(a) ? `<button class="si-play" data-idx="${idx}" data-id="${a.id}">▶ ouvir ${playLabel(a)}</button>` : ''}
               <button class="si-log" data-id="${a.id}">★ registrar</button>
@@ -5645,8 +5989,10 @@ document.getElementById('logBtn').addEventListener('click', async ()=>{
       localEntry.id = entry.id;
       localEntry.date = new Date(entry.createdAt).getTime();
       localEntry.comments = entry.comments || [];
+      listenLater = listenLater.filter(id => id !== pendingAlbum.id);
     }catch(e){
-      console.error('não deu pra salvar a escuta no servidor:', e.message);
+      showToast(e.message || 'não deu pra salvar essa escuta agora — tente de novo.', true);
+      return;
     }
   }
   const streakBefore = computeStreak();

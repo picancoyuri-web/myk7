@@ -1,5 +1,14 @@
 const db = require('../db');
 
+function parseFavorites(raw){
+  try{
+    const list = JSON.parse(raw || '[]');
+    return Array.isArray(list) ? list.slice(0, 4) : [];
+  }catch(e){
+    return [];
+  }
+}
+
 function parseGenres(raw){
   try{
     const list = JSON.parse(raw || '[]');
@@ -40,9 +49,12 @@ function serializeUser(row){
     emailVerified: !!row.email_verified,
     nationality: row.nationality,
     genres: parseGenres(row.genres),
+    bio: row.bio || '',
+    favorites: parseFavorites(row.favorites),
     avatar: avatarUrl(row),
     followers,
     following,
+    spotifyConnected: !!db.prepare('SELECT 1 FROM spotify_tokens WHERE user_id = ?').get(row.id),
     createdAt: row.created_at ? row.created_at.replace(' ', 'T') + 'Z' : null,
   };
 }
@@ -50,7 +62,7 @@ function serializeUser(row){
 // colunas pra montar o perfil público já com as contagens, numa consulta só
 // (antes eram 2 consultas extras por pessoa — 100 numa lista de 50)
 const PUBLIC_COLUMNS = `
-  u.id, u.username, u.nationality, u.genres, u.avatar_v,
+  u.id, u.username, u.nationality, u.genres, u.bio, u.favorites, u.avatar_v,
   (u.avatar IS NOT NULL) AS has_avatar,
   (SELECT COUNT(*) FROM follows WHERE followee_id = u.id) AS follower_count,
   (SELECT COUNT(*) FROM follows WHERE follower_id = u.id) AS following_count,
@@ -71,6 +83,8 @@ function serializePublicUser(row){
     avatar: row.has_avatar ? avatarUrl({ username: row.username, avatar: true, avatar_v: row.avatar_v }) : null,
     nationality: row.nationality,
     genres: parseGenres(row.genres),
+    bio: row.bio || '',
+    favorites: parseFavorites(row.favorites),
     followerCount: row.follower_count,
     followingCount: row.following_count,
     entryCount: row.entry_count,
