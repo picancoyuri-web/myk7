@@ -1,4 +1,4 @@
 # Netlify: repassa /api/* pro backend no Render, fazendo a API parecer
 # "o mesmo site" pro navegador (evita o bloqueio de cookies entre
 # domínios do Safari/iPhone). Troque a URL se o seu backend tiver outra.
-/api/*  https://cassete.onrender.com/api/:splat  200
+/api/*  https://myk7.onrender.com/api/:splat  200

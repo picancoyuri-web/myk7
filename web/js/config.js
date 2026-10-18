@@ -10,7 +10,7 @@ const isLocalDevServer = location.protocol === 'file:' ||
   ((location.hostname === 'localhost' || location.hostname === '127.0.0.1') && /^55\d\d$/.test(location.port));
 
 export const API_BASE = window.CASSETE_API_BASE || (isNativeApp
-  ? 'https://cassete.onrender.com/api'
+  ? 'https://myk7.onrender.com/api'
   : isLocalDevServer
     ? 'http://localhost:3001/api'
     : '/api');
