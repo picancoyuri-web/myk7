@@ -34,6 +34,15 @@ Use um *Persistent Disk* e aponte `DB_PATH` pra ele, senão o banco é apagado a
 O `_redirects` (proxy da API) e o `_headers` (cache) já estão dentro dela — confira se a URL
 do backend no `_redirects` é a do seu serviço no Render.
 
+## Monetização (28/out/2026)
+
+- **Anúncios (AdMob)** só no app das lojas: banner acima da navegação, card do MyK7+ a cada 8 fitas
+  e vídeo recompensado que libera a Retrospectiva por 24 h. Consentimento LGPD/GDPR e ATT no iPhone.
+  Hoje estão com os **IDs de teste** do Google.
+- **MyK7+** (RevenueCat): sem anúncios, Retrospectiva sempre liberada e selo no perfil. Tela de
+  assinatura com restaurar compras; o servidor confirma a compra com a RevenueCat (`/api/billing`).
+- Configuração passo a passo em `PUBLICAR-NAS-LOJAS.md`, seção 5.
+
 ## App nas lojas (28/out/2026)
 
 - **Android e iOS prontos pra compilar** com Capacitor 8 (`android/`, `ios/`). Passo a passo,

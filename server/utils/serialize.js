@@ -34,6 +34,13 @@ function commentPhotoUrl(row){
 
 // versão "privada" — só pra retornar pro próprio dono da conta
 // (inclui e-mail e as listas completas de quem segue/é seguido)
+// MyK7+ ativo? premium_until é uma data ISO, 'lifetime' ou null
+function isPremium(row){
+  if(!row || !row.premium_until) return false;
+  if(row.premium_until === 'lifetime') return true;
+  return new Date(row.premium_until).getTime() > Date.now();
+}
+
 function serializeUser(row){
   if(!row) return null;
   const followers = db.prepare(
@@ -55,6 +62,10 @@ function serializeUser(row){
     followers,
     following,
     spotifyConnected: !!db.prepare('SELECT 1 FROM spotify_tokens WHERE user_id = ?').get(row.id),
+    premium: isPremium(row),
+    premiumUntil: isPremium(row) ? row.premium_until : null,
+    // id fixo usado na loja (RevenueCat) — o nome de usuário pode mudar
+    billingId: 'u' + row.id,
     createdAt: row.created_at ? row.created_at.replace(' ', 'T') + 'Z' : null,
   };
 }
@@ -62,7 +73,7 @@ function serializeUser(row){
 // colunas pra montar o perfil público já com as contagens, numa consulta só
 // (antes eram 2 consultas extras por pessoa — 100 numa lista de 50)
 const PUBLIC_COLUMNS = `
-  u.id, u.username, u.nationality, u.genres, u.bio, u.favorites, u.avatar_v,
+  u.id, u.username, u.nationality, u.genres, u.bio, u.favorites, u.avatar_v, u.premium_until,
   (u.avatar IS NOT NULL) AS has_avatar,
   (SELECT COUNT(*) FROM follows WHERE followee_id = u.id) AS follower_count,
   (SELECT COUNT(*) FROM follows WHERE follower_id = u.id) AS following_count,
@@ -88,6 +99,7 @@ function serializePublicUser(row){
     followerCount: row.follower_count,
     followingCount: row.following_count,
     entryCount: row.entry_count,
+    premium: isPremium(row),
   };
 }
 
@@ -99,6 +111,7 @@ function findUserByUsername(username){
 }
 
 module.exports = {
+  isPremium,
   serializeUser,
   serializePublicUser,
   parseGenres,

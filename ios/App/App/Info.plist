@@ -70,6 +70,18 @@
 	<string>O MyK7 salva na sua galeria os cards de Story que você escolher guardar.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>O MyK7 usa a câmera para você tirar a foto de um Momento ou da sua foto de perfil.</string>
+	<!-- AdMob: ID do APP (o de teste do Google). Troque pelo seu antes de publicar -->
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>Sua permissão deixa os anúncios mais relevantes pra você. Isso ajuda a manter o MyK7 gratuito. Quem assina o MyK7+ não vê anúncios.</string>
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
+	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 </dict>

@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../db');
 const requireAuth = require('../middleware/requireAuth');
+const requireAdmin = require('../middleware/requireAdmin');
 const rateLimit = require('../utils/rateLimit');
 const { cleanString } = require('../utils/validate');
 
@@ -29,11 +30,6 @@ router.post('/', requireAuth, reportLimiter, (req, res) => {
 // ---- moderação ----
 // quem modera é definido na variável ADMIN_USERNAMES (separados por vírgula).
 // A App Store exige que denúncias possam ser tratadas (prazo de 24 h).
-function requireAdmin(req, res, next){
-  const admins = (process.env.ADMIN_USERNAMES || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
-  if(!admins.includes(String(req.user.username).toLowerCase())) return res.status(403).json({ error: 'só pra moderação.' });
-  next();
-}
 
 // tabela de cada tipo de conteúdo denunciável (a chave é o target_type)
 const TARGET_TABLES = {

@@ -86,7 +86,7 @@
     background:var(--rust);color:#F3ECDA;padding:6px 14px;border-radius:20px;margin-bottom:12px;
     box-shadow:0 4px 14px rgba(176,81,47,.35);
   }
-  .feed-card.daily-card{height:auto;min-height:calc(100vh - 212px);padding:22px 20px 112px;justify-content:flex-start;}
+  .feed-card.daily-card{height:auto;min-height:calc(100vh - 212px - var(--ad-h, 0px));padding:22px 20px 112px;justify-content:flex-start;}
   .feed-card.daily-card .fc-disc{width:min(60vw,240px);margin-bottom:12px;}
   .feed-card.daily-card.rated .fc-disc{width:min(42vw,160px);margin-bottom:8px;}
   .feed-card.daily-card.rated .fc-artist{margin-bottom:10px;}
@@ -253,6 +253,7 @@
     -webkit-font-smoothing:antialiased;
   }
   .wrap{max-width:920px;margin:0 auto;padding:0 20px 110px;}
+  html.native-app body{padding-top:env(safe-area-inset-top, 0px);}
 
   /* ---------- HEADER ---------- */
   header.top{
@@ -335,7 +336,7 @@
   nav.tabs button:hover{color:var(--ink);}
 
   .bottom-nav{
-    position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+    position:fixed;left:50%;bottom:calc(18px + var(--ad-h, 0px));transform:translateX(-50%);
     display:flex;align-items:center;gap:2px;
     background:rgba(21,18,13,0.92);
     -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
@@ -399,13 +400,13 @@
   }
   .gchip.active{background:var(--teal);color:#F3ECDA;border-color:var(--teal);}
   .feed-scroll{
-    height:calc(100vh - 212px);
+    height:calc(100vh - 212px - var(--ad-h, 0px));
     overflow-y:scroll;scroll-snap-type:y mandatory;
     scrollbar-width:none;
   }
   .feed-scroll::-webkit-scrollbar{display:none;}
   .feed-card{
-    height:calc(100vh - 212px);
+    height:calc(100vh - 212px - var(--ad-h, 0px));
     scroll-snap-align:start;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     position:relative;padding:20px;cursor:pointer;
@@ -1135,7 +1136,7 @@
 
   /* ---------- TOAST (mensagens rápidas) ---------- */
   .toast{
-    position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+    position:fixed;left:50%;bottom:calc(24px + var(--ad-h, 0px));transform:translateX(-50%) translateY(20px);
     background:#ECE7DD;color:#17161A;padding:10px 18px;border-radius:6px;
     font-family:'JetBrains Mono',monospace;font-size:12px;opacity:0;pointer-events:none;
     transition:opacity .2s ease, transform .2s ease;z-index:3000;max-width:90vw;text-align:center;
@@ -1264,6 +1265,37 @@
     color:var(--ink-soft);cursor:pointer;display:block;
   }
   .link-btn:hover{color:var(--ink);}
+
+  /* ---------- MyK7+ e anúncios ---------- */
+  .promo-card{background:#17161A;color:#ECE7DD;text-align:center;}
+  .promo-card .promo-k{font-family:'Anton',sans-serif;font-size:44px;letter-spacing:.02em;color:var(--mustard);line-height:1;}
+  .promo-card .promo-t{font-family:'Caveat',cursive;font-size:30px;margin:4px 0 18px;}
+  .promo-card .promo-list{list-style:none;padding:0;margin:0 0 22px;text-align:left;font-size:15px;}
+  .promo-card .promo-list li{display:flex;gap:10px;align-items:center;margin-bottom:10px;}
+  .promo-card .promo-btn{background:var(--mustard);color:#15120D;border:none;border-radius:30px;padding:12px 26px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;}
+  .promo-card .promo-note{font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.5;margin-top:18px;}
+  .paywall .pw-lead, .paywall .pw-reason{font-size:14px;line-height:1.5;margin:0 0 16px;}
+  .paywall .pw-reason{color:var(--mustard);}
+  .pw-benefits{list-style:none;padding:0;margin:0 0 18px;}
+  .pw-benefits li{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;font-size:14px;line-height:1.35;}
+  .pw-benefits small{color:var(--ink-soft);font-size:12px;}
+  .pw-ic{font-size:20px;width:26px;text-align:center;flex:none;}
+  .pw-plans{display:flex;flex-direction:column;gap:10px;margin-bottom:8px;}
+  .pw-plan{display:flex;justify-content:space-between;align-items:center;width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:var(--paper-dim);color:var(--ink);font-family:'JetBrains Mono',monospace;font-size:13px;cursor:pointer;}
+  .pw-plan.best{border-color:var(--mustard);}
+  .pw-plan em{font-style:normal;font-size:10px;color:#15120D;background:var(--mustard);border-radius:10px;padding:2px 7px;margin-left:6px;}
+  .pw-plan-price{font-weight:600;}
+  .pw-plan:disabled{opacity:.5;}
+  .pw-loading{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-soft);text-align:center;padding:14px 0;}
+  .pw-restore{margin:4px auto 12px;}
+  .pw-legal{font-size:10.5px;line-height:1.5;color:var(--ink-soft);margin:0;}
+  .pw-legal a{color:inherit;}
+  .pw-cta{width:100%;margin-bottom:10px;}
+  .plus-box{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;margin:0 0 14px;padding:14px 16px;border-radius:12px;border:1px solid var(--mustard);background:none;color:var(--ink);font-size:14px;line-height:1.35;cursor:pointer;}
+  .plus-box small{color:var(--ink-soft);font-size:12px;}
+  .plus-box.on{background:rgba(199,154,70,.12);cursor:default;}
+  .plus-box > span:last-child{font-size:22px;color:var(--mustard);}
+  .plus-badge{display:inline-block;vertical-align:middle;margin-left:6px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.04em;color:#15120D;background:var(--mustard);border-radius:10px;padding:2px 7px;text-transform:none;}
   .terms-check{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.45;color:var(--ink-soft);margin:4px 0 14px;cursor:pointer;}
   .terms-check input{margin-top:2px;flex:none;width:16px;height:16px;accent-color:var(--mustard);}
   .terms-check a, .legal-links a{color:inherit;text-decoration:underline;}
@@ -2025,10 +2057,20 @@
 const IS_NATIVE_APP = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 if(IS_NATIVE_APP) document.documentElement.classList.add('native-app');
 
+// barra de status do celular: ícones claros no tema escuro e vice-versa
+function syncStatusBar(){
+  const StatusBar = IS_NATIVE_APP && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar;
+  if(!StatusBar) return;
+  const light = document.documentElement.getAttribute('data-theme') === 'light';
+  StatusBar.setStyle({ style: light ? 'LIGHT' : 'DARK' }).catch(() => {});
+  StatusBar.setBackgroundColor({ color: light ? '#F3ECDA' : '#17161A' }).catch(() => {});
+}
+
 (function setupPWA(){
   // no app das lojas o conteúdo já vem dentro do pacote: nada de service
   // worker nem de "instalar o app"
   if(IS_NATIVE_APP){
+    syncStatusBar();
     // links internos com target=_blank (Termos, Privacidade) não abrem nada
     // dentro do WebView — abre na mesma tela, que tem o "← voltar"
     document.addEventListener('click', (e) => {
@@ -2072,6 +2114,341 @@ if(IS_NATIVE_APP) document.documentElement.classList.add('native-app');
     });
   });
 })();
+
+/* ============================================================
+   MONETIZAÇÃO (só no app das lojas)
+   - Anúncios do Google AdMob: banner fixo acima da navegação e um vídeo
+     recompensado que libera a Retrospectiva por 24 h.
+   - MyK7+: assinatura que tira os anúncios e libera os extras. A compra é
+     feita pela App Store / Play Store através da RevenueCat; o servidor
+     confere com a RevenueCat antes de marcar a conta como premium.
+   No site (navegador) nada disso aparece.
+   ============================================================ */
+const MONETIZATION = {
+  // true = anúncios de TESTE do Google (seguros pra demo). Antes de publicar:
+  // troque pelos IDs da sua conta AdMob e mude pra false.
+  adsTestMode: true,
+  admob: {
+    android: { banner: 'ca-app-pub-3940256099942544/9214589741', rewarded: 'ca-app-pub-3940256099942544/5224354917' },
+    ios:     { banner: 'ca-app-pub-3940256099942544/2435281174', rewarded: 'ca-app-pub-3940256099942544/1712485313' },
+  },
+  // chaves PÚBLICAS da RevenueCat (Project settings → API keys): appl_... e goog_...
+  // vazias = a tela de assinatura aparece, mas avisa que abre em breve
+  revenuecat: { android: '', ios: '' },
+  entitlement: 'premium',
+  promoEvery: 8,               // um card do MyK7+ a cada N fitas no feed
+  rewardHours: 24,             // quanto tempo o anúncio recompensado libera a Retrospectiva
+  benefits: [
+    ['🚫', 'sem anúncios', 'nem banner, nem vídeo — só música'],
+    ['🎞️', 'Retrospectiva sempre liberada', 'seus stories do mês e sua personalidade musical'],
+    ['✦', 'selo MyK7+ no perfil', 'pra galera saber que você apoia o app'],
+    ['💛', 'apoia um app independente', 'feito no Brasil, sem vender seus dados'],
+  ],
+};
+
+const NATIVE_PLATFORM = IS_NATIVE_APP && window.Capacitor.getPlatform ? window.Capacitor.getPlatform() : 'web';
+const monet = {
+  started: false, adsReady: false, bannerOn: false, purchasesReady: false,
+  rcPremium: false, privacyOptions: false,
+};
+
+function nativePlugin(name){
+  return IS_NATIVE_APP && window.Capacitor.Plugins ? window.Capacitor.Plugins[name] || null : null;
+}
+
+function isPremium(){
+  return !!(currentUser && (currentUser.premium || monet.rcPremium));
+}
+
+function adsActive(){
+  return IS_NATIVE_APP && monet.adsReady && !!currentUser && !isPremium();
+}
+
+function safeAreaBottom(){
+  const probe = document.createElement('div');
+  probe.style.cssText = 'position:fixed;visibility:hidden;height:env(safe-area-inset-bottom, 0px);';
+  document.body.appendChild(probe);
+  const v = probe.getBoundingClientRect().height;
+  probe.remove();
+  return v;
+}
+
+function setAdHeight(px){
+  const h = px > 0 ? px + safeAreaBottom() : 0;
+  document.documentElement.style.setProperty('--ad-h', `${Math.max(0, Math.round(h))}px`);
+}
+
+async function initAds(){
+  const AdMob = nativePlugin('AdMob');
+  if(!AdMob || monet.adsReady) return;
+  try{
+    // iPhone: pedido de rastreamento (ATT) antes de qualquer anúncio
+    if(NATIVE_PLATFORM === 'ios'){
+      const { status } = await AdMob.trackingAuthorizationStatus();
+      if(status === 'notDetermined') await AdMob.requestTrackingAuthorization();
+    }
+    // consentimento (LGPD/GDPR) pela tela oficial do Google
+    try{
+      const info = await AdMob.requestConsentInfo();
+      if(info.isConsentFormAvailable && info.status === 'REQUIRED') await AdMob.showConsentForm();
+      const after = await AdMob.requestConsentInfo();
+      monet.privacyOptions = after.privacyOptionsRequirementStatus === 'REQUIRED';
+      if(after.canRequestAds === false) return;
+    }catch(e){ /* sem formulário configurado no AdMob: segue normalmente */ }
+
+    await AdMob.initialize({ initializeForTesting: MONETIZATION.adsTestMode, maxAdContentRating: 'Teen' });
+    AdMob.addListener('bannerAdSizeChanged', (size) => setAdHeight(monet.bannerOn ? size.height : 0));
+    AdMob.addListener('bannerAdFailedToLoad', () => setAdHeight(0));
+    monet.adsReady = true;
+  }catch(e){
+    console.warn('anúncios indisponíveis:', e);
+  }
+}
+
+async function refreshBanner(){
+  const AdMob = nativePlugin('AdMob');
+  if(!AdMob) return;
+  const ids = MONETIZATION.admob[NATIVE_PLATFORM];
+  try{
+    if(adsActive() && ids && !monet.bannerOn){
+      monet.bannerOn = true;
+      await AdMob.showBanner({
+        adId: ids.banner, adSize: 'ADAPTIVE_BANNER', position: 'BOTTOM_CENTER',
+        margin: 0, isTesting: MONETIZATION.adsTestMode,
+      });
+    }else if(!adsActive() && monet.bannerOn){
+      monet.bannerOn = false;
+      setAdHeight(0);
+      await AdMob.removeBanner();
+    }
+  }catch(e){
+    monet.bannerOn = false;
+    setAdHeight(0);
+  }
+}
+
+// mostra o vídeo recompensado; resolve true se a pessoa assistiu até o fim
+async function showRewardedAd(){
+  const AdMob = nativePlugin('AdMob');
+  const ids = MONETIZATION.admob[NATIVE_PLATFORM];
+  if(!AdMob || !monet.adsReady || !ids) return false;
+  try{
+    await AdMob.prepareRewardVideoAd({ adId: ids.rewarded, isTesting: MONETIZATION.adsTestMode });
+    const reward = await AdMob.showRewardVideoAd();
+    return !!reward;
+  }catch(e){
+    showToast('nenhum anúncio disponível agora — tente daqui a pouco.', true);
+    return false;
+  }
+}
+
+const WRAPPED_UNLOCK_KEY = 'myk7-wrapped-unlocked-until';
+function wrappedUnlocked(){
+  // sem anúncios carregados (ou no site) a retrospectiva fica livre
+  if(!IS_NATIVE_APP || isPremium() || !monet.adsReady) return true;
+  try{ return Number(localStorage.getItem(WRAPPED_UNLOCK_KEY) || 0) > Date.now(); }catch(e){ return false; }
+}
+function unlockWrappedForAWhile(){
+  try{ localStorage.setItem(WRAPPED_UNLOCK_KEY, String(Date.now() + MONETIZATION.rewardHours * 3600000)); }catch(e){}
+}
+
+async function initPurchases(){
+  const Purchases = nativePlugin('Purchases');
+  const apiKey = MONETIZATION.revenuecat[NATIVE_PLATFORM];
+  if(!Purchases || !apiKey || !currentUser || !currentUser.billingId) return;
+  try{
+    if(!monet.purchasesReady){
+      await Purchases.configure({ apiKey, appUserID: currentUser.billingId });
+      monet.purchasesReady = true;
+    }else{
+      await Purchases.logIn({ appUserID: currentUser.billingId });
+    }
+    const { customerInfo } = await Purchases.getCustomerInfo();
+    applyCustomerInfo(customerInfo);
+  }catch(e){
+    console.warn('loja indisponível:', e);
+  }
+}
+
+function applyCustomerInfo(info){
+  const active = info && info.entitlements && info.entitlements.active;
+  monet.rcPremium = !!(active && active[MONETIZATION.entitlement]);
+}
+
+// confirma no servidor (que pergunta pra RevenueCat) e atualiza a tela toda
+async function syncPremiumFromServer(){
+  try{
+    const st = await apiFetch('/billing/refresh', { method: 'POST' });
+    if(currentUser){ currentUser.premium = st.premium; currentUser.premiumUntil = st.premiumUntil; }
+  }catch(e){ /* o webhook da RevenueCat acerta depois */ }
+  onPremiumChanged();
+}
+
+function onPremiumChanged(){
+  refreshBanner();
+  renderProfile();
+  if(!feedLoading) renderFeed();
+}
+
+// chamada depois que a sessão carrega (abrir o app, login, cadastro)
+async function initMonetization(){
+  if(!IS_NATIVE_APP || !currentUser) return;
+  if(!monet.started){
+    monet.started = true;
+    await initAds();
+  }
+  await initPurchases();
+  refreshBanner();
+  if(!feedLoading) renderFeed(); // entra o card do MyK7+ no feed
+}
+
+async function resetMonetization(){
+  monet.rcPremium = false;
+  await refreshBanner();
+  const Purchases = nativePlugin('Purchases');
+  if(Purchases && monet.purchasesReady){ try{ await Purchases.logOut(); }catch(e){} }
+}
+
+function storeSubscriptionsUrl(){
+  return NATIVE_PLATFORM === 'ios'
+    ? 'https://apps.apple.com/account/subscriptions'
+    : 'https://play.google.com/store/account/subscriptions?package=br.com.ntech.myk7';
+}
+
+// card do MyK7+ que entra no meio do feed pra quem vê anúncios
+function promoCardHtml(){
+  return `
+    <div class="feed-card promo-card">
+      <div class="promo-k">MyK7+</div>
+      <div class="promo-t">ouça sem interrupção</div>
+      <ul class="promo-list">${MONETIZATION.benefits.slice(0, 3).map(([ic, t]) => `<li><span>${ic}</span>${escapeHtml(t)}</li>`).join('')}</ul>
+      <button type="button" class="promo-btn" data-act="paywall">conhecer o MyK7+</button>
+      <div class="promo-note">role pra continuar ↓</div>
+    </div>`;
+}
+
+// tela de assinatura
+async function openPaywall(reason){
+  const overlay = document.getElementById('followListOverlay');
+  const title = document.getElementById('followListTitle');
+  const body = document.getElementById('followListBody');
+  title.textContent = 'MyK7+';
+
+  if(!IS_NATIVE_APP){
+    body.innerHTML = `<div class="paywall"><p class="pw-lead">o MyK7+ é assinado pelo app do MyK7 na App Store ou na Play Store. quem assina lá fica com os benefícios aqui no site também.</p></div>`;
+    overlay.classList.add('active');
+    return;
+  }
+
+  body.innerHTML = `
+    <div class="paywall">
+      ${reason ? `<p class="pw-reason">${escapeHtml(reason)}</p>` : ''}
+      <ul class="pw-benefits">
+        ${MONETIZATION.benefits.map(([ic, t, s]) => `<li><span class="pw-ic">${ic}</span><span><b>${escapeHtml(t)}</b><br><small>${escapeHtml(s)}</small></span></li>`).join('')}
+      </ul>
+      <div id="pwPlans" class="pw-plans"><div class="pw-loading">carregando planos…</div></div>
+      <p id="pwMsg" class="form-msg"></p>
+      <button type="button" class="link-btn pw-restore" id="pwRestore">restaurar compras</button>
+      <p class="pw-legal">A assinatura renova automaticamente pelo mesmo valor e período, cobrada na sua conta ${NATIVE_PLATFORM === 'ios' ? 'Apple' : 'Google Play'}, a menos que seja cancelada pelo menos 24 h antes do fim do período. Gerencie ou cancele nas configurações da loja. <a href="termos.html">Termos de Uso</a> · <a href="privacidade.html">Privacidade</a></p>
+    </div>`;
+  overlay.classList.add('active');
+
+  const plansEl = document.getElementById('pwPlans');
+  const msg = document.getElementById('pwMsg');
+  const Purchases = nativePlugin('Purchases');
+
+  document.getElementById('pwRestore').addEventListener('click', async () => {
+    if(!Purchases || !monet.purchasesReady){ msg.textContent = 'a loja ainda não está disponível.'; return; }
+    try{
+      const { customerInfo } = await Purchases.restorePurchases();
+      applyCustomerInfo(customerInfo);
+      await syncPremiumFromServer();
+      if(isPremium()){ overlay.classList.remove('active'); showToast('MyK7+ restaurado ✦'); }
+      else msg.textContent = 'nenhuma assinatura ativa encontrada nessa conta da loja.';
+    }catch(e){ msg.textContent = 'não deu pra restaurar agora.'; }
+  });
+
+  if(!Purchases || !monet.purchasesReady){
+    plansEl.innerHTML = `<div class="pw-loading">as assinaturas abrem em breve 💛</div>`;
+    return;
+  }
+  try{
+    const offerings = await Purchases.getOfferings();
+    const pkgs = (offerings.current && offerings.current.availablePackages) || [];
+    if(!pkgs.length){ plansEl.innerHTML = `<div class="pw-loading">as assinaturas abrem em breve 💛</div>`; return; }
+    const label = { MONTHLY: 'mensal', ANNUAL: 'anual', WEEKLY: 'semanal', LIFETIME: 'vitalício' };
+    plansEl.innerHTML = pkgs.map((p, i) => `
+      <button type="button" class="pw-plan ${p.packageType === 'ANNUAL' ? 'best' : ''}" data-i="${i}">
+        <span class="pw-plan-name">${escapeHtml(label[p.packageType] || p.product.title || p.identifier)}${p.packageType === 'ANNUAL' ? ' <em>melhor preço</em>' : ''}</span>
+        <span class="pw-plan-price">${escapeHtml(p.product.priceString)}</span>
+      </button>`).join('');
+    plansEl.querySelectorAll('.pw-plan').forEach(btn => btn.addEventListener('click', async () => {
+      plansEl.querySelectorAll('.pw-plan').forEach(b => { b.disabled = true; });
+      msg.textContent = '';
+      try{
+        const { customerInfo } = await Purchases.purchasePackage({ aPackage: pkgs[Number(btn.dataset.i)] });
+        applyCustomerInfo(customerInfo);
+        await syncPremiumFromServer();
+        overlay.classList.remove('active');
+        showToast('bem-vindo ao MyK7+ ✦ obrigado pelo apoio!');
+      }catch(e){
+        if(!(e && (e.userCancelled || /cancel/i.test(String(e.message))))) msg.textContent = 'a compra não foi concluída — nada foi cobrado.';
+        plansEl.querySelectorAll('.pw-plan').forEach(b => { b.disabled = false; });
+      }
+    }));
+  }catch(e){
+    plansEl.innerHTML = `<div class="pw-loading">não deu pra carregar os planos agora.</div>`;
+  }
+}
+
+// Retrospectiva: liberada pra MyK7+, ou por 24 h assistindo um anúncio
+function openWrappedGate(){
+  if(wrappedUnlocked()) return openWrapped();
+  const overlay = document.getElementById('followListOverlay');
+  document.getElementById('followListTitle').textContent = 'Sua retrospectiva';
+  document.getElementById('followListBody').innerHTML = `
+    <div class="paywall">
+      <p class="pw-lead">a retrospectiva completa é um extra do <b>MyK7+</b>. quer ver agora? assista um anúncio curto e ela fica liberada por ${MONETIZATION.rewardHours} h.</p>
+      <button type="button" class="primary pw-cta" id="wgPlus">✦ assinar o MyK7+</button>
+      <button type="button" class="ghost pw-cta" id="wgAd">▶ ver um anúncio e liberar</button>
+    </div>`;
+  overlay.classList.add('active');
+  document.getElementById('wgPlus').addEventListener('click', () => openPaywall());
+  document.getElementById('wgAd').addEventListener('click', async (e) => {
+    e.currentTarget.disabled = true;
+    const ok = await showRewardedAd();
+    overlay.classList.remove('active');
+    if(ok){ unlockWrappedForAWhile(); openWrapped(); }
+  });
+}
+
+// bloco do Perfil
+function premiumProfileHtml(){
+  if(!currentUser) return '';
+  if(isPremium()){
+    const until = currentUser.premiumUntil && currentUser.premiumUntil !== 'lifetime'
+      ? ` · válido até ${new Date(currentUser.premiumUntil).toLocaleDateString('pt-BR')}` : '';
+    return `<div class="plus-box on" style="max-width:420px;">
+      <span><b>✦ você é MyK7+</b><br><small>obrigado por apoiar o app${until}</small></span>
+      ${IS_NATIVE_APP ? `<a class="link-btn" href="${storeSubscriptionsUrl()}" target="_blank" rel="noopener">gerenciar</a>` : ''}
+    </div>`;
+  }
+  if(!IS_NATIVE_APP) return '';
+  return `<button type="button" class="plus-box" id="plusOpenBtn" style="max-width:420px;">
+      <span><b>✦ conheça o MyK7+</b><br><small>sem anúncios, retrospectiva liberada e selo no perfil</small></span><span aria-hidden="true">›</span>
+    </button>
+    ${monet.privacyOptions ? `<button type="button" class="link-btn" id="adPrivacyBtn" style="margin:-4px 0 14px;">privacidade dos anúncios</button>` : ''}`;
+}
+
+function bindPremiumProfile(){
+  const btn = document.getElementById('plusOpenBtn');
+  if(btn) btn.addEventListener('click', () => openPaywall());
+  const priv = document.getElementById('adPrivacyBtn');
+  if(priv) priv.addEventListener('click', async () => {
+    const AdMob = nativePlugin('AdMob');
+    if(AdMob){ try{ await AdMob.showPrivacyOptionsForm(); }catch(e){} }
+  });
+}
 
 // a logo do header é a fonte única: as outras (portão de login, cadastro)
 // são cópias dela, então mudar o desenho lá muda em todo lugar
@@ -3380,6 +3757,7 @@ function toggleAppTheme(){
 
   const meta = document.querySelector('meta[name="theme-color"]');
   if(meta) meta.setAttribute('content', isLight ? '#17161A' : '#F3ECDA');
+  syncStatusBar();
 
   if(currentUser) renderProfile(); // atualiza o texto do botão (☀️/🌙)
 }
@@ -3526,7 +3904,7 @@ function personMeta(id){
     id, username:u.username, avatar:u.avatar || null, color:'#3C6459',
     sub:u.nationality || '', genres:u.genres || [], nationality:u.nationality,
     followers:u.followerCount || 0, following:u.followingCount || 0,
-    bio:u.bio || '', favorites:u.favorites || [], isReal:true, reviews:realUserDiaryCache.get(id) || []
+    bio:u.bio || '', favorites:u.favorites || [], isReal:true, premium:!!u.premium, reviews:realUserDiaryCache.get(id) || []
   };
 }
 
@@ -3697,7 +4075,7 @@ async function renderPersonProfileView(id){
       <div class="ac-avatar-row">
         <div class="ac-avatar" style="${p.avatar ? `background-image:url(${p.avatar})` : `background:${p.color||'#3C6459'}`}">${p.avatar ? '' : p.username[0].toUpperCase()}</div>
       </div>
-      <div class="ac-name">${escapeHtml(p.username)}</div>
+      <div class="ac-name">${escapeHtml(p.username)}${p.premium ? '<span class="plus-badge">MyK7+</span>' : ''}</div>
       ${p.sub ? `<div class="ac-row">${escapeHtml(p.sub)}</div>` : ''}
       ${p.genres.length ? `<div class="ac-genres">${p.genres.map(g=>`<span>${escapeHtml(g)}</span>`).join('')}</div>` : ''}
       ${p.bio ? `<div class="ac-bio"><span>${escapeHtml(p.bio)}</span></div>` : ''}
@@ -4835,7 +5213,8 @@ function renderFeed(){
       else if(ps.gs > 0) whyTag = `porque você curte ${escapeHtml(a.genre)}`;
       else if(ps.favBoost > 0) whyTag = 'no seu estilo favorito';
     }
-    return `
+    const promo = adsActive() && i > 0 && i % MONETIZATION.promoEvery === 0 ? promoCardHtml() : '';
+    return promo + `
     <div class="feed-card" data-item-id="${a.id}">
       ${feedMode === 'trending' ? `<div class="fc-trending">🔥 Em alta · ${escapeHtml(trendCountryForUser())}</div>` : (trendingIds.includes(a.id) ? '<div class="fc-trending">🔥 Em alta</div>' : (whyTag ? `<div class="fc-trending fc-why">✦ ${whyTag}</div>` : ''))}
       <div class="fc-eyebrow">${typeLabel(a)} · ${escapeHtml(a.genre)}</div>
@@ -4869,7 +5248,8 @@ function renderFeed(){
   });
 
   bindDailyCard();
-  scroll.querySelectorAll('.feed-card:not(.daily-card)').forEach(card=>{
+  scroll.querySelectorAll('.promo-card [data-act="paywall"]').forEach(btn => btn.addEventListener('click', () => openPaywall()));
+  scroll.querySelectorAll('.feed-card:not(.daily-card):not(.promo-card)').forEach(card=>{
     card.addEventListener('click', (e)=>{
       if(e.target.closest('.fc-rail') || e.target.closest('.fc-disc-spotify') || e.target.closest('.fc-preview')) return;
       openItemDetail(parseItemId(card.dataset.itemId));
@@ -4904,7 +5284,7 @@ function setupFeedAutoplayObserver(){
         if(!best || entry.intersectionRatio > best.intersectionRatio) best = entry;
       }
     });
-    if(best) handleFeedCardInView(parseItemId(best.target.dataset.itemId));
+    if(best && best.target.dataset.itemId) handleFeedCardInView(parseItemId(best.target.dataset.itemId));
   }, { root: scroll, threshold: [0, 0.25, 0.5, 0.65, 0.75, 1] });
 
   scroll.querySelectorAll('.feed-card').forEach(card => feedAutoplayObserver.observe(card));
@@ -6733,7 +7113,7 @@ function renderDiary(){
 
   bindListenLater(body);
   const wrappedDiaryBtn = document.getElementById('wrappedOpenBtnDiary');
-  if(wrappedDiaryBtn) wrappedDiaryBtn.addEventListener('click', openWrapped);
+  if(wrappedDiaryBtn) wrappedDiaryBtn.addEventListener('click', openWrappedGate);
   body.querySelectorAll('.diary-edit-btn').forEach(btn=>{
     btn.addEventListener('click', ()=> startEditDiaryEntry(Number(btn.dataset.id)));
   });
@@ -7154,7 +7534,7 @@ async function renderProfile(){
         </div>
         <input type="file" accept="image/*" id="avatarInput" style="display:none">
       </div>
-      <div class="ac-name">${escapeHtml(currentUser.username)}</div>
+      <div class="ac-name">${escapeHtml(currentUser.username)}${isPremium() ? '<span class="plus-badge">MyK7+</span>' : ''}</div>
       <div class="ac-row">${escapeHtml(currentUser.email)}</div>
       <div class="ac-row">${escapeHtml(currentUser.nationality || '')}</div>
       <div class="ac-genres">${currentUser.genres.map(g=>`<span>${escapeHtml(g)}</span>`).join('')}</div>
@@ -7243,6 +7623,7 @@ async function renderProfile(){
     </div>
 
     <div class="field-label" style="margin:30px 0 12px;">conta</div>
+    ${premiumProfileHtml()}
     <button class="ghost" id="goPessoasBtn" style="max-width:420px;margin-bottom:10px;">Ver e seguir pessoas</button>
     <button class="ghost" id="themeToggleBtn" style="max-width:420px;margin-bottom:10px;">
       ${document.documentElement.getAttribute('data-theme') === 'light' ? '🌙 modo escuro' : '☀️ modo claro'}
@@ -7259,7 +7640,8 @@ async function renderProfile(){
   hydrateArt([lastAlbum, ...diary.map(e => getItem(e.itemId))].filter(Boolean));
   bindFavorites(body);
   const wrappedBtn = document.getElementById('wrappedOpenBtn');
-  if(wrappedBtn) wrappedBtn.addEventListener('click', openWrapped);
+  if(wrappedBtn) wrappedBtn.addEventListener('click', openWrappedGate);
+  bindPremiumProfile();
 
   document.getElementById('avatarBtn').addEventListener('click', ()=>{
     document.getElementById('avatarInput').click();
@@ -7380,6 +7762,7 @@ async function renderProfile(){
   document.getElementById('tutorialBtn').addEventListener('click', ()=> startTutorial());
   document.getElementById('logoutBtn').addEventListener('click', async ()=>{
     await doLogout();
+    resetMonetization();
     diary = [];
     realConversationsCache = [];
     realThreadCache.clear();
@@ -8898,6 +9281,7 @@ async function renderOnboarding(){
 
 async function afterAuthSuccess(){
   renderAuthGate();
+  initMonetization();
   await loadDiaryFromServer();
   renderGenreBar();
   fetchLiveFeed();
@@ -9147,6 +9531,7 @@ document.addEventListener('touchend', (e)=>{
   renderGenreBar();
   fetchLiveFeed();
   currentUser = await loadSession();
+  initMonetization();
   await verifyEmailFromUrl();
   handleSpotifyRedirect();
   if(currentUser) loadBlockedUsernames();

@@ -147,6 +147,11 @@ if(!userColumns.includes('terms_accepted_at')){
   db.exec('ALTER TABLE users ADD COLUMN terms_accepted_at TEXT');
 }
 
+// assinatura MyK7+: até quando vale (ISO), 'lifetime' pra sem prazo, ou null
+if(!userColumns.includes('premium_until')){
+  db.exec('ALTER TABLE users ADD COLUMN premium_until TEXT');
+}
+
 // mensagens lidas/não lidas (as que já existiam contam como lidas)
 const messageColumns = db.prepare("PRAGMA table_info(messages)").all().map(c => c.name);
 if(!messageColumns.includes('read_at')){
