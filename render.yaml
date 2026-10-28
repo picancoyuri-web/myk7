@@ -1,0 +1,40 @@
+# Render Blueprint — cria o backend com disco persistente (o banco SQLite
+# não some a cada deploy). Render → New → Blueprint → aponte pra este repo.
+services:
+  - type: web
+    name: myk7
+    runtime: node
+    rootDir: server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    plan: starter            # disco persistente exige plano pago (o grátis apaga o banco)
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_ORIGIN
+        value: https://myk7.netlify.app
+      - key: DB_PATH
+        value: /var/data/cassete.db
+      - key: ADMIN_USERNAMES
+        sync: false
+      - key: DISCOGS_TOKEN
+        sync: false
+      - key: SPOTIFY_CLIENT_ID
+        sync: false
+      - key: SPOTIFY_CLIENT_SECRET
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+    disk:
+      name: myk7-data
+      mountPath: /var/data
+      sizeGB: 1

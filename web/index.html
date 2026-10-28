@@ -1264,6 +1264,10 @@
     color:var(--ink-soft);cursor:pointer;display:block;
   }
   .link-btn:hover{color:var(--ink);}
+  .terms-check{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.45;color:var(--ink-soft);margin:4px 0 14px;cursor:pointer;}
+  .terms-check input{margin-top:2px;flex:none;width:16px;height:16px;accent-color:var(--mustard);}
+  .terms-check a, .legal-links a{color:inherit;text-decoration:underline;}
+  .legal-links{text-align:center;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ink-soft);opacity:0.75;margin:18px auto 0;}
 
   /* ---------- ONBOARDING (sugestão de pessoas pra seguir) ---------- */
   .onboarding-list{max-height:44vh;overflow-y:auto;margin-bottom:18px;}
@@ -2018,7 +2022,21 @@
    não aceita service worker vindo de blob:, então o antigo nunca
    chegava a ser registrado.
    ============================================================ */
+const IS_NATIVE_APP = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+if(IS_NATIVE_APP) document.documentElement.classList.add('native-app');
+
 (function setupPWA(){
+  // no app das lojas o conteúdo já vem dentro do pacote: nada de service
+  // worker nem de "instalar o app"
+  if(IS_NATIVE_APP){
+    // links internos com target=_blank (Termos, Privacidade) não abrem nada
+    // dentro do WebView — abre na mesma tela, que tem o "← voltar"
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest && e.target.closest('a[target="_blank"]');
+      if(a && a.origin === location.origin) a.removeAttribute('target');
+    }, true);
+    return;
+  }
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW não registrado:', err));
@@ -3216,12 +3234,26 @@ async function apiFetch(path, options = {}){
   });
   let body = null;
   try{ body = await res.json(); }catch(e){ /* respostas 204 não têm corpo */ }
+  if(body && /^https?:/.test(API_BASE)) body = absolutizeApiPaths(body);
   if(!res.ok){
     const err = new Error((body && body.error) || 'erro ao falar com o servidor.');
     err.status = res.status;
     throw err;
   }
   return body;
+}
+
+// fotos e avatares vêm da API como "/api/...". No site o Netlify repassa
+// isso pro Render, mas no app empacotado (Capacitor) não existe esse proxy —
+// sem isso nenhuma foto carrega no iOS/Android
+const API_ORIGIN = /^https?:/.test(API_BASE) ? API_BASE.replace(/\/api\/?$/, '') : '';
+function absolutizeApiPaths(v){
+  if(typeof v === 'string') return v.startsWith('/api/') ? API_ORIGIN + v : v;
+  if(Array.isArray(v)) return v.map(absolutizeApiPaths);
+  if(v && typeof v === 'object'){
+    for(const k of Object.keys(v)) v[k] = absolutizeApiPaths(v[k]);
+  }
+  return v;
 }
 
 let toastTimer = null;
@@ -3376,16 +3408,17 @@ async function loadSession(){
   return currentUser;
 }
 
-async function doSignup({username, email, password, nationality, genres}){
+async function doSignup({username, email, password, nationality, genres, acceptedTerms}){
   if(!username || !email || !password) return 'preencha usuário, e-mail e senha.';
   if(password.length < 8) return 'a senha precisa ter pelo menos 8 caracteres.';
   if(!/^\S+@\S+\.\S+$/.test(email)) return 'e-mail inválido.';
   if(!nationality) return 'escolha sua nacionalidade.';
   if(genres.length === 0) return 'escolha pelo menos um estilo musical.';
+  if(!acceptedTerms) return 'pra criar a conta, aceite os Termos de Uso e a Política de Privacidade.';
   try{
     const { user } = await apiFetch('/auth/signup', {
       method: 'POST',
-      body: JSON.stringify({ username, email, password, nationality, genres }),
+      body: JSON.stringify({ username, email, password, nationality, genres, acceptedTerms: true }),
     });
     currentUser = user;
     return null;
@@ -6430,6 +6463,27 @@ async function shareImageBlob(blob, { filename, shareTitle, shareText, link }){
   const file = new File([blob], filename, { type: 'image/png' });
   const copied = await copyAppLink(link);
 
+  // app das lojas: o WebView do Android não tem navigator.share — usa a
+  // folha de compartilhar nativa (grava a imagem no cache e manda o arquivo)
+  const plugins = IS_NATIVE_APP && window.Capacitor.Plugins;
+  if(plugins && plugins.Share && plugins.Filesystem){
+    try{
+      const data = await new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result).split(',')[1]);
+        r.onerror = reject;
+        r.readAsDataURL(blob);
+      });
+      const { uri } = await plugins.Filesystem.writeFile({ path: filename, data, directory: 'CACHE' });
+      await plugins.Share.share({ title: shareTitle, text: `${shareText}\n${link}`, files: [uri], dialogTitle: shareTitle });
+      if(copied) showToast('link do MyK7 copiado — no story, cole no sticker "Link" pra levar a galera pro app.');
+    }catch(e){
+      // cancelou a folha de compartilhar — sem problema
+      if(!/cancel/i.test(String(e && e.message))) console.warn('compartilhar falhou:', e);
+    }
+    return;
+  }
+
   if(navigator.canShare && navigator.canShare({ files: [file] })){
     try{
       await navigator.share({ files: [file], title: shareTitle, text: `${shareText}\n${link}` });
@@ -7039,6 +7093,7 @@ async function renderProfile(){
             ${famousGenres.map(g=>`<button type="button" class="gpchip" data-g="${g}">${g}</button>`).join('')}
           </div>
         </div>
+        <label class="terms-check"><input type="checkbox" id="suTerms"> <span>tenho 13 anos ou mais e aceito os <a href="termos.html" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>. Não há tolerância com conteúdo ofensivo ou abusivo.</span></label>
         <div class="form-msg" id="authMsg"></div>
         <button class="primary" id="signupSubmit">Criar conta</button>
       `;
@@ -7057,7 +7112,8 @@ async function renderProfile(){
           email: document.getElementById('suEmail').value.trim(),
           password: document.getElementById('suPass').value,
           nationality: document.getElementById('suCountry').value,
-          genres: [...signupGenres]
+          genres: [...signupGenres],
+          acceptedTerms: document.getElementById('suTerms').checked
         });
         btn.disabled = false;
         if(err){ document.getElementById('authMsg').textContent = err; return; }
@@ -7124,7 +7180,7 @@ async function renderProfile(){
         </div>
         <div id="nowPlayingOwn"></div>
         <button class="ghost" id="spotifyDisconnectBtn" style="margin-top:10px;">desconectar Spotify</button>
-      ` : `
+      ` : IS_NATIVE_APP ? '' : `
         <button class="spotify-connect" id="spotifyConnectBtn">🎧 conectar com Spotify</button>
         <p class="db-note" style="opacity:0.6;margin-top:8px;margin-bottom:0;">conecta sua conta pra mostrar pras pessoas o que você está ouvindo agora.</p>
       `}
@@ -7197,6 +7253,7 @@ async function renderProfile(){
     <button type="button" id="deleteAccountBtn">excluir minha conta permanentemente</button>
     <p class="db-note">seus dados de conta ficam salvos num servidor de verdade, com a senha criptografada.</p>
     <p class="db-note" style="opacity:0.5;">dados de música (títulos, artistas, prévias) fornecidos pela iTunes Search API — Apple Inc.</p>
+    <p class="legal-links" style="max-width:420px;"><a href="termos.html" target="_blank" rel="noopener">Termos de Uso</a> · <a href="privacidade.html" target="_blank" rel="noopener">Privacidade</a> · <a href="mailto:ntechcontato.administrativo@gmail.com?subject=MyK7%20-%20suporte">Suporte</a></p>
   `;
 
   hydrateArt([lastAlbum, ...diary.map(e => getItem(e.itemId))].filter(Boolean));
@@ -8667,6 +8724,7 @@ function renderAuthGate(){
       <button class="auth-tab" data-gate-mode="cadastro">Cadastrar</button>
     </div>
     <div class="auth-form" id="gateAuthForm"></div>
+    <p class="legal-links"><a href="termos.html" target="_blank" rel="noopener">Termos de Uso</a> · <a href="privacidade.html" target="_blank" rel="noopener">Privacidade</a></p>
   `;
 
   box.querySelectorAll('.auth-tab').forEach(btn=>{
@@ -8716,6 +8774,7 @@ function renderAuthGate(){
           ${famousGenres.map(g=>`<button type="button" class="gpchip" data-g="${g}">${g}</button>`).join('')}
         </div>
       </div>
+      <label class="terms-check"><input type="checkbox" id="gateSuTerms"> <span>tenho 13 anos ou mais e aceito os <a href="termos.html" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>. Não há tolerância com conteúdo ofensivo ou abusivo.</span></label>
       <div class="form-msg" id="gateAuthMsg"></div>
       <button class="primary" id="gateSignupSubmit">Criar conta</button>
     `;
@@ -8734,7 +8793,8 @@ function renderAuthGate(){
         email: document.getElementById('gateSuEmail').value.trim(),
         password: document.getElementById('gateSuPass').value,
         nationality: document.getElementById('gateSuCountry').value,
-        genres: [...gateSignupGenres]
+        genres: [...gateSignupGenres],
+        acceptedTerms: document.getElementById('gateSuTerms').checked
       });
       btn.disabled = false;
       if(err){ document.getElementById('gateAuthMsg').textContent = err; return; }

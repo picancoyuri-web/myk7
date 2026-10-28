@@ -1,0 +1,28 @@
+{
+  "appId": "br.com.ntech.myk7",
+  "appName": "MyK7",
+  "webDir": "web",
+  "backgroundColor": "#17161A",
+  "android": {
+    "allowMixedContent": false
+  },
+  "ios": {
+    "contentInset": "never",
+    "scheme": "MyK7"
+  },
+  "plugins": {
+    "CapacitorHttp": { "enabled": true },
+    "CapacitorCookies": { "enabled": true },
+    "SplashScreen": {
+      "launchShowDuration": 800,
+      "launchAutoHide": true,
+      "backgroundColor": "#17161A",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#17161A",
+      "overlaysWebView": false
+    }
+  }
+}

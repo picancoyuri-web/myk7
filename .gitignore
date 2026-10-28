@@ -1,5 +1,19 @@
-﻿node_modules/
+node_modules/
 *.db
 *.db-journal
+*.db-wal
+*.db-shm
 .env
 
+# Capacitor / nativo
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/app/release/
+ios/App/Pods/
+ios/App/build/
+ios/DerivedData/
+*.keystore
+*.jks
+keystore.properties

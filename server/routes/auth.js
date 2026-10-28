@@ -68,6 +68,7 @@ router.post('/signup', signupLimiter, async (req, res, next) => {
     if(pwErr) return res.status(400).json({ error: pwErr });
     if(!nationality) return res.status(400).json({ error: 'escolha sua nacionalidade.' });
     if(genres.length === 0) return res.status(400).json({ error: 'escolha pelo menos um estilo musical.' });
+    if(body.acceptedTerms !== true) return res.status(400).json({ error: 'pra criar a conta, aceite os Termos de Uso e a Política de Privacidade.' });
 
     const existing = db.prepare(
       'SELECT id FROM users WHERE username = ? COLLATE NOCASE OR email = ? COLLATE NOCASE'
@@ -76,7 +77,7 @@ router.post('/signup', signupLimiter, async (req, res, next) => {
 
     const hash = await bcrypt.hash(password, 10);
     const info = db.prepare(
-      'INSERT INTO users (username, email, password_hash, nationality, genres) VALUES (?,?,?,?,?)'
+      "INSERT INTO users (username, email, password_hash, nationality, genres, terms_accepted_at) VALUES (?,?,?,?,?,datetime('now'))"
     ).run(username, email, hash, nationality, JSON.stringify(genres));
 
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);

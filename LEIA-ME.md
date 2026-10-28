@@ -34,6 +34,18 @@ Use um *Persistent Disk* e aponte `DB_PATH` pra ele, senão o banco é apagado a
 O `_redirects` (proxy da API) e o `_headers` (cache) já estão dentro dela — confira se a URL
 do backend no `_redirects` é a do seu serviço no Render.
 
+## App nas lojas (28/out/2026)
+
+- **Android e iOS prontos pra compilar** com Capacitor 8 (`android/`, `ios/`). Passo a passo,
+  textos da ficha e checklist de revisão em **`PUBLICAR-NAS-LOJAS.md`**.
+- **Termos de Uso e Política de Privacidade** (`web/termos.html`, `web/privacidade.html`, LGPD) —
+  o cadastro exige o aceite; links no login e no Perfil, com e-mail de suporte.
+- **Moderação de denúncias** pra quem está em `ADMIN_USERNAMES`.
+- Correções do app nativo: fotos e avatares não carregavam (caminhos `/api/...` relativos),
+  compartilhar card de Story não fazia nada no Android (agora usa a folha nativa), sem banner de
+  "instalar" nem service worker dentro do app.
+- `render.yaml` (backend com disco persistente) e `netlify.toml`.
+
 ## Atualização de outubro/2026 (3) — MyK7
 
 - **Nova identidade MyK7:** logo desenhada em SVG (fita + "My" escrito à mão + "K7"), que segue a

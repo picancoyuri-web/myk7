@@ -141,6 +141,12 @@ if(!userColumns.includes('avatar_v')){
   db.exec('ALTER TABLE users ADD COLUMN avatar_v INTEGER NOT NULL DEFAULT 0');
 }
 
+// quando a pessoa aceitou os Termos de Uso e a Política de Privacidade
+// (exigido pela App Store e pela Play Store pra apps com conteúdo de usuários)
+if(!userColumns.includes('terms_accepted_at')){
+  db.exec('ALTER TABLE users ADD COLUMN terms_accepted_at TEXT');
+}
+
 // mensagens lidas/não lidas (as que já existiam contam como lidas)
 const messageColumns = db.prepare("PRAGMA table_info(messages)").all().map(c => c.name);
 if(!messageColumns.includes('read_at')){

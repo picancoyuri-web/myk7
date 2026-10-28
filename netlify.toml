@@ -1,0 +1,6 @@
+# Netlify: publica a pasta web/ sem build. O proxy da API (_redirects) e os
+# cabeçalhos de cache (_headers) ficam dentro dela.
+[build]
+  base = "web"
+  publish = "."
+  command = ""

@@ -1,0 +1,30 @@
+{
+  "name": "myk7-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MyK7 — app da App Store e da Play Store (Capacitor em volta da pasta web/).",
+  "scripts": {
+    "sync": "cap sync",
+    "assets": "capacitor-assets generate --android --ios --iconBackgroundColor \"#17161A\" --iconBackgroundColorDark \"#17161A\" --splashBackgroundColor \"#17161A\" --splashBackgroundColorDark \"#17161A\"",
+    "android": "cap sync android && cap open android",
+    "ios": "cap sync ios && cap open ios",
+    "android:release": "cap sync android && cd android && gradlew bundleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.6.0",
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/ios": "^8.6.0",
+    "@capacitor/share": "^8.0.3",
+    "@capacitor/splash-screen": "^8.0.0",
+    "@capacitor/status-bar": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.6.0"
+  },
+  "allowScripts": {
+    "sharp@0.32.6": true
+  }
+}
