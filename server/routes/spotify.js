@@ -27,7 +27,7 @@ function redirectUri(req){
 
 // pra onde a pessoa volta depois de autorizar (o site, não a API)
 function frontendUrl(){
-  const first = (process.env.FRONTEND_ORIGIN || 'https://cassete.netlify.app').split(',')[0].trim();
+  const first = (process.env.FRONTEND_ORIGIN || 'https://myk7.netlify.app').split(',')[0].trim();
   return first.replace(/\/$/, '');
 }
 

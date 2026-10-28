@@ -3,10 +3,10 @@
 // quem já instalou) e cai no cache só quando não há conexão. Imagens e
 // fontes, que quase nunca mudam, saem direto do cache.
 // A API e as prévias de áudio nunca passam pelo cache.
-const CACHE_NAME = 'myk7-v1';
+const CACHE_NAME = 'myk7-v2';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'favicon.svg',
-  'icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'img/cassette.jpg',
+  'icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'img/cassette.jpg', 'js/qrcode.min.js',
 ];
 
 self.addEventListener('install', (event) => {

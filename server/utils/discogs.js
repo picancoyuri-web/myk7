@@ -4,7 +4,7 @@
 // - cache em memória: o Discogs só permite 60 requisições/minuto, e o feed
 //   de artistas pede várias de uma vez — sem cache estoura rapidinho.
 const DISCOGS_BASE = 'https://api.discogs.com';
-const USER_AGENT = 'CasseteApp/1.0 (+https://cassete.netlify.app)';
+const USER_AGENT = 'CasseteApp/1.0 (+https://myk7.netlify.app)';
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6h
 const CACHE_MAX = 2000;
 

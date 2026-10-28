@@ -37,7 +37,8 @@ app.disable('x-powered-by');
 // origem separada por vírgula.
 const allowedOrigins = new Set([
   ...(process.env.FRONTEND_ORIGIN || 'http://localhost:5500').split(',').map(s => s.trim().replace(/\/$/, '')).filter(Boolean),
-  'https://cassete.netlify.app', // site em produção (Netlify)
+  'https://myk7.netlify.app',    // site em produção (Netlify)
+  'https://cassete.netlify.app', // endereço antigo
   'capacitor://localhost', // iOS (Capacitor)
   'https://localhost',     // Android (Capacitor)
   'http://localhost',

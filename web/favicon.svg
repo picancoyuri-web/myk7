@@ -1,12 +1,67 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#17161A"/>
-  <g transform="translate(6 13) scale(1.0833)">
-    <rect x="1.2" y="1.2" width="45.6" height="29.6" rx="5" fill="none" stroke="#ECE7DD" stroke-width="2.6"/>
-    <rect x="5.5" y="5" width="37" height="16.5" rx="2.5" fill="#C79A46"/>
-    <rect x="19.5" y="10.4" width="9" height="5.6" rx="1.2" fill="#17161A" stroke="#ECE7DD" stroke-width="1.6"/>
-    <circle cx="13.6" cy="13.2" r="4.4" fill="#17161A" stroke="#ECE7DD" stroke-width="1.8"/>
-    <circle cx="34.4" cy="13.2" r="4.4" fill="#17161A" stroke="#ECE7DD" stroke-width="1.8"/>
-    <path d="M13.6 10.6v5.2M11.35 11.9l4.5 2.6M11.35 14.5l4.5-2.6M34.4 10.6v5.2M32.15 11.9l4.5 2.6M32.15 14.5l4.5-2.6" stroke="#ECE7DD" stroke-width="1.6" stroke-linecap="round"/>
-    <path d="M11 30.8l3.2-5.8h19.6l3.2 5.8" fill="none" stroke="#ECE7DD" stroke-width="2.2" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><style>
+  /* cores da logo da fita: escura (metal grafite) no tema escuro, metal
+     claro com traço escuro no tema claro */
+  :root{
+    --k7-bg-a:#161618; --k7-bg-b:#0B0B0C;
+    --k7-metal-a:#2E2E31; --k7-metal-b:#1B1B1D; --k7-shine:#FFFFFF; --k7-rim:#4C4C51;
+    --k7-line:#0E0E10; --k7-ring:#5A5A5F; --k7-window:#424246;
+    --k7-tape:#33221D; --k7-tape-b:#4E3229; --k7-tape-line:rgba(0,0,0,.35);
+    --k7-gear:#323236; --k7-hole:#0E0E10;
+    --k7-play:#8A8A90; --k7-play-fill:rgba(10,10,12,.55);
+  }
+  @media (prefers-color-scheme: light){ :root{
+    --k7-bg-a:#EFE8D8; --k7-bg-b:#E2D9C5;
+    --k7-metal-a:#E4DDCE; --k7-metal-b:#CBC3B2; --k7-shine:#FFFFFF; --k7-rim:#F6F1E6;
+    --k7-line:#6F675A; --k7-ring:#4A433A; --k7-window:#A79F8F;
+    --k7-tape:#8E6A50; --k7-tape-b:#B08A6C; --k7-tape-line:rgba(255,255,255,.3);
+    --k7-gear:#BDB5A5; --k7-hole:#3A342D;
+    --k7-play:#2A2420; --k7-play-fill:rgba(42,36,32,.10);
+  } }</style>
+  <defs>
+    <linearGradient id="k7g-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--k7-bg-a)"/><stop offset="1" style="stop-color:var(--k7-bg-b)"/></linearGradient>
+    <linearGradient id="k7g-metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--k7-metal-a)"/><stop offset="1" style="stop-color:var(--k7-metal-b)"/></linearGradient>
+    <radialGradient id="k7g-shine" cx=".72" cy=".22" r=".7"><stop offset="0" style="stop-color:var(--k7-shine);stop-opacity:.22"/><stop offset="1" style="stop-color:var(--k7-shine);stop-opacity:0"/></radialGradient>
+    <radialGradient id="k7g-tape" r=".5"><stop offset=".55" style="stop-color:var(--k7-tape)"/><stop offset=".8" style="stop-color:var(--k7-tape-b)"/><stop offset="1" style="stop-color:var(--k7-tape)"/></radialGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="104" style="fill:url(#k7g-bg)"/>
+  <rect x="39" y="66" width="430" height="418" rx="56" style="fill:url(#k7g-metal);stroke:var(--k7-rim);stroke-width:3"/>
+  <rect x="39" y="66" width="430" height="418" rx="56" style="fill:url(#k7g-shine)"/>
+  <rect x="61" y="90" width="385" height="314" rx="26" style="fill:none;stroke:var(--k7-line);stroke-width:5"/>
+  <rect x="64" y="93" width="379" height="308" rx="23" style="fill:none;stroke:var(--k7-rim);stroke-width:1.5"/>
+  <rect x="233" y="242" width="48" height="68" rx="3" style="fill:var(--k7-window)"/>
+  <g transform="translate(159 276.5)">
+    <g class="lm-reel"><circle r="65" style="fill:url(#k7g-tape)"/>
+    <circle r="57" style="fill:none;stroke:var(--k7-tape-line);stroke-width:1.2"/>
+    <circle r="51" style="fill:none;stroke:var(--k7-tape-line);stroke-width:1"/>
+    <circle r="47" style="fill:var(--k7-gear)"/>
+    <rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(22.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(67.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(112.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(157.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(202.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(247.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(292.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(337.5)" style="fill:var(--k7-tape)"/>
+    <circle r="31" style="fill:var(--k7-hole)"/>
+    <rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(0)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(45)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(90)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(135)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(180)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(225)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(270)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(315)" style="fill:var(--k7-gear)"/>
+    <circle r="11" style="fill:var(--k7-gear)"/></g>
   </g>
+  <g transform="translate(350 276.5)">
+    <g class="lm-reel"><circle r="65" style="fill:url(#k7g-tape)"/>
+    <circle r="57" style="fill:none;stroke:var(--k7-tape-line);stroke-width:1.2"/>
+    <circle r="51" style="fill:none;stroke:var(--k7-tape-line);stroke-width:1"/>
+    <circle r="47" style="fill:var(--k7-gear)"/>
+    <rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(22.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(67.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(112.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(157.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(202.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(247.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(292.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(337.5)" style="fill:var(--k7-tape)"/>
+    <circle r="31" style="fill:var(--k7-hole)"/>
+    <rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(0)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(45)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(90)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(135)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(180)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(225)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(270)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(315)" style="fill:var(--k7-gear)"/>
+    <circle r="11" style="fill:var(--k7-gear)"/></g>
+  </g>
+  <circle cx="159" cy="276.5" r="80" style="fill:none;stroke:var(--k7-ring);stroke-width:9"/>
+  <circle cx="159" cy="276.5" r="86" style="fill:none;stroke:var(--k7-line);stroke-width:3"/>
+  <circle cx="350" cy="276.5" r="80" style="fill:none;stroke:var(--k7-ring);stroke-width:9"/>
+  <circle cx="350" cy="276.5" r="86" style="fill:none;stroke:var(--k7-line);stroke-width:3"/>
+  <path d="M196 165 L196 389 L317 277 Z" style="fill:var(--k7-play-fill);stroke:var(--k7-metal-b);stroke-width:20;stroke-linejoin:round"/>
+  <path d="M196 165 L196 389 L317 277 Z" style="fill:none;stroke:var(--k7-play);stroke-width:7;stroke-linejoin:round"/>
+  <rect x="240" y="367" width="189" height="25" rx="7" style="fill:none;stroke:var(--k7-ring);stroke-width:4"/>
+  <path d="M82 388 L91 362 L100 388 M85.5 379 H96.5" style="fill:none;stroke:var(--k7-ring);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round"/>
+  <path d="M111 484 L129 422 Q131 414 139 414 H372 Q380 414 382 422 L398 484" style="fill:var(--k7-metal-b);stroke:var(--k7-line);stroke-width:4;stroke-linejoin:round"/>
+  <circle cx="85" cy="442" r="11" style="fill:none;stroke:var(--k7-line);stroke-width:4"/><circle cx="85" cy="442" r="4.5" style="fill:var(--k7-line)"/>
+  <circle cx="422" cy="442" r="11" style="fill:none;stroke:var(--k7-line);stroke-width:4"/><circle cx="422" cy="442" r="4.5" style="fill:var(--k7-line)"/>
+  <circle cx="254" cy="436" r="8.5" style="fill:none;stroke:var(--k7-line);stroke-width:3.5"/>
+  <circle cx="154" cy="467" r="10" style="fill:var(--k7-hole)"/><circle cx="353" cy="467" r="10" style="fill:var(--k7-hole)"/>
+  <rect x="186.5" y="453.5" width="17" height="17" rx="4" style="fill:var(--k7-hole)"/><rect x="302.5" y="453.5" width="17" height="17" rx="4" style="fill:var(--k7-hole)"/>
 </svg>

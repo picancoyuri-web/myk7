@@ -25,7 +25,7 @@ com pessoas e escutas de exemplo (login: `voce.ouve` / `cassete123`).
 ## Deploy
 
 **Render (backend):** Root Directory `server` · Build `npm install` · Start `npm start`.
-Variáveis: `JWT_SECRET`, `FRONTEND_ORIGIN=https://cassete.netlify.app`, `DISCOGS_TOKEN`,
+Variáveis: `JWT_SECRET`, `FRONTEND_ORIGIN=https://myk7.netlify.app`, `DISCOGS_TOKEN`,
 `SPOTIFY_CLIENT_ID` + `SPOTIFY_CLIENT_SECRET` (opcional) e SMTP (opcional) — todas explicadas em `server/.env.example`.
 O banco antigo funciona sem perder nada: as mudanças no banco só acrescentam colunas e tabelas.
 Use um *Persistent Disk* e aponte `DB_PATH` pra ele, senão o banco é apagado a cada deploy.

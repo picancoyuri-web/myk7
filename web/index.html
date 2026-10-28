@@ -265,34 +265,40 @@
   .brand{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
   .brand-left{display:flex;align-items:center;gap:6px 16px;flex-wrap:wrap;flex:1;min-width:0;}
 
-  /* ---------- LOGO MyK7 ----------
-     desenhada em SVG + texto (nada de imagem), então segue a cor do tema:
-     o traço usa currentColor (--ink) e a etiqueta/"My" usam --brand.
-     Os carretéis giram enquanto qualquer prévia estiver tocando. */
+  /* ---------- LOGO (a fita com o play) ----------
+     é a mesma logo de antes, redesenhada em vetor: fica nítida em qualquer
+     tamanho/tela e as cores vêm das variáveis --k7-* abaixo, que mudam com o
+     tema. Os carretéis giram enquanto alguma prévia estiver tocando. */
+  /* cores da logo da fita: escura (metal grafite) no tema escuro, metal
+     claro com traço escuro no tema claro */
+  :root{
+    --k7-bg-a:#161618; --k7-bg-b:#0B0B0C;
+    --k7-metal-a:#2E2E31; --k7-metal-b:#1B1B1D; --k7-shine:#FFFFFF; --k7-rim:#4C4C51;
+    --k7-line:#0E0E10; --k7-ring:#5A5A5F; --k7-window:#424246;
+    --k7-tape:#33221D; --k7-tape-b:#4E3229; --k7-tape-line:rgba(0,0,0,.35);
+    --k7-gear:#323236; --k7-hole:#0E0E10;
+    --k7-play:#8A8A90; --k7-play-fill:rgba(10,10,12,.55);
+  }
+  :root[data-theme="light"]{
+    --k7-bg-a:#EFE8D8; --k7-bg-b:#E2D9C5;
+    --k7-metal-a:#E4DDCE; --k7-metal-b:#CBC3B2; --k7-shine:#FFFFFF; --k7-rim:#F6F1E6;
+    --k7-line:#6F675A; --k7-ring:#4A433A; --k7-window:#A79F8F;
+    --k7-tape:#8E6A50; --k7-tape-b:#B08A6C; --k7-tape-line:rgba(255,255,255,.3);
+    --k7-gear:#BDB5A5; --k7-hole:#3A342D;
+    --k7-play:#2A2420; --k7-play-fill:rgba(42,36,32,.10);
+  }
   .logo{
-    --logo-h:clamp(34px,6.2vw,44px);
-    display:inline-flex;align-items:center;gap:calc(var(--logo-h) * .26);
-    color:var(--ink);line-height:1;text-decoration:none;user-select:none;-webkit-user-select:none;
-    background:none;border:none;padding:0;cursor:pointer;font:inherit;
+    --logo-h:clamp(54px,9.5vw,64px);
+    display:inline-flex;align-items:center;line-height:1;
+    background:none;border:none;padding:0;cursor:pointer;border-radius:22%;
   }
-  .logo:focus-visible{outline:2px solid var(--brand);outline-offset:6px;border-radius:6px;}
-  .logo-mark{height:var(--logo-h);width:auto;flex:none;overflow:visible;}
-  .logo-mark .lm-body{fill:none;stroke:currentColor;stroke-width:2.4;}
-  .logo-mark .lm-label{fill:var(--brand);transition:fill .3s ease;}
-  .logo-mark .lm-win{fill:var(--paper);stroke:currentColor;stroke-width:1.6;}
-  .logo-mark .lm-reel circle{fill:var(--paper);stroke:currentColor;stroke-width:1.8;}
-  .logo-mark .lm-reel path{stroke:currentColor;stroke-width:1.6;stroke-linecap:round;}
+  .logo:focus-visible{outline:2px solid var(--brand);outline-offset:4px;}
+  .logo-mark{height:var(--logo-h);width:var(--logo-h);flex:none;display:block;}
+  .k7-logo{border-radius:20%;box-shadow:0 4px 14px rgba(0,0,0,.28);}
+  :root[data-theme="light"] .k7-logo{box-shadow:0 3px 10px rgba(42,36,32,.16);}
   .logo-mark .lm-reel{transform-box:fill-box;transform-origin:center;}
-  .logo-mark .lm-foot{fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round;}
-  body.k7-playing .logo .lm-reel{animation:k7Reel 1.6s linear infinite;}
-  .logo-word{display:inline-flex;align-items:baseline;white-space:nowrap;}
-  .logo-my{
-    font-family:'Caveat',cursive;font-weight:700;font-size:calc(var(--logo-h) * 1.06);
-    color:var(--brand);display:inline-block;margin-right:calc(var(--logo-h) * .1);
-    transform:rotate(-7deg) translateY(1px);transition:color .3s ease;
-  }
-  .logo-k7{font-family:'Anton',sans-serif;font-size:var(--logo-h);letter-spacing:.01em;}
-  .logo.lg{--logo-h:52px;}
+  body.k7-playing .logo .lm-reel{animation:k7Reel 2.4s linear infinite;}
+  .logo.lg{--logo-h:92px;}
   @keyframes k7Reel{to{transform:rotate(360deg);}}
   @media (prefers-reduced-motion: reduce){ body.k7-playing .logo .lm-reel, .mo-card.playing .lm-reel{animation:none;} }
   .top-notif-btn{
@@ -1137,6 +1143,33 @@
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   .toast.err{background:#7a2b2b;}
 
+  /* ---------- TUTORIAL (tour guiado na primeira vez) ---------- */
+  .tour{position:fixed;inset:0;z-index:4000;}
+  .tour-hole{
+    position:fixed;border-radius:14px;pointer-events:none;
+    box-shadow:0 0 0 9999px rgba(10,9,12,.74), 0 0 0 2px #C79A46 inset;
+    transition:top .3s ease, left .3s ease, width .3s ease, height .3s ease;
+  }
+  .tour-hole.none{box-shadow:0 0 0 9999px rgba(10,9,12,.74);}
+  .tour-card{
+    position:fixed;left:50%;transform:translateX(-50%);width:min(92vw,360px);
+    background:#17161A;color:#F3ECDA;border:1px solid #C79A46;border-radius:16px;
+    padding:18px 18px 14px;box-shadow:0 14px 40px rgba(0,0,0,.45);
+    animation:tourIn .25s ease;
+  }
+  @keyframes tourIn{from{opacity:0;}to{opacity:1;}}
+  @media (prefers-reduced-motion: reduce){ .tour-hole{transition:none;} .tour-card{animation:none;} }
+  .tour-step{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#C79A46;}
+  .tour-title{font-family:'Anton',sans-serif;font-size:22px;letter-spacing:.02em;margin:6px 0 6px;}
+  .tour-text{font-size:14px;line-height:1.5;color:#D9D2C4;}
+  .tour-dots{display:flex;gap:5px;margin:14px 0 12px;}
+  .tour-dots span{width:6px;height:6px;border-radius:50%;background:rgba(243,236,218,.22);}
+  .tour-dots span.on{background:#C79A46;width:16px;border-radius:3px;}
+  .tour-actions{display:flex;align-items:center;gap:8px;}
+  .tour-actions .tour-skip{margin-right:auto;background:none;border:none;color:#B5AFA2;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;padding:8px 4px;}
+  .tour-actions .tour-btn{font-family:'JetBrains Mono',monospace;font-size:12px;border-radius:20px;padding:9px 16px;cursor:pointer;border:1px solid #F3ECDA;background:none;color:#F3ECDA;}
+  .tour-actions .tour-btn.go{background:#C79A46;border-color:#C79A46;color:#17161A;font-weight:600;}
+
   /* ---------- editar/apagar (resenhas, comentários, diário) ---------- */
   .entry-actions, .rv-actions, .rvc-actions{
     display:flex;gap:10px;margin-top:4px;
@@ -1537,7 +1570,7 @@
   }
   .mo-np:disabled{cursor:default;}
   .mo-np-k7{flex:none;display:flex;}
-  .mo-np-k7 .logo-mark{height:26px;--paper:#17161A;--brand:#C79A46;color:#ECE7DD;}
+  .mo-np-k7 .logo-mark{height:28px;width:28px;--paper:#17161A;--brand:#C79A46;color:#ECE7DD;}
   .mo-card.playing .mo-np-k7 .lm-reel, .mo-viewer.playing .mo-np-k7 .lm-reel{animation:k7Reel 1.4s linear infinite;}
   .mo-np-txt{display:flex;flex-direction:column;min-width:0;flex:1;line-height:1.2;}
   .mo-np-txt b{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -1635,7 +1668,7 @@
     display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
     background:var(--paper-dim);margin-bottom:8px;
   }
-  .mo-track .logo-mark{height:24px;flex:none;}
+  .mo-track .logo-mark{height:30px;width:30px;flex:none;}
   .mo-track-txt{flex:1;min-width:0;line-height:1.25;}
   .mo-track-txt b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .mo-track-txt span{display:block;font-size:12px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -1668,6 +1701,14 @@
 </style>
 </head>
 <body>
+<svg class="k7-defs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <defs>
+    <linearGradient id="k7g-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--k7-bg-a)"/><stop offset="1" style="stop-color:var(--k7-bg-b)"/></linearGradient>
+    <linearGradient id="k7g-metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--k7-metal-a)"/><stop offset="1" style="stop-color:var(--k7-metal-b)"/></linearGradient>
+    <radialGradient id="k7g-shine" cx=".72" cy=".22" r=".7"><stop offset="0" style="stop-color:var(--k7-shine);stop-opacity:.22"/><stop offset="1" style="stop-color:var(--k7-shine);stop-opacity:0"/></radialGradient>
+    <radialGradient id="k7g-tape" r=".5"><stop offset=".55" style="stop-color:var(--k7-tape)"/><stop offset=".8" style="stop-color:var(--k7-tape-b)"/><stop offset="1" style="stop-color:var(--k7-tape)"/></radialGradient>
+  </defs>
+</svg>
 
 <div class="auth-gate" id="authGate">
   <div class="auth-gate-box">
@@ -1693,14 +1734,48 @@
     <div class="brand">
       <div class="brand-left">
         <button type="button" class="logo" id="logoHome" aria-label="MyK7 — ir para o feed">
-        <svg class="logo-mark" viewBox="0 0 48 32" aria-hidden="true">
-          <rect class="lm-body" x="1.2" y="1.2" width="45.6" height="29.6" rx="5"/>
-          <rect class="lm-label" x="5.5" y="5" width="37" height="16.5" rx="2.5"/>
-          <rect class="lm-win" x="19.5" y="10.4" width="9" height="5.6" rx="1.2"/>
-          <g class="lm-reel"><circle cx="13.6" cy="13.2" r="4.4"/><path d="M13.6 10.6v5.2M11.35 11.9l4.5 2.6M11.35 14.5l4.5-2.6"/></g>
-          <g class="lm-reel"><circle cx="34.4" cy="13.2" r="4.4"/><path d="M34.4 10.6v5.2M32.15 11.9l4.5 2.6M32.15 14.5l4.5-2.6"/></g>
-          <path class="lm-foot" d="M11 30.8l3.2-5.8h19.6l3.2 5.8"/>
-        </svg><span class="logo-word" aria-hidden="true"><span class="logo-my">My</span><span class="logo-k7">K7</span></span>
+        <svg class="logo-mark k7-logo" viewBox="0 0 512 512" aria-hidden="true">
+  <rect width="512" height="512" rx="104" style="fill:url(#k7g-bg)"/>
+  <rect x="39" y="66" width="430" height="418" rx="56" style="fill:url(#k7g-metal);stroke:var(--k7-rim);stroke-width:3"/>
+  <rect x="39" y="66" width="430" height="418" rx="56" style="fill:url(#k7g-shine)"/>
+  <rect x="61" y="90" width="385" height="314" rx="26" style="fill:none;stroke:var(--k7-line);stroke-width:5"/>
+  <rect x="64" y="93" width="379" height="308" rx="23" style="fill:none;stroke:var(--k7-rim);stroke-width:1.5"/>
+  <rect x="233" y="242" width="48" height="68" rx="3" style="fill:var(--k7-window)"/>
+  <g transform="translate(159 276.5)">
+    <g class="lm-reel"><circle r="65" style="fill:url(#k7g-tape)"/>
+    <circle r="57" style="fill:none;stroke:var(--k7-tape-line);stroke-width:1.2"/>
+    <circle r="51" style="fill:none;stroke:var(--k7-tape-line);stroke-width:1"/>
+    <circle r="47" style="fill:var(--k7-gear)"/>
+    <rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(22.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(67.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(112.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(157.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(202.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(247.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(292.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(337.5)" style="fill:var(--k7-tape)"/>
+    <circle r="31" style="fill:var(--k7-hole)"/>
+    <rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(0)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(45)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(90)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(135)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(180)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(225)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(270)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(315)" style="fill:var(--k7-gear)"/>
+    <circle r="11" style="fill:var(--k7-gear)"/></g>
+  </g>
+  <g transform="translate(350 276.5)">
+    <g class="lm-reel"><circle r="65" style="fill:url(#k7g-tape)"/>
+    <circle r="57" style="fill:none;stroke:var(--k7-tape-line);stroke-width:1.2"/>
+    <circle r="51" style="fill:none;stroke:var(--k7-tape-line);stroke-width:1"/>
+    <circle r="47" style="fill:var(--k7-gear)"/>
+    <rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(22.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(67.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(112.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(157.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(202.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(247.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(292.5)" style="fill:var(--k7-tape)"/><rect x="-5.5" y="-50" width="11" height="9" rx="1.5" transform="rotate(337.5)" style="fill:var(--k7-tape)"/>
+    <circle r="31" style="fill:var(--k7-hole)"/>
+    <rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(0)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(45)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(90)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(135)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(180)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(225)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(270)" style="fill:var(--k7-gear)"/><rect x="-4" y="-33" width="8" height="7" rx="1" transform="rotate(315)" style="fill:var(--k7-gear)"/>
+    <circle r="11" style="fill:var(--k7-gear)"/></g>
+  </g>
+  <circle cx="159" cy="276.5" r="80" style="fill:none;stroke:var(--k7-ring);stroke-width:9"/>
+  <circle cx="159" cy="276.5" r="86" style="fill:none;stroke:var(--k7-line);stroke-width:3"/>
+  <circle cx="350" cy="276.5" r="80" style="fill:none;stroke:var(--k7-ring);stroke-width:9"/>
+  <circle cx="350" cy="276.5" r="86" style="fill:none;stroke:var(--k7-line);stroke-width:3"/>
+  <path d="M196 165 L196 389 L317 277 Z" style="fill:var(--k7-play-fill);stroke:var(--k7-metal-b);stroke-width:20;stroke-linejoin:round"/>
+  <path d="M196 165 L196 389 L317 277 Z" style="fill:none;stroke:var(--k7-play);stroke-width:7;stroke-linejoin:round"/>
+  <rect x="240" y="367" width="189" height="25" rx="7" style="fill:none;stroke:var(--k7-ring);stroke-width:4"/>
+  <path d="M82 388 L91 362 L100 388 M85.5 379 H96.5" style="fill:none;stroke:var(--k7-ring);stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round"/>
+  <path d="M111 484 L129 422 Q131 414 139 414 H372 Q380 414 382 422 L398 484" style="fill:var(--k7-metal-b);stroke:var(--k7-line);stroke-width:4;stroke-linejoin:round"/>
+  <circle cx="85" cy="442" r="11" style="fill:none;stroke:var(--k7-line);stroke-width:4"/><circle cx="85" cy="442" r="4.5" style="fill:var(--k7-line)"/>
+  <circle cx="422" cy="442" r="11" style="fill:none;stroke:var(--k7-line);stroke-width:4"/><circle cx="422" cy="442" r="4.5" style="fill:var(--k7-line)"/>
+  <circle cx="254" cy="436" r="8.5" style="fill:none;stroke:var(--k7-line);stroke-width:3.5"/>
+  <circle cx="154" cy="467" r="10" style="fill:var(--k7-hole)"/><circle cx="353" cy="467" r="10" style="fill:var(--k7-hole)"/>
+  <rect x="186.5" y="453.5" width="17" height="17" rx="4" style="fill:var(--k7-hole)"/><rect x="302.5" y="453.5" width="17" height="17" rx="4" style="fill:var(--k7-hole)"/>
+</svg>
         </button>
         <div class="tagline">um diário de escuta, não de streams</div>
       </div>
@@ -2920,23 +2995,23 @@ async function generateWrappedShareCard(data){
   drawStoryBackground(ctx, hue, 0.36);
   drawStoryHeader(ctx, `retrospectiva ${data.periodLabel}${currentUser ? ` · @${currentUser.username}` : ''}`);
   ctx.textAlign = 'center';
-  ctx.font = '150px sans-serif';
-  ctx.fillText(data.persona.icon, W / 2, 460);
+  ctx.font = '120px sans-serif';
+  ctx.fillText(data.persona.icon, W / 2, 485);
   ctx.fillStyle = 'rgba(236,231,221,0.7)';
-  ctx.font = '600 28px "JetBrains Mono", monospace';
+  ctx.font = '600 26px "JetBrains Mono", monospace';
   ctx.letterSpacing = '4px';
-  ctx.fillText('MINHA PERSONALIDADE MUSICAL', W / 2, 545);
+  ctx.fillText('MINHA PERSONALIDADE MUSICAL', W / 2, 550);
   ctx.letterSpacing = '0px';
   ctx.fillStyle = '#F3ECDA';
-  const n = fitLines(ctx, data.persona.name.toUpperCase(), s => `400 ${s}px "Anton", sans-serif`, 140, 80, W - 140, 2);
-  let y = 595;
+  const n = fitLines(ctx, data.persona.name.toUpperCase(), s => `400 ${s}px "Anton", sans-serif`, 120, 72, W - 140, 2);
+  let y = 572;
   n.lines.forEach(l => { y += n.size * 1.02; ctx.fillText(l, W / 2, y); });
   ctx.fillStyle = 'rgba(236,231,221,0.8)';
-  const d = fitLines(ctx, data.persona.desc, s => `italic 400 ${s}px "Spectral", serif`, 42, 32, W - 220, 2);
-  d.lines.forEach(l => { y += d.size * 1.4; ctx.fillText(l, W / 2, y + 20); });
+  const d = fitLines(ctx, data.persona.desc, s => `italic 400 ${s}px "Spectral", serif`, 38, 30, W - 220, 2);
+  d.lines.forEach(l => { y += d.size * 1.4; ctx.fillText(l, W / 2, y + 14); });
 
   // três números em "cartões"
-  y += 120;
+  y += 70;
   const tiles = [
     [String(data.entries.length), 'fitas'],
     [data.avg.toFixed(1), 'nota média'],
@@ -2946,31 +3021,34 @@ async function generateWrappedShareCard(data){
   tiles.forEach(([v, k], i) => {
     const x = tx + i * (tw + gap);
     ctx.fillStyle = 'rgba(236,231,221,0.08)';
-    ctxRoundRect(ctx, x, y, tw, 190, 26); ctx.fill();
+    ctxRoundRect(ctx, x, y, tw, 160, 26); ctx.fill();
     ctx.fillStyle = '#F3ECDA';
-    ctx.font = '400 84px "Anton", sans-serif';
-    ctx.fillText(v, x + tw / 2, y + 110);
+    ctx.font = '400 74px "Anton", sans-serif';
+    ctx.fillText(v, x + tw / 2, y + 92);
     ctx.fillStyle = 'rgba(236,231,221,0.65)';
-    ctx.font = '400 24px "JetBrains Mono", monospace';
-    ctx.fillText(k.toUpperCase(), x + tw / 2, y + 156);
+    ctx.font = '400 22px "JetBrains Mono", monospace';
+    ctx.fillText(k.toUpperCase(), x + tw / 2, y + 132);
   });
-  y += 270;
+  y += 160;
   ctx.textAlign = 'left';
   const rows = [
     ['ARTISTA Nº 1', data.artists[0] ? data.artists[0][0] : '—'],
     ['ESTILO Nº 1', data.genres[0] ? data.genres[0][0] : '—'],
     ['A FITA DO PERÍODO', data.best ? data.best.a.title : '—'],
   ];
+  // as três linhas dividem o espaço que sobrou até o rodapé
+  const rowH = Math.min(124, Math.floor((STORY_FOOTER_Y - 40 - y) / rows.length));
+  y += rowH * 0.42;
   rows.forEach(([k, v]) => {
     ctx.fillStyle = '#E2B24C';
-    ctx.font = '600 24px "JetBrains Mono", monospace';
+    ctx.font = '600 22px "JetBrains Mono", monospace';
     ctx.fillText(k, 130, y);
     ctx.fillStyle = '#F3ECDA';
-    const f = fitLines(ctx, v, s => `600 ${s}px "Spectral", serif`, 46, 30, W - 260, 1);
-    ctx.fillText(f.lines[0], 130, y + 56);
-    y += 128;
+    const f = fitLines(ctx, v, s => `600 ${s}px "Spectral", serif`, 42, 28, W - 260, 1);
+    ctx.fillText(f.lines[0], 130, y + 48);
+    y += rowH;
   });
-  drawStoryFooter(ctx, 'descubra a sua · grátis');
+  drawStoryFooter(ctx, 'descubra a sua · grátis', currentUser && currentUser.username);
   return cardToBlob(canvas);
 }
 
@@ -3092,6 +3170,10 @@ let resetTokenFromUrl = new URLSearchParams(location.search).get('reset');
 if(resetTokenFromUrl) gateAuthMode = 'reset';
 const verifyTokenFromUrl = new URLSearchParams(location.search).get('verify');
 const spotifyStatusFromUrl = new URLSearchParams(location.search).get('spotify');
+// quem chega por um card compartilhado (QR/link do story) vem com ?u=usuario:
+// já logado abre o perfil dessa pessoa; sem conta, cai direto no cadastro
+const sharedProfileFromUrl = new URLSearchParams(location.search).get('u');
+if(sharedProfileFromUrl && !resetTokenFromUrl) gateAuthMode = 'cadastro';
 let currentUser = null;
 let blockedUsernames = new Set();
 
@@ -5510,12 +5592,19 @@ function drawCardBackground(ctx, W, H, hue){
   ctx.fillRect(0, 0, W, H);
 }
 
-// endereço que aparece no selo dos cards: o domínio de onde o app está
-// rodando (se for um site de verdade), senão o endereço oficial
+// endereço oficial do app — é pra onde os cards e os links compartilhados
+// levam. Fixo de propósito: no app empacotado o host é "localhost" e em
+// deploy de teste é um endereço provisório, e nenhum dos dois serve pra
+// quem vê o story.
+const APP_URL = 'https://myk7.netlify.app';
+
 function appDomainLabel(){
-  const host = location.hostname;
-  const isReal = host && host.includes('.') && !/^(d+.){3}d+$/.test(host) && host !== 'localhost';
-  return (isReal ? host.replace(/^www./, '') : 'cassete.netlify.app').toUpperCase();
+  return APP_URL.replace(/^https?:\/\//, '').toUpperCase();
+}
+
+// link que vai junto do card: abre o MyK7 já no perfil de quem postou
+function appShareLink(username){
+  return username ? `${APP_URL}/?u=${encodeURIComponent(username)}` : `${APP_URL}/`;
 }
 
 // a marca MyK7 desenhada no canvas: "My" à mão (Caveat) + "K7" (Anton),
@@ -5725,6 +5814,65 @@ async function ensureCardFonts(){
       document.fonts.load('600 40px "Spectral"'),
     ]);
   }catch(e){ /* sem a fonte, cai na do sistema — ainda gera o card */ }
+  // o ícone e o gerador de QR do rodapé também precisam estar prontos antes
+  // de desenhar (o rodapé é síncrono)
+  await Promise.all([loadAppIcon(), loadQrLib()]);
+}
+
+let appIconImg = null;
+let appIconPromise = null;
+function loadAppIcon(){
+  if(!appIconPromise){
+    appIconPromise = new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => { appIconImg = img; resolve(img); };
+      img.onerror = () => resolve(null);
+      img.src = 'icon-512.png';
+    });
+  }
+  return appIconPromise;
+}
+
+let qrLibPromise = null;
+function loadQrLib(){
+  if(typeof window.qrcode === 'function') return Promise.resolve(true);
+  if(!qrLibPromise){
+    qrLibPromise = new Promise((resolve) => {
+      const s = document.createElement('script');
+      s.src = 'js/qrcode.min.js';
+      s.onload = () => resolve(true);
+      s.onerror = () => { qrLibPromise = null; resolve(false); };
+      document.head.appendChild(s);
+    });
+  }
+  return qrLibPromise;
+}
+
+// QR code nítido: módulos de tamanho inteiro, centralizado no quadrado dado
+function drawQrCode(ctx, text, x, y, size, color = '#17161A'){
+  if(typeof window.qrcode !== 'function') return false;
+  const qr = window.qrcode(0, 'M');
+  qr.addData(text);
+  qr.make();
+  const n = qr.getModuleCount();
+  const cell = Math.floor(size / n);
+  const off = Math.floor((size - cell * n) / 2);
+  ctx.fillStyle = color;
+  for(let r = 0; r < n; r++){
+    for(let c = 0; c < n; c++){
+      if(qr.isDark(r, c)) ctx.fillRect(x + off + c * cell, y + off + r * cell, cell, cell);
+    }
+  }
+  return true;
+}
+
+function drawAppIcon(ctx, x, y, size){
+  if(!appIconImg) return;
+  ctx.save();
+  ctxRoundRect(ctx, x, y, size, size, size * 0.22);
+  ctx.clip();
+  ctx.drawImage(appIconImg, x, y, size, size);
+  ctx.restore();
 }
 
 let cassettePhotoPromise = null;
@@ -5771,47 +5919,117 @@ function drawStoryBackground(ctx, hue, glowY = 0.33){
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, W, H);
 
+  // um segundo brilho, mais fraco e numa cor vizinha, atrás do rodapé —
+  // tira a cara de "degradê que morre no preto" da metade de baixo
+  const low = ctx.createRadialGradient(W * 0.15, H * 0.86, 10, W * 0.15, H * 0.86, W * 0.7);
+  low.addColorStop(0, `hsla(${(hue + 40) % 360},60%,50%,0.14)`);
+  low.addColorStop(1, `hsla(${(hue + 40) % 360},60%,50%,0)`);
+  ctx.fillStyle = low;
+  ctx.fillRect(0, 0, W, H);
+
   for(let i = 0; i < 2600; i++){
     ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.035})`;
     ctx.fillRect(Math.random() * W, Math.random() * H, 1.5, 1.5);
   }
 }
 
-// cabeçalho: marca do app + uma linha de contexto (quem/quando)
+// Área segura do story: o Instagram cobre ~220px em cima (barra de progresso,
+// foto e nome) e ~230px embaixo (campo de resposta). Nada importante fica ali.
+// O conteúdo de cada card vai de STORY_TOP até STORY_FOOTER_Y.
+const STORY_TOP = 370;
+const STORY_FOOTER_Y = 1496;
+
+// cabeçalho: ícone + marca do app e uma linha de contexto (quem/quando)
 function drawStoryHeader(ctx, kicker){
   const W = CARD_W;
-  drawBrandWordmark(ctx, W / 2, 152, 66);
+  const iconS = 84, gap = 20, markSize = 60, cy = 222;
+  ctx.font = `700 ${Math.round(markSize * 1.06)}px "Caveat", cursive`;
+  const myW = ctx.measureText('My').width;
+  ctx.font = `400 ${markSize}px "Anton", sans-serif`;
+  const markW = myW + markSize * 0.1 + ctx.measureText('K7').width;
+  const total = (appIconImg ? iconS + gap : 0) + markW;
+  const x0 = W / 2 - total / 2;
+  if(appIconImg){
+    ctx.save();
+    ctx.shadowColor = 'rgba(0,0,0,0.45)'; ctx.shadowBlur = 20; ctx.shadowOffsetY = 6;
+    ctx.fillStyle = '#0B0B0C';
+    ctxRoundRect(ctx, x0, cy - iconS / 2, iconS, iconS, iconS * 0.22);
+    ctx.fill();
+    ctx.restore();
+    drawAppIcon(ctx, x0, cy - iconS / 2, iconS);
+  }
+  drawBrandWordmark(ctx, x0 + total - markW / 2, cy + markSize * 0.36, markSize);
   ctx.textAlign = 'center';
   if(kicker){
-    ctx.font = '600 26px "JetBrains Mono", monospace';
-    const w = ctx.measureText(kicker).width + 48;
-    ctx.fillStyle = 'rgba(236,231,221,0.10)';
-    ctxRoundRect(ctx, W / 2 - w / 2, 184, w, 50, 25);
+    ctx.font = '600 25px "JetBrains Mono", monospace';
+    const w = ctx.measureText(kicker).width + 52;
+    ctx.fillStyle = 'rgba(236,231,221,0.09)';
+    ctxRoundRect(ctx, W / 2 - w / 2, 284, w, 50, 25);
     ctx.fill();
+    ctx.strokeStyle = 'rgba(236,231,221,0.14)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
     ctx.fillStyle = '#D9C9A3';
-    ctx.fillText(kicker, W / 2, 218);
+    ctx.fillText(kicker, W / 2, 318);
   }
 }
 
-// rodapé: selo do app (o "call to action" de quem vê o story)
-function drawStoryFooter(ctx, line){
-  const W = CARD_W, H = CARD_H;
-  const pillW = 560, pillH = 88, y = H - 190;
+// rodapé: o "call to action" de quem vê o story — QR code que abre o MyK7
+// (no perfil de quem postou), o endereço bem grande e uma frase do card
+function drawStoryFooter(ctx, line, username){
+  const W = CARD_W;
+  const x = 80, y = STORY_FOOTER_Y, w = W - 160, h = 184, r = 40;
+
   ctx.save();
-  ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 24; ctx.shadowOffsetY = 8;
-  const pg = ctx.createLinearGradient(0, y, 0, y + pillH);
-  pg.addColorStop(0, '#DDB563'); pg.addColorStop(1, '#B0812E');
-  ctx.fillStyle = pg;
-  ctxRoundRect(ctx, W / 2 - pillW / 2, y, pillW, pillH, pillH / 2);
+  ctx.shadowColor = 'rgba(0,0,0,0.45)'; ctx.shadowBlur = 40; ctx.shadowOffsetY = 14;
+  ctx.fillStyle = 'rgba(12,11,14,0.72)';
+  ctxRoundRect(ctx, x, y, w, h, r);
   ctx.fill();
   ctx.restore();
+  ctx.save();
+  ctxRoundRect(ctx, x, y, w, h, r);
+  ctx.clip();
+  const sheen = ctx.createLinearGradient(0, y, 0, y + h);
+  sheen.addColorStop(0, 'rgba(236,231,221,0.07)');
+  sheen.addColorStop(1, 'rgba(236,231,221,0)');
+  ctx.fillStyle = sheen;
+  ctx.fillRect(x, y, w, h);
+  // filete dourado no topo, a "etiqueta" da fita
+  const edge = ctx.createLinearGradient(x, 0, x + w, 0);
+  edge.addColorStop(0, 'rgba(221,181,99,0)');
+  edge.addColorStop(0.5, 'rgba(221,181,99,0.9)');
+  edge.addColorStop(1, 'rgba(221,181,99,0)');
+  ctx.fillStyle = edge;
+  ctx.fillRect(x, y, w, 3);
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(236,231,221,0.13)';
+  ctx.lineWidth = 1.5;
+  ctxRoundRect(ctx, x, y, w, h, r);
+  ctx.stroke();
+
+  // QR num quadrado claro (precisa de contraste e de margem pra ser lido)
+  const tile = h - 32, tx = x + 16, ty = y + 16;
+  ctx.fillStyle = '#F3ECDA';
+  ctxRoundRect(ctx, tx, ty, tile, tile, 24);
+  ctx.fill();
+  if(!drawQrCode(ctx, appShareLink(username), tx + 14, ty + 14, tile - 28)){
+    drawAppIcon(ctx, tx + 14, ty + 14, tile - 28);
+  }
+
+  const textX = tx + tile + 34, textW = x + w - 36 - textX;
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#E2B24C';
+  ctx.font = '600 22px "JetBrains Mono", monospace';
+  ctx.letterSpacing = '3px';
+  ctx.fillText('ESCANEIE OU ACESSE', textX, y + 54);
+  ctx.letterSpacing = '0px';
+  ctx.fillStyle = '#F3ECDA';
+  const url = fitLines(ctx, appDomainLabel(), s => `400 ${s}px "Anton", sans-serif`, 58, 36, textW, 1);
+  ctx.fillText(url.lines[0], textX, y + 116);
+  ctx.fillStyle = 'rgba(236,231,221,0.7)';
+  const sub = fitLines(ctx, line || 'seu diário de escuta · grátis', s => `italic 400 ${s}px "Spectral", serif`, 30, 22, textW, 1);
+  ctx.fillText(sub.lines[0], textX, y + 156);
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#17161A';
-  ctx.font = '400 38px "Anton", sans-serif';
-  ctx.fillText(appDomainLabel(), W / 2, y + 57);
-  ctx.fillStyle = 'rgba(236,231,221,0.62)';
-  ctx.font = '400 24px "JetBrains Mono", monospace';
-  ctx.fillText(line || 'seu diário de música · grátis', W / 2, y + pillH + 52);
 }
 
 // texto que encolhe até caber em maxLines linhas de largura maxWidth
@@ -5901,53 +6119,59 @@ async function generateSongShareCard({ title, artist, rating, hue, note, usernam
   drawStoryBackground(ctx, hue, 0.30);
   drawStoryHeader(ctx, username ? `@${username} registrou · ${cardDate()}` : `ouvindo agora · ${cardDate()}`);
 
-  const tapeH = await drawPhotoCassette(ctx, W / 2, 590, 900, hue, -3, title);
-  let y = 590 + tapeH / 2 + 110;
+  // com resenha a fita encolhe um pouco pra sobrar espaço pro texto
+  const tapeW = note ? 640 : 860, tapeY = note ? 590 : 680;
+  const tapeH = await drawPhotoCassette(ctx, W / 2, tapeY, tapeW, hue, -3, title);
+  let y = tapeY + tapeH / 2 + 86;
 
   ctx.textAlign = 'center';
   const eyebrow = [kind, year, genre].filter(Boolean).join(' · ').toUpperCase();
   if(eyebrow){
     ctx.fillStyle = '#E2B24C';
-    ctx.font = '600 26px "JetBrains Mono", monospace';
+    ctx.font = '600 25px "JetBrains Mono", monospace';
     ctx.letterSpacing = '3px';
     ctx.fillText(eyebrow, W / 2, y);
     ctx.letterSpacing = '0px';
-    y += 30;
+    y += 28;
   }
 
   ctx.fillStyle = '#F3ECDA';
-  const t = fitLines(ctx, title.toUpperCase(), s => `400 ${s}px "Anton", sans-serif`, 104, 60, W - 160, 2);
+  const t = fitLines(ctx, title.toUpperCase(), s => `400 ${s}px "Anton", sans-serif`, 96, 56, W - 160, 2);
   t.lines.forEach(l => { y += t.size * 1.02; ctx.fillText(l, W / 2, y); });
 
   ctx.fillStyle = 'rgba(236,231,221,0.78)';
-  const a = fitLines(ctx, artist || '', s => `italic 400 ${s}px "Spectral", serif`, 46, 30, W - 200, 1);
-  y += a.size + 22;
+  const a = fitLines(ctx, artist || '', s => `italic 400 ${s}px "Spectral", serif`, 44, 30, W - 200, 1);
+  y += a.size + 20;
   ctx.fillText(a.lines[0] || '', W / 2, y);
 
   if(rating){
-    y += 82;
-    drawStars(ctx, W / 2, y - 18, rating, 62);
+    y += 74;
+    drawStars(ctx, W / 2, y - 18, rating, 56);
   }
 
   if(note){
-    y += 70;
-    const boxX = 90, boxW = W - 180;
-    ctx.font = 'italic 400 38px "Spectral", serif';
-    const q = fitLines(ctx, `“${note}”`, s => `italic 400 ${s}px "Spectral", serif`, 40, 30, boxW - 90, 5);
-    const lh = q.size * 1.38;
-    const boxH = q.lines.length * lh + 70;
-    const room = CARD_H - 300 - y;
-    if(boxH <= room){
+    y += rating ? 44 : 50;
+    // a resenha num "papel" com um filete dourado — quantas linhas cabem
+    // depende do quanto o título e as estrelas já ocuparam
+    const boxX = 100, boxW = W - 200, pad = 34, size = 36, lh = size * 1.36;
+    const maxLines = Math.min(5, Math.floor((STORY_FOOTER_Y - 44 - y - pad * 2) / lh));
+    if(maxLines >= 1){
+      const q = fitLines(ctx, `“${note}”`, s => `italic 400 ${s}px "Spectral", serif`, size, 28, boxW - 100, maxLines);
+      const qlh = q.size * 1.36;
+      const boxH = q.lines.length * qlh + pad * 2 - (qlh - q.size);
       ctx.fillStyle = 'rgba(236,231,221,0.07)';
       ctxRoundRect(ctx, boxX, y, boxW, boxH, 26);
       ctx.fill();
+      ctx.fillStyle = '#E2B24C';
+      ctxRoundRect(ctx, boxX, y + 22, 5, boxH - 44, 3);
+      ctx.fill();
       ctx.fillStyle = '#EDE6D6';
       ctx.font = `italic 400 ${q.size}px "Spectral", serif`;
-      q.lines.forEach((l, i) => ctx.fillText(l, W / 2, y + 52 + i * lh + q.size * 0.3));
+      q.lines.forEach((l, i) => ctx.fillText(l, W / 2, y + pad + q.size * 0.8 + i * qlh));
     }
   }
 
-  drawStoryFooter(ctx, 'registre o que você ouve · grátis');
+  drawStoryFooter(ctx, 'registre o que você ouve · grátis', username);
   return cardToBlob(canvas);
 }
 
@@ -5959,36 +6183,38 @@ async function generatePlaylistShareCard({ tracks, label, hue, username }){
   drawStoryBackground(ctx, hue, 0.2);
   drawStoryHeader(ctx, username ? `a fita de @${username}` : cardDate());
 
-  const tapeH = await drawPhotoCassette(ctx, W / 2, 470, 640, hue, -2.5, `playlist ${label}`);
-  let y = 470 + tapeH / 2 + 90;
+  const tapeH = await drawPhotoCassette(ctx, W / 2, 565, 560, hue, -2.5, `playlist ${label}`);
+  let y = 565 + tapeH / 2 + 56;
 
-  const shown = tracks.slice(0, 10);
-  const rowH = shown.length > 8 ? 92 : 104;
+  // até 8 faixas; se tiver mais, mostra 7 e uma linha "+ N faixas"
+  const shown = tracks.length > 8 ? tracks.slice(0, 7) : tracks.slice(0, 8);
+  const extra = tracks.length - shown.length;
+  const rowH = Math.min(100, Math.floor((STORY_FOOTER_Y - 40 - y - (extra ? 50 : 0)) / Math.max(1, shown.length)));
   ctx.textAlign = 'left';
   shown.forEach((tr, i) => {
     const rowY = y + i * rowH;
     ctx.fillStyle = '#E2B24C';
-    ctx.font = '400 50px "Anton", sans-serif';
-    ctx.fillText(String(i + 1).padStart(2, '0'), 110, rowY + 50);
+    ctx.font = '400 44px "Anton", sans-serif';
+    ctx.fillText(String(i + 1).padStart(2, '0'), 120, rowY + rowH * 0.56);
     ctx.fillStyle = '#F3ECDA';
-    const tl = fitLines(ctx, tr.item.title, s => `600 ${s}px "Spectral", serif`, 38, 28, 760, 1);
-    ctx.fillText(tl.lines[0], 210, rowY + 28);
+    const tl = fitLines(ctx, tr.item.title, s => `600 ${s}px "Spectral", serif`, 36, 26, 740, 1);
+    ctx.fillText(tl.lines[0], 215, rowY + rowH * 0.36);
     ctx.fillStyle = 'rgba(236,231,221,0.6)';
-    const al = fitLines(ctx, tr.item.artist || '', s => `400 ${s}px "JetBrains Mono", monospace`, 24, 18, 760, 1);
-    ctx.fillText(al.lines[0] || '', 210, rowY + 66);
+    const al = fitLines(ctx, tr.item.artist || '', s => `400 ${s}px "JetBrains Mono", monospace`, 22, 17, 740, 1);
+    ctx.fillText(al.lines[0] || '', 215, rowY + rowH * 0.72);
     if(i < shown.length - 1){
       ctx.fillStyle = 'rgba(236,231,221,0.08)';
-      ctx.fillRect(110, rowY + rowH - 12, W - 220, 2);
+      ctx.fillRect(120, rowY + rowH - 2, W - 240, 2);
     }
   });
-  if(tracks.length > shown.length){
+  if(extra){
     ctx.textAlign = 'center';
     ctx.fillStyle = 'rgba(236,231,221,0.6)';
-    ctx.font = '400 26px "JetBrains Mono", monospace';
-    ctx.fillText(`+ ${tracks.length - shown.length} faixas na fita`, W / 2, y + shown.length * rowH + 30);
+    ctx.font = '400 24px "JetBrains Mono", monospace';
+    ctx.fillText(`+ ${extra} faixas na fita`, W / 2, y + shown.length * rowH + 36);
   }
 
-  drawStoryFooter(ctx, 'monte a sua fita · grátis');
+  drawStoryFooter(ctx, 'monte a sua fita · grátis', username);
   return cardToBlob(canvas);
 }
 
@@ -6006,6 +6232,15 @@ async function generateReceiptShareCard({ tracks, label, username }){
   const pX = 150, pW = W - 300, pY = 150;
   const pH = 470 + shown.length * 62 + 170 + 200;
   const mono = (s, wgt = 400) => `${wgt} ${s}px "JetBrains Mono", monospace`;
+
+  // o recibo é um objeto: se for comprido demais pra área segura do story,
+  // ele inteiro encolhe (em vez de passar por baixo do rodapé)
+  const paperTop = 250;
+  const fit = Math.min(1, (STORY_FOOTER_Y - 50 - paperTop) / (pH + 18));
+  ctx.save();
+  ctx.translate(W / 2, paperTop);
+  ctx.scale(fit, fit);
+  ctx.translate(-W / 2, -pY);
 
   // papel térmico com borda serrilhada embaixo
   ctx.save();
@@ -6096,8 +6331,9 @@ async function generateReceiptShareCard({ tracks, label, username }){
   ctx.textAlign = 'center';
   ctx.font = mono(22);
   ctx.fillText('OBRIGADO POR OUVIR ♥', cx, y);
+  ctx.restore();
 
-  drawStoryFooter(ctx, 'gere o seu recibo · grátis');
+  drawStoryFooter(ctx, 'gere o seu recibo · grátis', username);
   return cardToBlob(canvas);
 }
 
@@ -6108,7 +6344,7 @@ async function generateStreakShareCard(streak, tier){
   drawStoryBackground(ctx, 30, 0.38);
   drawStoryHeader(ctx, currentUser ? `@${currentUser.username} · ${cardDate()}` : cardDate());
 
-  const cx = W / 2, cy = 760, R = 360;
+  const cx = W / 2, cy = 720, R = 300;
   if(tier.glow){
     const glow = ctx.createRadialGradient(cx, cy, R * 0.6, cx, cy, R * 1.5);
     glow.addColorStop(0, `${tier.c1}66`);
@@ -6137,20 +6373,20 @@ async function generateStreakShareCard(streak, tier){
   ctx.restore();
   ctx.textAlign = 'center';
   ctx.fillStyle = '#17161A';
-  const numSize = String(streak).length > 2 ? 96 : 130;
+  const numSize = String(streak).length > 2 ? 80 : 110;
   ctx.font = `400 ${numSize}px "Anton", sans-serif`;
   ctx.fillText(String(streak), cx, cy + numSize * 0.36);
 
   ctx.fillStyle = '#F3ECDA';
-  ctx.font = '400 92px "Anton", sans-serif';
-  ctx.fillText(`${streak} ${streak === 1 ? 'DIA' : 'DIAS'} SEGUIDOS`, cx, cy + R + 150);
+  ctx.font = '400 84px "Anton", sans-serif';
+  ctx.fillText(`${streak} ${streak === 1 ? 'DIA' : 'DIAS'} SEGUIDOS`, cx, cy + R + 135);
   ctx.fillStyle = 'rgba(236,231,221,0.75)';
   ctx.font = 'italic 400 40px "Spectral", serif';
-  ctx.fillText(`${tier.icon} registrando o que eu ouço, todo dia`, cx, cy + R + 215);
+  ctx.fillText(`${tier.icon} registrando o que eu ouço, todo dia`, cx, cy + R + 200);
 
   const milestones = [7, 30, 100, 365];
   const next = milestones.find(m => m > streak);
-  const barY = cy + R + 300;
+  const barY = cy + R + 280;
   if(next){
     const prev = [...milestones].reverse().find(m => m <= streak) || 0;
     const pct = Math.max(0.05, (streak - prev) / (next - prev));
@@ -6170,20 +6406,34 @@ async function generateStreakShareCard(streak, tier){
     ctx.fillText('todos os marcos conquistados', W / 2, barY + 30);
   }
 
-  drawStoryFooter(ctx, 'quanto tempo você aguenta? · grátis');
+  drawStoryFooter(ctx, 'quanto tempo você aguenta? · grátis', currentUser && currentUser.username);
   return cardToBlob(canvas);
 }
 
-async function shareImageBlob(blob, { filename, shareTitle, shareText }){
+// copia o link do app sem atrapalhar: se o navegador não deixar, segue sem
+async function copyAppLink(link){
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(link); return true; }
+  }catch(e){ /* sem permissão de área de transferência */ }
+  return false;
+}
+
+// O story do Instagram não aceita link vindo de fora: a imagem leva o QR e
+// o endereço, e o link fica copiado pra pessoa colar no sticker "Link".
+// No WhatsApp/X/Mensagens o link já vai clicável no texto.
+async function shareImageBlob(blob, { filename, shareTitle, shareText, link }){
   if(!blob){
     showToast('não deu pra gerar a imagem agora.', true);
     return;
   }
+  link = link || appShareLink(currentUser && currentUser.username);
   const file = new File([blob], filename, { type: 'image/png' });
+  const copied = await copyAppLink(link);
 
   if(navigator.canShare && navigator.canShare({ files: [file] })){
     try{
-      await navigator.share({ files: [file], title: shareTitle, text: shareText });
+      await navigator.share({ files: [file], title: shareTitle, text: `${shareText}\n${link}` });
+      if(copied) showToast('link do MyK7 copiado — no story, cole no sticker "Link" pra levar a galera pro app.');
     }catch(e){
       // usuário cancelou a folha de compartilhamento — sem problema
     }
@@ -6197,7 +6447,9 @@ async function shareImageBlob(blob, { filename, shareTitle, shareText }){
   a.download = filename;
   a.click();
   URL.revokeObjectURL(url);
-  showToast('imagem baixada — abra o Instagram/WhatsApp e poste manualmente.');
+  showToast(copied
+    ? 'imagem baixada e link do MyK7 copiado — poste no Instagram e cole o link no sticker "Link".'
+    : 'imagem baixada — abra o Instagram/WhatsApp e poste manualmente.');
 }
 
 async function shareSongCard(item, rating, btn, { note, username } = {}){
@@ -6213,6 +6465,7 @@ async function shareSongCard(item, rating, btn, { note, username } = {}){
       filename: 'myk7.png',
       shareTitle: `${item.title} — ${item.artist}`,
       shareText: `Ouvindo "${item.title}" de ${item.artist} 🎧 via MyK7`,
+      link: appShareLink(username),
     });
   }catch(e){
     console.error('não deu pra gerar o card de compartilhamento:', e.message);
@@ -6938,6 +7191,7 @@ async function renderProfile(){
     <button class="ghost" id="themeToggleBtn" style="max-width:420px;margin-bottom:10px;">
       ${document.documentElement.getAttribute('data-theme') === 'light' ? '🌙 modo escuro' : '☀️ modo claro'}
     </button>
+    <button class="ghost" id="tutorialBtn" style="max-width:420px;margin-bottom:10px;">Ver tutorial de novo</button>
     <button class="ghost" id="changePasswordBtn" style="max-width:420px;margin-bottom:10px;">Trocar senha</button>
     <button class="ghost" id="logoutBtn" style="max-width:420px;margin-bottom:10px;">Sair</button>
     <button type="button" id="deleteAccountBtn">excluir minha conta permanentemente</button>
@@ -7066,6 +7320,7 @@ async function renderProfile(){
     }
     resendBtn.disabled = false;
   });
+  document.getElementById('tutorialBtn').addEventListener('click', ()=> startTutorial());
   document.getElementById('logoutBtn').addEventListener('click', async ()=>{
     await doLogout();
     diary = [];
@@ -7996,11 +8251,11 @@ async function generateMomentShareCard(p, item){
 
   // a foto vira uma polaroid torta, com a legenda (ou a música) escrita à mão
   const ratio = photo.width / photo.height;
-  let pw = 800, ph = pw / ratio;
-  if(ph > 820){ ph = 820; pw = ph * ratio; }
-  const pad = 30, strip = 140;
+  let pw = 720, ph = pw / ratio;
+  if(ph > 640){ ph = 640; pw = ph * ratio; }
+  const pad = 28, strip = 130;
   const fw = pw + pad * 2, fh = ph + pad + strip;
-  const top = 290;
+  const top = STORY_TOP + 20;
   ctx.save();
   ctx.translate(W / 2, top + fh / 2);
   ctx.rotate(-2.2 * Math.PI / 180);
@@ -8019,15 +8274,15 @@ async function generateMomentShareCard(p, item){
   ctx.restore();
 
   // e embaixo, o que estava tocando
-  let y = top + fh + 96;
+  let y = top + fh + 84;
   ctx.textAlign = 'center';
   ctx.fillStyle = '#E2B24C';
-  ctx.font = '600 26px "JetBrains Mono", monospace';
+  ctx.font = '600 25px "JetBrains Mono", monospace';
   ctx.letterSpacing = '3px';
   ctx.fillText('TOCANDO NESSA FOTO', W / 2, y);
   ctx.letterSpacing = '0px';
   ctx.fillStyle = '#F3ECDA';
-  const t = fitLines(ctx, String(item.title || '').toUpperCase(), s => `400 ${s}px "Anton", sans-serif`, 84, 50, W - 160, 2);
+  const t = fitLines(ctx, String(item.title || '').toUpperCase(), s => `400 ${s}px "Anton", sans-serif`, 80, 48, W - 160, 2);
   t.lines.forEach(l => { y += t.size * 1.04; ctx.fillText(l, W / 2, y); });
   if(item.artist){
     ctx.fillStyle = 'rgba(236,231,221,0.78)';
@@ -8036,7 +8291,7 @@ async function generateMomentShareCard(p, item){
     ctx.fillText(a.lines[0] || '', W / 2, y);
   }
 
-  drawStoryFooter(ctx, 'poste o seu momento · grátis');
+  drawStoryFooter(ctx, 'poste o seu momento · grátis', p.username);
   return cardToBlob(canvas);
 }
 
@@ -8051,6 +8306,7 @@ async function shareMoment(id, btn){
       filename: 'myk7-momento.png',
       shareTitle: 'Um momento no MyK7',
       shareText: `📷🎧 ouvindo "${item.title}"${item.artist ? ` de ${item.artist}` : ''} — via MyK7`,
+      link: appShareLink(p.username),
     });
   }catch(e){
     console.error('[Momentos] card:', e);
@@ -8593,6 +8849,135 @@ async function afterAuthSuccess(){
   renderMensagens();
   updateNotifBadge();
   if(!notifPollInterval) notifPollInterval = setInterval(updateNotifBadge, 30000);
+  maybeStartTutorial();
+}
+
+// ---------- Tutorial: tour guiado que destaca as partes reais da tela ----------
+// aparece sozinho uma vez por conta em cada aparelho; dá pra rever pelo Perfil
+const TUTORIAL_STEPS = [
+  { title: 'Bem-vindo ao MyK7',
+    text: 'aqui é um diário de escuta: você registra o que ouviu, dá nota e vê o que a galera anda escutando. bora dar uma volta rápida?' },
+  { sel: '.feed-toggle', title: 'O feed de fitas',
+    text: 'cada fita toca uma prévia de 30 s — role pra passar pra próxima. troque entre álbuns, músicas soltas e o que está em alta.' },
+  { sel: '#genreBar', title: 'Filtre por gênero',
+    text: 'toque num gênero pra ver só fitas daquele estilo.' },
+  { sel: 'nav.tabs', title: 'Momentos e resenhas',
+    text: 'em Momentos, a galera posta uma foto com a música que estava tocando. em Resenhas, o que cada um registrou e comentou.' },
+  { sel: '.bottom-nav [data-view="buscar"]', title: 'Registre o que ouviu',
+    text: 'busque um álbum ou música, dê as estrelas e salve no seu diário. é o coração do app.' },
+  { sel: '.bottom-nav [data-view="diary"]', title: 'Seu diário',
+    text: 'todas as suas escutas ficam aqui, e dá pra gerar a playlist da semana, do mês ou de tudo.' },
+  { sel: '.bottom-nav [data-view="pessoas"]', title: 'Pessoas',
+    text: 'siga outros ouvintes pra acompanhar o que eles andam escutando.' },
+  { sel: '.bottom-nav [data-view="mensagens"]', title: 'Mensagens',
+    text: 'converse com quem você segue e mande indicações de disco.' },
+  { sel: '.top-notif-btn', title: 'Notificações',
+    text: 'quem te seguiu, curtiu ou comentou algo seu aparece aqui.' },
+  { sel: '.bottom-nav [data-view="profile"]', title: 'Seu perfil',
+    text: 'estante, conquistas, seus números e o tema claro/escuro. o botão pra rever este tutorial também fica lá.' },
+  { title: 'Tudo pronto!',
+    text: 'dica: arraste a tela pro lado pra pular entre as abas. boa escuta 📼' },
+];
+
+function tutorialKey(){ return currentUser ? `cassete_tutorial_${currentUser.username}` : null; }
+
+function maybeStartTutorial(){
+  const key = tutorialKey();
+  if(!key || document.querySelector('.tour')) return;
+  try{ if(localStorage.getItem(key)) return; }catch(e){ return; }
+  startTutorial();
+}
+
+function startTutorial(){
+  if(document.querySelector('.tour')) return;
+  switchView('foryou');
+  window.scrollTo(0, 0);
+
+  const root = document.createElement('div');
+  root.className = 'tour';
+  root.setAttribute('role', 'dialog');
+  root.setAttribute('aria-modal', 'true');
+  root.setAttribute('aria-label', 'Tutorial');
+  root.innerHTML = `<div class="tour-hole"></div><div class="tour-card" aria-live="polite"></div>`;
+  document.body.appendChild(root);
+  const hole = root.querySelector('.tour-hole');
+  const card = root.querySelector('.tour-card');
+
+  // pula passos cujo alvo não está na tela (ex.: barra de gêneros ainda vazia)
+  const steps = TUTORIAL_STEPS.filter(s => {
+    if(!s.sel) return true;
+    const el = document.querySelector(s.sel);
+    return el && el.getBoundingClientRect().width > 0;
+  });
+  let idx = 0;
+
+  const place = () => {
+    const step = steps[idx];
+    const el = step.sel ? document.querySelector(step.sel) : null;
+    const r = el ? el.getBoundingClientRect() : null;
+    card.style.top = card.style.bottom = '';
+    if(!r || !r.width){
+      hole.classList.add('none');
+      Object.assign(hole.style, { top: '50%', left: '50%', width: '0px', height: '0px' });
+      card.style.top = '50%';
+      card.style.transform = 'translate(-50%,-50%)';
+      return;
+    }
+    const pad = 6;
+    hole.classList.remove('none');
+    Object.assign(hole.style, {
+      top: (r.top - pad) + 'px', left: (r.left - pad) + 'px',
+      width: (r.width + pad * 2) + 'px', height: (r.height + pad * 2) + 'px',
+    });
+    card.style.transform = 'translateX(-50%)';
+    // card do lado com mais espaço: alvo embaixo → card em cima, e vice-versa
+    if(r.top + r.height / 2 > innerHeight / 2) card.style.bottom = (innerHeight - r.top + pad + 12) + 'px';
+    else card.style.top = (r.bottom + pad + 12) + 'px';
+  };
+
+  const finish = () => {
+    const key = tutorialKey();
+    try{ if(key) localStorage.setItem(key, '1'); }catch(e){ /* modo privado */ }
+    window.removeEventListener('resize', place);
+    document.removeEventListener('keydown', onKey);
+    root.remove();
+  };
+
+  const go = (to) => {
+    if(to >= steps.length) return finish();
+    idx = Math.max(0, to);
+    const step = steps[idx];
+    const last = idx === steps.length - 1;
+    card.innerHTML = `
+      <div class="tour-step">${idx + 1} de ${steps.length}</div>
+      <div class="tour-title">${escapeHtml(step.title)}</div>
+      <div class="tour-text">${escapeHtml(step.text)}</div>
+      <div class="tour-dots">${steps.map((_, i) => `<span class="${i === idx ? 'on' : ''}"></span>`).join('')}</div>
+      <div class="tour-actions">
+        ${last ? '<span style="margin-right:auto"></span>' : '<button type="button" class="tour-skip">pular</button>'}
+        ${idx > 0 ? '<button type="button" class="tour-btn" data-tour="prev">voltar</button>' : ''}
+        <button type="button" class="tour-btn go" data-tour="next">${idx === 0 ? 'bora' : last ? 'começar' : 'próximo'}</button>
+      </div>
+    `;
+    card.style.animation = 'none'; void card.offsetWidth; card.style.animation = '';
+    const skip = card.querySelector('.tour-skip');
+    if(skip) skip.addEventListener('click', finish);
+    card.querySelector('[data-tour="next"]').addEventListener('click', () => go(idx + 1));
+    const prev = card.querySelector('[data-tour="prev"]');
+    if(prev) prev.addEventListener('click', () => go(idx - 1));
+    place();
+    card.querySelector('[data-tour="next"]').focus({ preventScroll: true });
+  };
+
+  const onKey = (e) => {
+    if(e.key === 'Escape') finish();
+    else if(e.key === 'ArrowRight') go(idx + 1);
+    else if(e.key === 'ArrowLeft' && idx > 0) go(idx - 1);
+  };
+
+  window.addEventListener('resize', place);
+  document.addEventListener('keydown', onKey);
+  go(0);
 }
 
 // ordem "canônica" das telas principais, usada tanto pro swipe quanto
@@ -8661,6 +9046,7 @@ function shouldIgnoreSwipeTarget(target){
     target.closest('.item-credits-gallery') ||
     target.closest('input, textarea, select, button') ||
     target.closest('.overlay.active') ||
+    target.closest('.tour') ||
     target.closest('.auth-gate.show')
   );
 }
@@ -8725,6 +9111,12 @@ document.addEventListener('touchend', (e)=>{
   };
   viewFromHash();
   window.addEventListener('hashchange', viewFromHash);
+  if(currentUser && sharedProfileFromUrl){
+    history.replaceState(null, '', location.pathname + location.hash);
+    if(sharedProfileFromUrl !== currentUser.username) openPersonProfile(sharedProfileFromUrl);
+  } else if(currentUser){
+    maybeStartTutorial();
+  }
 })();
 </script>
 </body>
