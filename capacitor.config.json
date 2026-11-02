@@ -2,7 +2,7 @@
   "appId": "br.com.ntech.myk7",
   "appName": "MyK7",
   "webDir": "web",
-  "backgroundColor": "#17161A",
+  "backgroundColor": "#15110E",
   "android": {
     "allowMixedContent": false
   },
@@ -16,12 +16,12 @@
     "SplashScreen": {
       "launchShowDuration": 800,
       "launchAutoHide": true,
-      "backgroundColor": "#17161A",
+      "backgroundColor": "#15110E",
       "showSpinner": false
     },
     "StatusBar": {
       "style": "DARK",
-      "backgroundColor": "#17161A",
+      "backgroundColor": "#15110E",
       "overlaysWebView": false
     }
   }

@@ -1,6 +1,6 @@
 /* páginas de Termos e Privacidade — mesmas cores do app */
 :root{
-  --ink:#ECE7DD; --ink-soft:#B5AFA2; --paper:#17161A; --line:#34303A; --mustard:#C79A46;
+  --ink:#EFE5CF; --ink-soft:#B9AC94; --paper:#15110E; --line:#3A3029; --mustard:#D8913A;
   color-scheme:dark;
 }
 @media (prefers-color-scheme: light){
