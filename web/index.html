@@ -1815,6 +1815,71 @@
   .feed-card.daily-card{background-image:linear-gradient(180deg,#F4E2B8 0%,rgba(239,229,207,0) 55%), radial-gradient(ellipse at 50% 42%, rgba(255,250,236,0) 50%, rgba(92,64,30,.16) 100%), var(--grain);}
   .feed-card .fc-disc{box-shadow:0 20px 50px rgba(40,24,10,.45), 0 0 0 2px rgba(201,205,210,.55), inset 0 0 0 3px rgba(0,0,0,.3);}
   .fc-rail button{box-shadow:inset 0 1px 0 rgba(255,255,255,.5);}
+
+  /* ---------- SENSAÇÃO (resposta, gavetas, materiais, tipografia) ----------
+     o toque responde na hora (no "apertar", não no "soltar"); as gavetas
+     entram e saem pelo mesmo caminho e podem ser arrastadas pra fechar; a
+     barra de baixo e o fundo das gavetas são vidro fosco. */
+  :root{ --sheet-ease:cubic-bezier(.32,.72,0,1); }
+  button, a, [role="button"], label{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+  /* "scale" é independente do "transform", então não estraga botões que já usam translate */
+  button:not(:disabled):active, [role="button"]:active{scale:.96;}
+  .bottom-nav button:not(:disabled):active{scale:.9;}
+
+  body{font-optical-sizing:auto;text-rendering:optimizeLegibility;transition:background-color .35s ease, color .35s ease;}
+  .w-big, .w-name{letter-spacing:-0.01em;}
+  .fc-title, .fc-artist-name{line-height:1.02;}
+  .tagline, .fc-eyebrow, .daily-badge{letter-spacing:.14em;}
+
+  .bottom-nav{-webkit-backdrop-filter:blur(20px) saturate(170%);backdrop-filter:blur(20px) saturate(170%);}
+  .bottom-nav::before{
+    content:'';position:absolute;left:18%;right:18%;top:0;height:1px;pointer-events:none;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);
+  }
+
+  /* gaveta: o fundo escurece e desfoca; a folha sobe de baixo (ou cresce no centro, no desktop) */
+  .overlay{background:rgba(12,9,7,.5);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);}
+  .overlay.active{animation:k7ScrimIn .28s ease backwards;}
+  .overlay.active > .drawer{animation:k7SheetIn .48s var(--sheet-ease) backwards;}
+  .overlay.leaving{display:flex;pointer-events:none;animation:k7ScrimOut .3s ease both;}
+  .overlay.leaving > .drawer{animation:k7SheetOut .3s cubic-bezier(.4,0,1,1) both;}
+  .overlay.no-anim, .overlay.no-anim > .drawer{animation:none !important;}
+  @keyframes k7ScrimIn{from{background-color:rgba(12,9,7,0);-webkit-backdrop-filter:blur(0);backdrop-filter:blur(0);}}
+  @keyframes k7ScrimOut{to{background-color:rgba(12,9,7,0);-webkit-backdrop-filter:blur(0);backdrop-filter:blur(0);}}
+  @keyframes k7SheetIn{from{transform:translateY(100%);}}
+  @keyframes k7SheetOut{to{transform:translateY(100%);}}
+  @media(min-width:600px){
+    @keyframes k7SheetIn{from{transform:scale(.94);opacity:0;}}
+    @keyframes k7SheetOut{to{transform:scale(.96);opacity:0;}}
+  }
+  .drawer{box-shadow:0 -1px 0 rgba(255,255,255,.07), 0 -14px 40px rgba(0,0,0,.4);overscroll-behavior:contain;}
+  /* alça de arrastar (só no celular, onde a gaveta vem de baixo) */
+  @media(max-width:599px){
+    .overlay > .drawer::before{
+      content:'';display:block;width:38px;height:5px;border-radius:3px;
+      background:var(--ink-soft);opacity:.35;margin:-14px auto 14px;
+    }
+    .chat-overlay > .drawer::before, .mo-viewer > .drawer::before{margin:8px auto 6px;}
+  }
+  .drawer.dragging{transition:none !important;user-select:none;-webkit-user-select:none;}
+
+  @media (prefers-reduced-motion: reduce){
+    button:not(:disabled):active, [role="button"]:active, .bottom-nav button:not(:disabled):active{scale:none;}
+    .overlay.active > .drawer{animation:k7FadeIn .2s ease both;}
+    .overlay.leaving > .drawer{animation:k7FadeOut .2s ease both;}
+    @keyframes k7FadeIn{from{opacity:0;}}
+    @keyframes k7FadeOut{to{opacity:0;}}
+  }
+  @media (prefers-reduced-transparency: reduce){
+    .bottom-nav{-webkit-backdrop-filter:none;backdrop-filter:none;background:#18130F padding-box, var(--chrome-ring) border-box;}
+    .overlay{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(12,9,7,.72);}
+    .mo-viewer .close-x{-webkit-backdrop-filter:none;backdrop-filter:none;}
+  }
+  @media (prefers-contrast: more){
+    :root{--line:rgba(236,231,221,.4);--ink-soft:#D8CDB6;}
+    :root[data-theme="light"]{--line:rgba(42,36,32,.45);--ink-soft:#3E362E;}
+    .bottom-nav{background:#120E0B padding-box, var(--chrome-ring) border-box;}
+  }
 </style>
 </head>
 <body>
@@ -9649,6 +9714,147 @@ document.addEventListener('touchend', (e)=>{
     if(sharedProfileFromUrl !== currentUser.username) openPersonProfile(sharedProfileFromUrl);
   } else if(currentUser){
     maybeStartTutorial();
+  }
+})();
+</script>
+<script>
+// ---------- GAVETAS COM FÍSICA ----------
+// 1) saída: quando qualquer parte do app tira o "active" de uma gaveta, ela
+//    desce pelo mesmo caminho por onde entrou (o observer roda antes do
+//    próximo quadro, então não chega a piscar sumindo).
+// 2) arrastar pra fechar: a folha segue o dedo 1:1, resiste ao ser puxada pra
+//    cima, e ao soltar projeta o "arremesso" (como a rolagem do iPhone) pra
+//    decidir se fecha ou volta. Dá pra pegar de novo no meio do movimento.
+(function(){
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const isSheet = () => window.innerWidth < 600; // no desktop a gaveta fica no centro
+
+  document.querySelectorAll('.overlay').forEach(ov => {
+    let wasActive = ov.classList.contains('active');
+    new MutationObserver(() => {
+      const active = ov.classList.contains('active');
+      if(active === wasActive) return;
+      wasActive = active;
+      if(active){ ov.classList.remove('leaving'); return; }
+      if(ov.classList.contains('no-anim')){ ov.classList.remove('no-anim'); return; }
+      ov.classList.add('leaving');
+      const done = () => ov.classList.remove('leaving');
+      const sheet = ov.querySelector(':scope > .drawer');
+      (sheet || ov).addEventListener('animationend', function end(e){
+        if(e.target !== (sheet || ov)) return;
+        (sheet || ov).removeEventListener('animationend', end); done();
+      });
+      setTimeout(done, 450); // garantia, se a animação não rodar
+    }).observe(ov, { attributes: true, attributeFilter: ['class'] });
+  });
+
+  // posição de repouso projetada a partir da velocidade (desaceleração exponencial)
+  const project = (v, d = 0.998) => (v / 1000) * d / (1 - d);
+  // quanto mais passa do limite, menos a folha acompanha
+  const rubberband = (x, dim, c = 0.55) => (x * dim * c) / (dim + c * Math.abs(x));
+  const currentY = el => new DOMMatrixReadOnly(getComputedStyle(el).transform).m42 || 0;
+
+  function closeOverlay(ov){
+    const x = ov.querySelector(':scope > .drawer > .close-x, :scope > .drawer .close-x');
+    ov.classList.add('no-anim'); // a folha já saiu pelo arraste, sem animação de saída extra
+    if(x) x.click(); else ov.classList.remove('active');
+    if(ov.classList.contains('active')) ov.classList.remove('no-anim'); // quem fecha decidiu não fechar
+  }
+
+  // eventos de toque (e não de ponteiro): com toque o navegador assume a
+  // rolagem e cancela o ponteiro; aqui dá pra barrar a rolagem só enquanto
+  // a folha está sendo arrastada
+  document.addEventListener('touchstart', e => {
+    if(e.touches.length !== 1 || !isSheet()) return;
+    const sheet = e.target.closest('.overlay.active > .drawer');
+    if(!sheet || e.target.closest('input, textarea, select, [contenteditable], .no-drag')) return;
+    const ov = sheet.parentElement;
+    const t0 = e.touches[0], tid = t0.identifier;
+    const pt = list => [...list].find(t => t.identifier === tid);
+
+    // interromper: se a folha estava animando, parte de onde ela está agora na tela
+    const anim = sheet._k7anim;
+    let base = 0;
+    if(anim){ base = currentY(sheet); anim.cancel(); sheet._k7anim = null; sheet.style.transform = `translateY(${base}px)`; }
+
+    const startX = t0.clientX, startY = t0.clientY;
+    let tracking = base !== 0, decided = base !== 0, y = base;
+    const hist = [{ y: startY, t: e.timeStamp }];
+    const h = sheet.getBoundingClientRect().height;
+    if(tracking) sheet.classList.add('dragging');
+
+    const move = ev => {
+      const t = pt(ev.changedTouches); if(!t) return;
+      const dx = t.clientX - startX, dy = t.clientY - startY;
+      if(!decided){
+        if(Math.abs(dy) < 10 && Math.abs(dx) < 10) return; // pequena folga antes de decidir
+        decided = true;
+        // só vira arraste se for pra baixo, vertical, e a lista já estiver no topo
+        tracking = dy > 0 && Math.abs(dy) > Math.abs(dx) && sheet.scrollTop <= 0;
+        if(!tracking) return cleanup();
+        sheet.classList.add('dragging');
+      }
+      if(!tracking) return;
+      if(ev.cancelable) ev.preventDefault();
+      const raw = base + dy;
+      y = raw >= 0 ? raw : rubberband(raw, h);
+      sheet.style.transform = `translateY(${y}px)`;
+      ov.style.backgroundColor = `rgba(12,9,7,${0.5 * (1 - Math.min(1, Math.max(0, y) / h))})`;
+      hist.push({ y: t.clientY, t: ev.timeStamp });
+      if(hist.length > 6) hist.shift();
+    };
+
+    const up = ev => {
+      if(!pt(ev.changedTouches)) return;
+      cleanup();
+      if(!tracking) return;
+      sheet.classList.remove('dragging');
+      // velocidade dos últimos ~100 ms (o começo do gesto não conta)
+      const b = hist[hist.length - 1];
+      const a = hist.find(p => b.t - p.t <= 100) || hist[0];
+      // dedo parado antes de soltar = sem arremesso
+      const v = b.t > a.t && ev.timeStamp - b.t < 80 ? (b.y - a.y) / (b.t - a.t) * 1000 : 0; // px/s
+      const end = y + project(v);
+      const dismiss = ev.type !== 'touchcancel' && (end > h * 0.5 || v > 900);
+      settle(sheet, ov, y, dismiss ? h + 24 : 0, v, h, dismiss);
+    };
+
+    const cleanup = () => {
+      window.removeEventListener('touchmove', move);
+      window.removeEventListener('touchend', up);
+      window.removeEventListener('touchcancel', up);
+    };
+    window.addEventListener('touchmove', move, { passive: false });
+    window.addEventListener('touchend', up);
+    window.addEventListener('touchcancel', up);
+  }, { passive: true });
+
+  // termina o movimento continuando na velocidade do dedo (sem "emenda")
+  function settle(sheet, ov, from, to, v, h, dismiss){
+    const dist = Math.abs(to - from) || 1;
+    const speed = Math.min(Math.abs(v), 4000);
+    const dur = reduceMotion.matches ? 120
+      : Math.round(Math.min(420, Math.max(180, dismiss && speed > 0 ? dist / speed * 1000 * 2.2 : 380)));
+    // a curva começa com a inclinação da velocidade do dedo e chega parando (sem quique)
+    const slope = Math.min(3, Math.max(0, (speed / 1000) * dur / dist));
+    // inclinação inicial de um cubic-bezier = y1/x1; abaixo de 1 usa a curva padrão das gavetas
+    const ease = slope < 1 ? 'cubic-bezier(.32,.72,0,1)'
+      : `cubic-bezier(${Math.max(0.05, 0.6 / slope).toFixed(3)}, 0.6, 0.2, 1)`;
+    const scrimTo = dismiss ? 0 : 0.5;
+    const anim = sheet.animate(
+      [{ transform: `translateY(${from}px)` }, { transform: `translateY(${to}px)` }],
+      { duration: dur, easing: ease, fill: 'forwards' }
+    );
+    ov.animate([{ backgroundColor: getComputedStyle(ov).backgroundColor }, { backgroundColor: `rgba(12,9,7,${scrimTo})` }],
+      { duration: dur, easing: 'ease-out', fill: 'forwards' }).onfinish = function(){ this.cancel(); };
+    sheet._k7anim = anim;
+    anim.onfinish = () => {
+      sheet._k7anim = null;
+      if(dismiss){ closeOverlay(ov); }
+      anim.cancel();
+      sheet.style.transform = '';
+      ov.style.backgroundColor = '';
+    };
   }
 })();
 </script>
