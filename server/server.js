@@ -25,6 +25,7 @@ const spotifyRoutes = require('./routes/spotify');
 const postRoutes = require('./routes/posts');
 const billingRoutes = require('./routes/billing');
 const forYouRoutes = require('./routes/foryou');
+const connectRoutes = require('./routes/connect');
 const { checkMemories } = require('./utils/reminders');
 const app = express();
 
@@ -97,6 +98,7 @@ app.use('/api/spotify', spotifyRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/foryou', forYouRoutes);
+app.use('/api/connect', connectRoutes);
 
 // rota de API que não existe: responde JSON (e não a página HTML do front)
 app.use('/api', (req, res) => {

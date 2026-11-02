@@ -39,4 +39,8 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- "Cidade e contatos" (opcional, a pessoa escolhe na tela): só a localização
+         APROXIMADA (nunca a precisa) e leitura dos contatos pra achar amigos no MyK7 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 </manifest>

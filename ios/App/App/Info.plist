@@ -64,6 +64,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSContactsUsageDescription</key>
+	<string>O MyK7 procura nos seus contatos quem já está no app, pra você seguir seus amigos. Os números viram um código no seu aparelho e a agenda não é enviada nem guardada.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>O MyK7 usa sua localização aproximada (cerca de 10 km) pra mostrar o que as pessoas perto de você estão ouvindo. Sua posição exata não é guardada.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>O MyK7 usa suas fotos para você postar Momentos, mudar a foto de perfil e anexar imagens em comentários.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

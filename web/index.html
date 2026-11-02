@@ -1863,6 +1863,27 @@
   }
   .drawer.dragging{transition:none !important;user-select:none;-webkit-user-select:none;}
 
+  /* ---------- CIDADE E CONTATOS ---------- */
+  .cx-cta{
+    display:flex;align-items:center;gap:14px;width:100%;max-width:420px;margin:0 0 22px;padding:14px 16px;
+    border:1.5px solid transparent;border-radius:14px;cursor:pointer;text-align:left;color:var(--ink);font:inherit;
+    background:linear-gradient(var(--paper-dim),var(--paper-dim)) padding-box, var(--chrome-ring) border-box;
+  }
+  .cx-cta b{font-family:'Anton',sans-serif;font-weight:400;font-size:16px;text-transform:uppercase;letter-spacing:.02em;}
+  .cx-cta span span{font-size:12.5px;color:var(--ink-soft);}
+  .cx-cta-icon{width:42px;height:42px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:rgba(216,145,58,.16);font-size:18px;}
+  .cx-lead{font-size:14px;line-height:1.5;color:var(--ink-soft);margin:0 0 18px;}
+  .cx-block{border-top:1px solid var(--line);padding:16px 0 6px;}
+  .cx-k{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;}
+  .cx-row{display:flex;gap:8px;margin-bottom:8px;}
+  .cx-input{flex:1;min-width:0;border:1px solid var(--line);background:var(--paper-dim);color:var(--ink);border-radius:8px;padding:10px 12px;font:inherit;font-size:15px;}
+  .cx-note{font-size:12px;line-height:1.45;color:var(--ink-soft);margin:6px 0 10px;}
+  .cx-link{background:none;border:none;padding:6px 0;color:var(--mustard);font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;text-align:left;}
+  .cx-link.danger{color:var(--rust);}
+  .cx-block button.primary{width:100%;}
+  .cx-toggle{display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--line);padding-top:16px;margin-top:8px;font-size:13px;line-height:1.4;cursor:pointer;}
+  .cx-toggle input{margin-top:3px;accent-color:var(--mustard);width:18px;height:18px;flex:none;}
+
   @media (prefers-reduced-motion: reduce){
     button:not(:disabled):active, [role="button"]:active, .bottom-nav button:not(:disabled):active{scale:none;}
     .overlay.active > .drawer{animation:k7FadeIn .2s ease both;}
@@ -4114,6 +4135,17 @@ async function renderPessoas(search){
   let community = reviewers.map((r,idx)=>personMeta(communityId(idx)));
   if(term) community = community.filter(p => p.username.toLowerCase().includes(term));
   const real = await fetchRealPeople(term);
+  // sem busca digitada: no topo, seus contatos que estão no MyK7 e gente perto de você
+  let sug = null;
+  if(!term){ try{ sug = await apiFetch('/connect/suggestions'); }catch(e){ sug = null; } }
+  const sugHtml = !sug ? '' : `
+    ${sug.contacts.length ? `<div class="people-group-title">seus contatos no MyK7</div><div class="people-list">${connectPersonRows(sug.contacts, () => 'nos seus contatos')}</div>` : ''}
+    ${sug.nearby.length ? `<div class="people-group-title">perto de você${sug.city ? ' · ' + escapeHtml(sug.city) : ''}</div><div class="people-list">${connectPersonRows(sug.nearby, u => u.distance || 'perto de você')}</div>` : ''}
+    ${!sug.contacts.length && !sug.city && !sug.hasGeo ? `
+      <button type="button" class="cx-cta" id="cxOpenFromPeople">
+        <span class="cx-cta-icon">📍</span>
+        <span><b>ache seus amigos e quem está perto</b><br><span>adicione sua cidade ou procure nos seus contatos</span></span>
+      </button>` : ''}`;
 
   const renderGroup = (title, list) => list.length ? `
     <div class="people-group-title">${title}</div>
@@ -4135,6 +4167,7 @@ async function renderPessoas(search){
   ` : '';
 
   body.innerHTML = `
+    ${sugHtml}
     ${renderGroup('contas de outros ouvintes', real)}
     ${renderGroup('comunidade cassete', community)}
     ${(!real.length && !community.length) ? `<div class="people-empty">${term ? 'ninguém encontrado com esse nome.' : 'ninguém por aqui ainda.'}</div>` : ''}
@@ -4145,6 +4178,207 @@ async function renderPessoas(search){
   });
   bindFollowButtons(body);
   bindMessageButtons(body);
+  const cxOpen = document.getElementById('cxOpenFromPeople');
+  if(cxOpen) cxOpen.addEventListener('click', openConnections);
+}
+
+/* ============================================================
+   CONEXÕES — cidade, localização aproximada e contatos do celular
+   Privacidade em primeiro lugar:
+   - localização: só "aproximada" (arredondada a ~10 km aqui no aparelho,
+     antes de sair dele); dá pra usar só a cidade digitada
+   - contatos: cada telefone/e-mail vira um hash SHA-256 aqui no aparelho;
+     só os hashes vão pro servidor, que devolve quem já está no MyK7
+   - tudo pode ser removido a qualquer momento nesta mesma tela
+   ============================================================ */
+// (nativePlugin() já existe lá em cima, junto dos anúncios)
+
+async function sha256Hex(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+// telefone: só os últimos 9 dígitos (ignora +55, DDD com zero, espaços e traços)
+function phoneKey(raw){
+  const d = String(raw || '').replace(/\D/g, '');
+  return d.length >= 8 ? 'tel:' + d.slice(-9) : null;
+}
+const emailKey = raw => { const e = String(raw || '').trim().toLowerCase(); return /.+@.+\..+/.test(e) ? 'mail:' + e : null; };
+
+function contactsSupport(){
+  if(IS_NATIVE_APP && nativePlugin('Contacts')) return 'native';
+  if('contacts' in navigator && 'ContactsManager' in window) return 'picker'; // Chrome no Android
+  return null;
+}
+
+// lê a agenda e devolve só os hashes (nada em texto sai daqui)
+async function readContactHashes(){
+  const keys = new Set();
+  const support = contactsSupport();
+  if(support === 'native'){
+    const C = nativePlugin('Contacts');
+    const perm = await C.requestPermissions();
+    if(perm && perm.contacts && perm.contacts !== 'granted') throw new Error('permissão negada');
+    const { contacts } = await C.getContacts({ projection: { phones: true, emails: true } });
+    (contacts || []).forEach(c => {
+      (c.phones || []).forEach(p => { const k = phoneKey(p.number); if(k) keys.add(k); });
+      (c.emails || []).forEach(m => { const k = emailKey(m.address); if(k) keys.add(k); });
+    });
+  } else if(support === 'picker'){
+    const props = ['tel', 'email'];
+    const picked = await navigator.contacts.select(props, { multiple: true });
+    picked.forEach(c => {
+      (c.tel || []).forEach(t => { const k = phoneKey(t); if(k) keys.add(k); });
+      (c.email || []).forEach(m => { const k = emailKey(m); if(k) keys.add(k); });
+    });
+  } else {
+    throw new Error('sem suporte');
+  }
+  return Promise.all([...keys].slice(0, 5000).map(sha256Hex));
+}
+
+// posição aproximada: pede só a "aproximada" e ainda arredonda pra ~10 km
+async function readApproxLocation(){
+  const G = IS_NATIVE_APP ? nativePlugin('Geolocation') : null;
+  let pos;
+  if(G){
+    const perm = await G.requestPermissions({ permissions: ['coarseLocation'] }).catch(() => null);
+    if(perm && perm.coarseLocation === 'denied' && perm.location === 'denied') throw new Error('permissão negada');
+    pos = await G.getCurrentPosition({ enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 });
+  } else {
+    if(!navigator.geolocation) throw new Error('sem suporte');
+    pos = await new Promise((ok, fail) => navigator.geolocation.getCurrentPosition(ok, fail,
+      { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 }));
+  }
+  const r = v => Math.round(v * 10) / 10;
+  return { lat: r(pos.coords.latitude), lng: r(pos.coords.longitude) };
+}
+
+function connectPersonRows(list, subOf){
+  return list.map(u => {
+    cacheRealUser(u);
+    const p = personMeta(u.username);
+    if(!p) return '';
+    return `
+      <div class="person-row">
+        <button class="person-click" data-open="${p.id}">
+          <div class="person-avatar" style="background:${p.avatar ? `center/cover no-repeat url(${p.avatar})` : (p.color||'#3C6459')}">${p.avatar ? '' : escapeHtml(p.username[0].toUpperCase())}</div>
+          <div class="person-info">
+            <div class="person-name">${escapeHtml(p.username)}</div>
+            <div class="person-sub">${escapeHtml(subOf(u))}</div>
+          </div>
+        </button>
+        ${followBtnHtml(p.id)}
+      </div>`;
+  }).join('');
+}
+
+async function openConnections(){
+  if(!currentUser) return;
+  const overlay = document.getElementById('followListOverlay');
+  const body = document.getElementById('followListBody');
+  document.getElementById('followListTitle').textContent = 'Cidade e contatos';
+  body.innerHTML = '<div class="people-empty">carregando…</div>';
+  overlay.classList.add('active');
+  let st;
+  try{ st = await apiFetch('/connect/settings'); }
+  catch(e){ body.innerHTML = `<div class="people-empty">não deu pra carregar agora (${escapeHtml(e.message)}).</div>`; return; }
+
+  const support = contactsSupport();
+  body.innerHTML = `
+    <div class="cx">
+      <p class="cx-lead">quanto mais o MyK7 sabe de quem está perto de você, mais o <b>Pra Você</b> mostra o que essas pessoas estão curtindo. Tudo aqui é opcional e dá pra apagar quando quiser.</p>
+
+      <div class="cx-block">
+        <div class="cx-k">📍 sua cidade</div>
+        <div class="cx-row">
+          <input id="cxCity" class="cx-input" maxlength="80" placeholder="ex: Campinas" value="${escapeHtml(st.city)}" autocomplete="address-level2">
+          <button type="button" class="ghost" id="cxCitySave">salvar</button>
+        </div>
+        <button type="button" class="cx-link" id="cxGeo">${st.hasLocation ? '✓ localização aproximada ativa — atualizar' : 'usar minha localização aproximada'}</button>
+        <p class="cx-note">a localização é arredondada pra uns 10 km aqui no seu aparelho. Ninguém vê onde você está — só aparece "perto de você".</p>
+        ${st.city || st.hasLocation ? '<button type="button" class="cx-link danger" id="cxLocDel">apagar cidade e localização</button>' : ''}
+      </div>
+
+      <div class="cx-block">
+        <div class="cx-k">📇 seus contatos no MyK7</div>
+        ${support ? `
+          <button type="button" class="primary" id="cxContacts">${st.contactsMatched ? 'procurar de novo nos contatos' : 'encontrar amigos dos meus contatos'}</button>
+          <p class="cx-note">os números e e-mails viram um código embaralhado (hash) aqui no aparelho. Sua agenda não é enviada nem guardada — só ficam salvas as pessoas que já estão no MyK7.</p>
+        ` : `<p class="cx-note">neste navegador não dá pra ler os contatos. No app do celular (ou no Chrome do Android) essa opção aparece aqui.</p>`}
+        <div id="cxFound">${st.contactsMatched ? `<p class="cx-note">${st.contactsMatched} ${st.contactsMatched === 1 ? 'contato encontrado' : 'contatos encontrados'}.</p>` : ''}</div>
+        ${st.contactsMatched ? '<button type="button" class="cx-link danger" id="cxContactsDel">esquecer meus contatos</button>' : ''}
+      </div>
+
+      <div class="cx-block">
+        <div class="cx-k">📱 seu telefone (opcional)</div>
+        <div class="cx-row">
+          <input id="cxPhone" class="cx-input" inputmode="tel" maxlength="20" placeholder="${st.hasPhone ? 'telefone salvo ✓ — digite pra trocar' : 'ex: (11) 98888-7777'}" autocomplete="tel">
+          <button type="button" class="ghost" id="cxPhoneSave">salvar</button>
+        </div>
+        <p class="cx-note">só pra quem tem seu número salvo te achar. Ele vira um hash antes de sair do aparelho — nem o MyK7 vê o número.</p>
+        ${st.hasPhone ? '<button type="button" class="cx-link danger" id="cxPhoneDel">remover telefone</button>' : ''}
+      </div>
+
+      <label class="cx-toggle">
+        <input type="checkbox" id="cxDisc" ${st.discoverable ? 'checked' : ''}>
+        <span>deixar quem tem meu telefone ou e-mail nos contatos me encontrar</span>
+      </label>
+    </div>`;
+
+  const busy = async (btn, fn) => { btn.disabled = true; try{ await fn(); } finally { btn.disabled = false; } };
+  const refreshAll = () => { invalidateForYou(); openConnections(); };
+
+  document.getElementById('cxCitySave').addEventListener('click', e => busy(e.currentTarget, async () => {
+    await apiFetch('/connect/location', { method: 'PUT', body: JSON.stringify({ city: document.getElementById('cxCity').value }) });
+    showToast('cidade salva'); refreshAll();
+  }));
+  document.getElementById('cxGeo').addEventListener('click', e => busy(e.currentTarget, async () => {
+    try{
+      const { lat, lng } = await readApproxLocation();
+      await apiFetch('/connect/location', { method: 'PUT', body: JSON.stringify({ lat, lng }) });
+      showToast('localização aproximada ativada'); refreshAll();
+    }catch(err){ showToast(/negad|denied/i.test(err.message || '') ? 'sem permissão de localização — dá pra usar só a cidade.' : 'não deu pra pegar a localização agora.', true); }
+  }));
+  const locDel = document.getElementById('cxLocDel');
+  if(locDel) locDel.addEventListener('click', e => busy(e.currentTarget, async () => {
+    await apiFetch('/connect/location', { method: 'DELETE' }); showToast('cidade e localização apagadas'); refreshAll();
+  }));
+
+  const cBtn = document.getElementById('cxContacts');
+  if(cBtn) cBtn.addEventListener('click', e => busy(e.currentTarget, async () => {
+    const found = document.getElementById('cxFound');
+    found.innerHTML = '<p class="cx-note">procurando…</p>';
+    try{
+      const hashes = await readContactHashes();
+      const { users } = await apiFetch('/connect/contacts/match', { method: 'POST', body: JSON.stringify({ hashes }) });
+      invalidateForYou();
+      found.innerHTML = users.length
+        ? `<div class="people-list">${connectPersonRows(users, () => 'nos seus contatos')}</div>`
+        : '<p class="cx-note">nenhum dos seus contatos está no MyK7 ainda. Que tal chamar alguém?</p>';
+      found.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => { overlay.classList.remove('active'); openPersonProfile(b.dataset.open); }));
+      bindFollowButtons(found);
+    }catch(err){
+      found.innerHTML = `<p class="cx-note">${/negad|denied/i.test(err.message || '') ? 'sem permissão pra ler os contatos.' : 'não deu pra ler os contatos agora.'}</p>`;
+    }
+  }));
+  const cDel = document.getElementById('cxContactsDel');
+  if(cDel) cDel.addEventListener('click', e => busy(e.currentTarget, async () => {
+    await apiFetch('/connect/contacts', { method: 'DELETE' }); showToast('contatos esquecidos'); refreshAll();
+  }));
+
+  document.getElementById('cxPhoneSave').addEventListener('click', e => busy(e.currentTarget, async () => {
+    const k = phoneKey(document.getElementById('cxPhone').value);
+    if(!k){ showToast('digite um telefone com DDD.', true); return; }
+    await apiFetch('/connect/phone', { method: 'PUT', body: JSON.stringify({ phoneHash: await sha256Hex(k) }) });
+    showToast('telefone salvo'); refreshAll();
+  }));
+  const pDel = document.getElementById('cxPhoneDel');
+  if(pDel) pDel.addEventListener('click', e => busy(e.currentTarget, async () => {
+    await apiFetch('/connect/phone', { method: 'PUT', body: JSON.stringify({ phoneHash: null }) }); showToast('telefone removido'); refreshAll();
+  }));
+  document.getElementById('cxDisc').addEventListener('change', async e => {
+    await apiFetch('/connect/discoverable', { method: 'PUT', body: JSON.stringify({ value: e.target.checked }) }).catch(() => {});
+  });
 }
 
 let peopleSearchTimer = null;
@@ -5410,7 +5644,8 @@ function forYouWhy(a, ps){
   }
   if(w && w.tasteCount > 0) return w.tasteCount > 1 ? `${w.tasteCount} pessoas com gosto parecido com o seu curtiram` : 'alguém com gosto parecido com o seu curtiu';
   if(w && w.fofCount > 0) return 'amigos dos seus amigos estão ouvindo';
-  if(w && w.nearbyCount > 0) return `curtido perto de você${forYouSignals && forYouSignals.nationality ? ' · ' + forYouSignals.nationality : ''}`;
+  if(w && w.localCount > 0) return `curtido perto de você${forYouSignals && forYouSignals.city ? ' · ' + forYouSignals.city : ''}`;
+  if(w && w.nearbyCount > 0) return forYouSignals && forYouSignals.nationality ? `em alta · ${forYouSignals.nationality}` : 'em alta no seu país';
   if(ps.artistAff > 0) return `porque você curte ${a.artist}`;
   if(ps.netArtist) return `seu pessoal anda ouvindo ${a.artist}`;
   if(ps.genreAff > 0) return `porque você curte ${a.genre}`;
@@ -5492,7 +5727,7 @@ function renderFeed(){
   const personalScore = (a) => scores.get(a.id) || forYouScore(a);
   // "em alta" = o que mais gente do seu país curtiu nos últimos 30 dias (dados reais)
   const trendingIds = full
-    .map(a => ({ id: a.id, n: (personalScore(a).soc || { why: {} }).why.nearbyCount || 0 }))
+    .map(a => { const w = (personalScore(a).soc || { why: {} }).why; return { id: a.id, n: w.nearbyCount || 0 }; })
     .filter(x => x.n >= 2).sort((x,y) => y.n - x.n).slice(0,3).map(x => x.id);
   // "full" já vem filtrado pelo gênero certo desde a busca (o termo já foi
   // escolhido pra aquele gênero) — filtrar de novo aqui comparando com
@@ -5511,7 +5746,8 @@ function renderFeed(){
     const logged = diary.some(e => e.itemId === a.id);
     const ps = personalScore(a);
     // amigo que curtiu vale mais que o selo de "em alta"
-    const friendLiked = !!(ps.soc && ps.soc.why.friendCount > 0);
+    // (e "curtido perto de você" também: diz mais do que "em alta")
+    const friendLiked = !!(ps.soc && (ps.soc.why.friendCount > 0 || ps.soc.why.localCount > 0));
     if(friendLiked){ const k = trendingIds.indexOf(a.id); if(k !== -1) trendingIds.splice(k, 1); }
     const whyTag = trendingIds.includes(a.id) ? '' : escapeHtml(forYouWhy(a, ps));
     const promo = adsActive() && i > 0 && i % MONETIZATION.promoEvery === 0 ? promoCardHtml() : '';
@@ -7853,6 +8089,10 @@ async function renderProfile(){
       </div>
     </div>
 
+    <button type="button" class="cx-cta" id="cxOpenFromProfile">
+      <span class="cx-cta-icon">📍</span>
+      <span><b>cidade e contatos</b><br><span>pra o Pra Você mostrar o que seus amigos e quem está perto curtem</span></span>
+    </button>
     ${SPOTIFY_ENABLED ? `<div class="spotify-card">
       ${currentUser.spotifyConnected ? `
         <div class="spotify-status">
@@ -8044,6 +8284,8 @@ async function renderProfile(){
   }
   mountMomentsGrid(currentUser.username, 'ownMoments', { own: true });
   if(ownNowPlayingInterval){ clearInterval(ownNowPlayingInterval); ownNowPlayingInterval = null; }
+  const cxProfileBtn = document.getElementById('cxOpenFromProfile');
+  if(cxProfileBtn) cxProfileBtn.addEventListener('click', openConnections);
   if(SPOTIFY_ENABLED && currentUser.spotifyConnected){
     mountNowPlaying(currentUser.username, 'nowPlayingOwn', { showEmpty: true })
       .then(interval => { ownNowPlayingInterval = interval; });

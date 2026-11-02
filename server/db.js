@@ -256,4 +256,31 @@ if(!notificationColumns.includes('post_id')){
   db.exec('ALTER TABLE notifications ADD COLUMN post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE');
 }
 
+// CIDADE, LOCALIZAÇÃO APROXIMADA E CONTATOS (todos opcionais)
+// - geo_lat/geo_lng: arredondados a 0,1° (~10 km) já no aparelho; nunca o ponto exato
+// - phone_hash/email_hash: SHA-256 de "tel:<últimos 9 dígitos>" / "mail:<e-mail>"
+//   — é só com isso que os contatos de alguém são comparados
+// - discoverable: 0 = ninguém me acha pelos contatos
+// - contact_links: só os pares "fulano tem ciclano nos contatos" que deram
+//   match; a agenda em si nunca é guardada
+const userColumns2 = db.prepare("PRAGMA table_info(users)").all().map(c => c.name);
+[
+  ['city', 'TEXT'], ['geo_lat', 'REAL'], ['geo_lng', 'REAL'],
+  ['phone_hash', 'TEXT'], ['email_hash', 'TEXT'], ['discoverable', 'INTEGER NOT NULL DEFAULT 1'],
+].forEach(([name, type]) => {
+  if(!userColumns2.includes(name)) db.exec(`ALTER TABLE users ADD COLUMN ${name} ${type}`);
+});
+db.exec(`
+CREATE INDEX IF NOT EXISTS idx_users_phone_hash ON users(phone_hash);
+CREATE INDEX IF NOT EXISTS idx_users_email_hash ON users(email_hash);
+CREATE INDEX IF NOT EXISTS idx_users_geo ON users(geo_lat, geo_lng);
+CREATE TABLE IF NOT EXISTS contact_links (
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  contact_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (user_id, contact_user_id)
+);
+CREATE INDEX IF NOT EXISTS idx_contact_links_contact ON contact_links(contact_user_id);
+`);
+
 module.exports = db;
