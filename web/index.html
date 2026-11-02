@@ -3718,6 +3718,9 @@ let resetTokenFromUrl = new URLSearchParams(location.search).get('reset');
 if(resetTokenFromUrl) gateAuthMode = 'reset';
 const verifyTokenFromUrl = new URLSearchParams(location.search).get('verify');
 const spotifyStatusFromUrl = new URLSearchParams(location.search).get('spotify');
+// Spotify fora do app por enquanto (conectar, "ouvindo agora", links). O
+// backend continua pronto: pra religar é só voltar isto pra true.
+const SPOTIFY_ENABLED = false;
 // quem chega por um card compartilhado (QR/link do story) vem com ?u=usuario:
 // já logado abre o perfil dessa pessoa; sem conta, cai direto no cadastro
 const sharedProfileFromUrl = new URLSearchParams(location.search).get('u');
@@ -3820,7 +3823,7 @@ async function verifyEmailFromUrl(){
 // trata a volta do fluxo de "conectar Spotify" (o backend redireciona pra
 // cá com ?spotify=connected|error|expired depois da autorização)
 function handleSpotifyRedirect(){
-  if(!spotifyStatusFromUrl) return;
+  if(!SPOTIFY_ENABLED || !spotifyStatusFromUrl) return;
   if(spotifyStatusFromUrl === 'connected'){
     showToast('Spotify conectado! agora as pessoas podem ver o que você está ouvindo.');
     if(currentUser) currentUser.spotifyConnected = true;
@@ -3865,6 +3868,7 @@ async function openNowPlayingItem(title, artist, btn){
 }
 
 async function mountNowPlaying(username, containerId, { showEmpty = false } = {}){
+  if(!SPOTIFY_ENABLED) return null;
   async function refresh(){
     const el = document.getElementById(containerId);
     if(!el) return; // saiu da tela — não insiste
@@ -5240,17 +5244,25 @@ function fetchLiveFeed(){
       : genresForCountry;
     const entries = wanted.flatMap(g => trendingFor(country, g));
 
-    Promise.all(entries.map(it => {
+    Promise.all([loadForYouSignals(), ...entries.map(it => {
       const term = /^sucessos recentes$/i.test(it.t) ? it.a : `${it.t} ${it.a}`;
       return itunesSearchJSONP(term, 'song');
-    }))
-      .then(groups=>{
+    })])
+      .then(([, ...groups])=>{
         if(mySeq !== feedFetchSeq) return;
         feedLoading = false;
         const raw = groups.map(g => g[0]).filter(Boolean); // pega só o resultado mais relevante de cada busca
         let found = raw.map(mapItunesResult).filter(Boolean).filter(it => it.type === 'single');
         const seen = new Set();
         found = found.filter(it => { if(seen.has(it.id)) return false; seen.add(it.id); return true; });
+        // na frente, o que gente de verdade do seu país está curtindo agora no MyK7
+        const nearby = (forYouSignals ? forYouSignals.items : [])
+          .filter(s => s.why.nearbyCount > 0 && s.type !== 'album' && s.type !== 'playlist')
+          .sort((x, y) => y.why.nearbyCount - x.why.nearbyCount).slice(0, 10)
+          .map(s => ({ id: parseItemId(String(s.itemId)), title: s.title, artist: s.artist || '', genre: s.genre || 'Música',
+                       year: s.year || '', type: 'single', previewUrl: s.previewUrl || null, external: true }))
+          .filter(it => !seen.has(it.id));
+        found = nearby.concat(found);
         liveFeedItems = found;
         found.forEach(item => { if(!allItems.some(x => x.id === item.id)) allItems.push(item); });
         renderFeed();
@@ -5263,35 +5275,170 @@ function fetchLiveFeed(){
     return;
   }
 
-  const rawTerms = activeGenre === 'all' ? pickRandomGenres(4) : [activeGenre];
-  const terms = rawTerms.map(searchTermForGenre); // traduz o gênero pra um termo que a iTunes acha de verdade
-
   const entity = feedMode === 'album' ? 'album' : 'song';
   const wantedType = feedMode === 'album' ? 'album' : 'single';
-  console.log('[Feed] buscando:', terms, '| entidade:', entity);
 
-  Promise.all(terms.map(t => itunesSearchJSONP(t, entity))).then(groups=>{
+  (async () => {
+    const sig = await loadForYouSignals();
+    if(mySeq !== feedFetchSeq) return;
+    const terms = forYouSearchTerms(sig);
+    console.log('[Feed] buscando:', terms, '| entidade:', entity);
+    const groups = await Promise.all(terms.map(t => itunesSearchJSONP(t, entity)));
     if(mySeq !== feedFetchSeq) return; // uma busca mais nova já foi disparada, descarta essa
+
+    const byId = new Map();
+    // 1) o que sua rede / gente perto ouviu (já vem do servidor com os motivos)
+    (sig ? sig.items : []).forEach(s => {
+      const type = s.type === 'album' ? 'album' : (s.type === 'playlist' ? 'playlist' : 'single');
+      if(type !== wantedType) return;
+      if(activeGenre !== 'all' && !genreMatchesChip(s.genre, activeGenre)) return;
+      const item = {
+        id: parseItemId(String(s.itemId)), title: s.title, artist: s.artist || '', genre: s.genre || 'Música',
+        year: s.year || '', type, previewUrl: s.previewUrl || null, external: true,
+      };
+      byId.set(String(item.id), item);
+    });
+    // 2) o que a busca achou a partir dos seus artistas, da sua rede e dos seus gêneros
+    groups.flat().map(mapItunesResult).filter(Boolean).filter(it => it.type === wantedType)
+      .forEach(it => { if(!byId.has(String(it.id))) byId.set(String(it.id), it); });
+
+    let found = [...byId.values()];
+    // o que você já registrou sai do feed (é descoberta), a não ser que sobre muito pouco
+    const loggedIds = new Set(diary.map(e => String(e.itemId)));
+    const fresh = found.filter(it => !loggedIds.has(String(it.id)));
+    if(fresh.length >= 8) found = fresh;
+    // artista que você avaliou mal várias vezes não volta
+    const disliked = new Set((sig ? sig.dislikedArtists : []).map(normKey));
+    found = found.filter(it => !disliked.has(normKey(it.artist)));
+
     feedLoading = false;
-    const raw = groups.flat();
-    console.log('[Feed] recebido bruto:', raw.length, '| esperando type =', wantedType);
-    let found = raw.map(mapItunesResult).filter(Boolean).filter(it => it.type === wantedType);
-    const seen = new Set();
-    found = found.filter(it => { if(seen.has(it.id)) return false; seen.add(it.id); return true; });
-    console.log('[Feed] itens finais depois do filtro/dedupe:', found.length);
-    for(let i = found.length - 1; i > 0; i--){
-      const j = Math.floor(Math.random() * (i + 1));
-      [found[i], found[j]] = [found[j], found[i]];
-    }
+    feedBuiltWithSignals = !!sig;
+    feedJitter = new Map(found.map(it => [String(it.id), Math.random()]));
     liveFeedItems = found;
     found.forEach(item => { if(!allItems.some(x => x.id === item.id)) allItems.push(item); });
+    console.log('[Feed] itens finais:', found.length, '| sinais da rede:', sig ? sig.items.length : 0);
     renderFeed();
-  }).catch((err)=>{
+  })().catch((err)=>{
     console.error('[Feed] erro inesperado:', err);
     if(mySeq !== feedFetchSeq) return;
     feedLoading = false;
     renderFeed();
   });
+}
+
+/* ---------- PRA VOCÊ: sinais reais (rede, gosto parecido, perto de você) ----------
+   o servidor (/api/foryou) junta quem você segue, quem te segue, amigos dos
+   amigos, quem tem gosto parecido e gente do seu país, e devolve: discos que
+   essas pessoas curtiram (com o motivo) + sua afinidade por artista/gênero.
+   Aqui isso decide O QUE buscar e EM QUE ORDEM mostrar. */
+let forYouSignals = null;
+let forYouAt = 0;
+let feedBuiltWithSignals = false;
+let feedSignalRetry = false;
+let feedJitter = new Map();
+const normKey = v => String(v || '').trim().toLowerCase();
+
+async function loadForYouSignals(force = false){
+  if(!currentUser) return null;
+  if(!force && forYouSignals && Date.now() - forYouAt < 60 * 1000) return forYouSignals;
+  try{
+    forYouSignals = await apiFetch('/foryou');
+    forYouAt = Date.now();
+  }catch(e){
+    console.warn('[Feed] sinais do Pra Você indisponíveis:', e.message);
+  }
+  return forYouSignals;
+}
+// depois de registrar/avaliar algo, a próxima busca já leva isso em conta
+function invalidateForYou(){ forYouAt = 0; }
+
+function genreMatchesChip(itemGenre, chip){
+  const g = normKey(itemGenre), t = normKey(searchTermForGenre(chip)), c = normKey(chip);
+  if(!g) return false;
+  return g.includes(t) || t.includes(g) || g.includes(c) || c.includes(g) || g.includes(t.split(' ')[0]);
+}
+
+function forYouSearchTerms(sig){
+  if(activeGenre !== 'all') return [searchTermForGenre(activeGenre)];
+  const terms = [];
+  const add = t => { if(t && !terms.some(x => normKey(x) === normKey(t))) terms.push(t); };
+  // artistas que você mais curte (um pouco de sorteio entre os do topo, pra variar a cada busca)
+  const mine = (sig ? sig.myArtists : []).slice(0, 6).sort(() => Math.random() - 0.5).slice(0, 3);
+  mine.forEach(a => add(a.name));
+  // o que sua rede anda ouvindo
+  (sig ? sig.networkArtists : []).slice(0, 4).sort(() => Math.random() - 0.5).slice(0, 2).forEach(a => add(a.name));
+  // seus gêneros (os que você mais ouve, senão os que escolheu no cadastro)
+  const genres = (sig && sig.myGenres.length ? sig.myGenres.map(g => g.name) : [])
+    .concat(currentUser ? currentUser.genres : []);
+  [...new Set(genres)].slice(0, 2).forEach(g => add(searchTermForGenre(g)));
+  // e sempre um pouquinho de novidade
+  add(searchTermForGenre(pickRandomGenres(1)[0]));
+  while(terms.length < 4) add(searchTermForGenre(pickRandomGenres(1)[0]));
+  return terms.slice(0, 7);
+}
+
+// pontuação de um card: rede > perto de você > seu gosto por artista/gênero
+function forYouScore(a){
+  const sig = forYouSignals;
+  const soc = socialFor(a);
+  const artistAff = sig ? (sig.myArtists.find(x => normKey(x.name) === normKey(a.artist)) || {}).score || 0 : 0;
+  const genreAff = sig ? (sig.myGenres.find(x => genreMatchesChip(a.genre, x.name) || normKey(x.name) === normKey(a.genre)) || {}).score || 0 : 0;
+  const netArtist = sig && sig.networkArtists.some(x => normKey(x.name) === normKey(a.artist)) ? 1 : 0;
+  const favGenres = currentUser ? currentUser.genres : [];
+  const favBoost = favGenres.some(g => genreMatchesChip(a.genre, g)) ? 1 : 0;
+  // sem sinais do servidor (offline etc.), cai no que dá pra calcular só com o diário daqui
+  const local = sig ? null : computeAffinity();
+  const localArtist = local ? (local.artistScore[a.artist] || 0) / 4 : 0;
+  const localGenre = local ? (local.genreScore[a.genre] || 0) / 4 : 0;
+  const total = 4 * (soc ? soc.social : 0) + 2 * (soc ? soc.nearby : 0)
+    + 0.5 * Math.max(-6, Math.min(10, artistAff)) + 0.35 * Math.max(-4, Math.min(8, genreAff))
+    + 1.2 * netArtist + 1.5 * favBoost + localArtist + localGenre
+    + 1.2 * (feedJitter.get(String(a.id)) || 0); // variação pra cada busca não sair igual
+  return { total, soc, artistAff: artistAff || localArtist, genreAff: genreAff || localGenre, netArtist, favBoost };
+}
+function socialFor(a){
+  return forYouSignals ? forYouSignals.items.find(s => String(s.itemId) === String(a.id)) || null : null;
+}
+// o motivo que aparece no card ("✦ ...")
+function forYouWhy(a, ps){
+  const w = ps.soc && ps.soc.why;
+  if(w && w.friendCount > 0){
+    const n = w.friends.map(u => '@' + u);
+    if(w.friendCount === 1) return `${n[0]} curtiu`;
+    if(w.friendCount === 2) return `${n[0]} e ${n[1]} curtiram`;
+    return `${n[0]} e mais ${w.friendCount - 1} que você conhece curtiram`;
+  }
+  if(w && w.tasteCount > 0) return w.tasteCount > 1 ? `${w.tasteCount} pessoas com gosto parecido com o seu curtiram` : 'alguém com gosto parecido com o seu curtiu';
+  if(w && w.fofCount > 0) return 'amigos dos seus amigos estão ouvindo';
+  if(w && w.nearbyCount > 0) return `curtido perto de você${forYouSignals && forYouSignals.nationality ? ' · ' + forYouSignals.nationality : ''}`;
+  if(ps.artistAff > 0) return `porque você curte ${a.artist}`;
+  if(ps.netArtist) return `seu pessoal anda ouvindo ${a.artist}`;
+  if(ps.genreAff > 0) return `porque você curte ${a.genre}`;
+  if(ps.favBoost) return 'no seu estilo favorito';
+  return '';
+}
+// o que sua rede / gente perto curtiu não pode sumir atrás do seu artista
+// favorito: pelo menos 1 a cada 3 cards vem desses sinais (quando houver)
+function weaveSocial(sorted, scoreOf){
+  const isSocial = a => { const s = scoreOf(a).soc; return !!(s && (s.social > 0 || s.nearby > 0)); };
+  const social = sorted.filter(isSocial), rest = sorted.filter(a => !isSocial(a));
+  const out = [];
+  while(social.length || rest.length){
+    const slot = out.length % 3 === 0;
+    if(social.length && (slot || !rest.length || scoreOf(social[0]).total >= scoreOf(rest[0]).total)) out.push(social.shift());
+    else out.push(rest.shift());
+  }
+  return out;
+}
+// evita o mesmo artista colado: não repete artista dentro de 3 cards seguidos
+function diversify(list){
+  const out = [], pool = list.slice();
+  while(pool.length){
+    const recent = out.slice(-3).map(x => normKey(x.artist));
+    const i = pool.findIndex(x => !recent.includes(normKey(x.artist)));
+    out.push(pool.splice(i === -1 ? 0 : i, 1)[0]);
+  }
+  return out;
 }
 
 function feedList(){
@@ -5314,6 +5461,13 @@ function renderGenreBar(){
 }
 
 function renderFeed(){
+  // o feed pode ter sido montado antes da sessão carregar (sem os sinais da
+  // rede): assim que a pessoa estiver logada, refaz a busca uma vez
+  if(currentUser && !feedLoading && !feedBuiltWithSignals && !feedSignalRetry && feedMode !== 'trending'){
+    feedSignalRetry = true;
+    fetchLiveFeed();
+    return;
+  }
   const scroll = document.getElementById('feedScroll');
   const full = feedList();
   const refreshBtn = document.getElementById('feedRefreshBtn');
@@ -5333,26 +5487,22 @@ function renderFeed(){
     return;
   }
 
-  const {genreScore, artistScore} = computeAffinity();
-  const favGenres = currentUser ? currentUser.genres.map(g=>g.toLowerCase()) : [];
-  const personalScore = (a) => {
-    const gs = genreScore[a.genre] || 0;
-    const as = artistScore[a.artist] || 0;
-    const favBoost = favGenres.some(fg => a.genre.toLowerCase().includes(fg) || fg.includes(a.genre.toLowerCase())) ? 4 : 0;
-    return {total: gs + as + favBoost, gs, as, favBoost};
-  };
-  // ranking de "em alta" calculado sobre a lista completa do modo atual
-  const trendingIds = [...full].sort((x,y)=> trendingScore(y.id) - trendingScore(x.id))
-    .slice(0,3).map(a=>a.id);
+  // pontuação real: rede, gosto parecido, perto de você e seu gosto (ver forYouScore)
+  const scores = new Map(full.map(a => [a.id, forYouScore(a)]));
+  const personalScore = (a) => scores.get(a.id) || forYouScore(a);
+  // "em alta" = o que mais gente do seu país curtiu nos últimos 30 dias (dados reais)
+  const trendingIds = full
+    .map(a => ({ id: a.id, n: (personalScore(a).soc || { why: {} }).why.nearbyCount || 0 }))
+    .filter(x => x.n >= 2).sort((x,y) => y.n - x.n).slice(0,3).map(x => x.id);
   // "full" já vem filtrado pelo gênero certo desde a busca (o termo já foi
   // escolhido pra aquele gênero) — filtrar de novo aqui comparando com
   // a.genre não funciona, porque esse campo vem da própria Apple em inglês
   // (ex: "Dance", "House") e nunca bate com o nome do chip do app
   // (ex: "Eletrônica"), o que descartava praticamente tudo que já tinha
   // sido encontrado.
-  const items = full
-    .slice()
-    .sort((x,y)=> (personalScore(y).total + trendingScore(y.id)) - (personalScore(x).total + trendingScore(x.id)));
+  const items = feedMode === 'trending'
+    ? full.slice()
+    : diversify(weaveSocial(full.slice().sort((x,y)=> personalScore(y).total - personalScore(x).total), personalScore));
   // o HTML do feed vai ser trocado inteiro: a prévia que estava aberta some
   // junto, então o card que voltar a aparecer precisa poder tocar de novo
   openPreviewId = null;
@@ -5360,12 +5510,10 @@ function renderFeed(){
     const stats = communityStatsFor(a.id);
     const logged = diary.some(e => e.itemId === a.id);
     const ps = personalScore(a);
-    let whyTag = '';
-    if(!trendingIds.includes(a.id) && ps.total > 0){
-      if(ps.as > 0) whyTag = `porque você curte ${escapeHtml(a.artist)}`;
-      else if(ps.gs > 0) whyTag = `porque você curte ${escapeHtml(a.genre)}`;
-      else if(ps.favBoost > 0) whyTag = 'no seu estilo favorito';
-    }
+    // amigo que curtiu vale mais que o selo de "em alta"
+    const friendLiked = !!(ps.soc && ps.soc.why.friendCount > 0);
+    if(friendLiked){ const k = trendingIds.indexOf(a.id); if(k !== -1) trendingIds.splice(k, 1); }
+    const whyTag = trendingIds.includes(a.id) ? '' : escapeHtml(forYouWhy(a, ps));
     const promo = adsActive() && i > 0 && i % MONETIZATION.promoEvery === 0 ? promoCardHtml() : '';
     return promo + `
     <div class="feed-card" data-item-id="${a.id}">
@@ -7407,7 +7555,7 @@ function renderPlaylistForPeriod(days){
             <div class="playlist-track-actions">
               ${t.item.previewUrl ? `<button class="playlist-play-btn" data-idx="${i}" aria-label="Tocar prévia">▶</button>` : ''}
               <a href="https://music.apple.com/search?term=${q}" target="_blank" rel="noopener" aria-label="Buscar no Apple Music" title="Apple Music">🍎</a>
-              <a href="https://open.spotify.com/search/${q}" target="_blank" rel="noopener" aria-label="Buscar no Spotify" title="Spotify">♫</a>
+              ${SPOTIFY_ENABLED ? `<a href="https://open.spotify.com/search/${q}" target="_blank" rel="noopener" aria-label="Buscar no Spotify" title="Spotify">♫</a>` : ''}
             </div>
           </div>
         `;
@@ -7705,7 +7853,7 @@ async function renderProfile(){
       </div>
     </div>
 
-    <div class="spotify-card">
+    ${SPOTIFY_ENABLED ? `<div class="spotify-card">
       ${currentUser.spotifyConnected ? `
         <div class="spotify-status">
           <span class="spotify-dot"></span>
@@ -7717,7 +7865,7 @@ async function renderProfile(){
         <button class="spotify-connect" id="spotifyConnectBtn">🎧 conectar com Spotify</button>
         <p class="db-note" style="opacity:0.6;margin-top:8px;margin-bottom:0;">conecta sua conta pra mostrar pras pessoas o que você está ouvindo agora.</p>
       `}
-    </div>
+    </div>` : ''}
 
     <div class="stat-row" style="max-width:420px;">
       <button type="button" class="stat stat-clickable" id="statFollowers"><div class="num">${(currentUser.followers||[]).length}</div><div class="lbl">seguidores</div></button>
@@ -7896,7 +8044,7 @@ async function renderProfile(){
   }
   mountMomentsGrid(currentUser.username, 'ownMoments', { own: true });
   if(ownNowPlayingInterval){ clearInterval(ownNowPlayingInterval); ownNowPlayingInterval = null; }
-  if(currentUser.spotifyConnected){
+  if(SPOTIFY_ENABLED && currentUser.spotifyConnected){
     mountNowPlaying(currentUser.username, 'nowPlayingOwn', { showEmpty: true })
       .then(interval => { ownNowPlayingInterval = interval; });
   }
@@ -8247,6 +8395,7 @@ document.getElementById('logBtn').addEventListener('click', async ()=>{
   };
   if(currentUser){
     try{
+      invalidateForYou(); // sua nova nota já pesa na próxima busca do Pra Você
       const { entry } = await apiFetch('/diary', {
         method: 'POST',
         body: JSON.stringify({
@@ -8310,6 +8459,7 @@ document.querySelectorAll('.ftbtn').forEach(btn=>{
 });
 
 document.getElementById('feedRefreshBtn').addEventListener('click', ()=>{
+  invalidateForYou(); // "buscar novas fitas" sempre pega os sinais mais novos
   fetchLiveFeed();
 });
 
