@@ -8,7 +8,8 @@
     "assets": "capacitor-assets generate --android --ios --iconBackgroundColor \"#15110E\" --iconBackgroundColorDark \"#15110E\" --splashBackgroundColor \"#15110E\" --splashBackgroundColorDark \"#15110E\"",
     "android": "cap sync android && cap open android",
     "ios": "cap sync ios && cap open ios",
-    "android:release": "cap sync android && cd android && gradlew bundleRelease"
+    "android:release": "cap sync android && cd android && gradlew bundleRelease",
+    "android:release:win": "cap sync android && cd android && .\\gradlew.bat bundleRelease"
   },
   "dependencies": {
     "@capacitor-community/admob": "^8.2.1",

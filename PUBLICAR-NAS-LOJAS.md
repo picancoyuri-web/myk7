@@ -40,7 +40,7 @@ Requisitos: Android Studio (já instalado) e a conta Google Play Console (US$ 25
    ```
    Copie `keystore.properties.example` para `keystore.properties` e preencha as senhas.
    O `.jks` e o `keystore.properties` **não** vão pro GitHub (já estão no `.gitignore`).
-2. **Gerar o pacote:** `npm run android:release` → sai em
+2. **Gerar o pacote:** `npm run android:release` (no Windows: `npm run android:release:win`) → sai em
    `android/app/build/outputs/bundle/release/app-release.aab`.
    (Se o Gradle reclamar de Java, use o JDK 21: `JAVA_HOME=C:\Users\MULTI\.jdks\jbr-21.0.11`.)
 3. Para cada nova versão, aumente `versionCode` e `versionName` em `android/app/build.gradle`.
@@ -135,7 +135,14 @@ no formulário de revisão. Dê MyK7+ a ela se quiser que vejam o app sem anúnc
 | Interações com o app / anúncios | sim (AdMob) | não | publicidade, análise |
 | Histórico de compras | sim | sim | funcionalidade do app (MyK7+) |
 | Diagnóstico de falhas | sim (AdMob) | não | publicidade |
-| Localização precisa, contatos, dados de cartão | **não** | — | — |
+| Localização aproximada (cidade / "usar minha localização", opcional) | sim | sim | funcionalidade do app, personalização |
+| Contatos (telefones/e-mails viram hash no aparelho, opcional) | sim | sim | funcionalidade do app |
+| Número de telefone (só o hash, opcional) | sim | sim | funcionalidade do app |
+| Localização precisa, dados de cartão | **não** | — | — |
+
+Contatos, cidade, localização e telefone são **opcionais** (marque "opcional" no Play Console) e
+**não são compartilhados** com terceiros. Mesmo virando hash, o Google conta como "coletado" porque
+sai do aparelho — por isso declare.
 
 Dados criptografados em trânsito (HTTPS): **sim**. A pessoa pode pedir a exclusão: **sim** (no app).
 **Contém anúncios: sim** (marque no Play Console). **Rastreamento (Apple): sim** — dados usados
