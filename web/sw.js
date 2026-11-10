@@ -1,9 +1,9 @@
-// service worker do MyK7 — deixa o app abrir offline e ser instalado.
-// O HTML vem da rede primeiro (senão um deploy novo demoraria a chegar em
-// quem já instalou) e cai no cache só quando não há conexão. Imagens e
+﻿// service worker do MyK7 â€” deixa o app abrir offline e ser instalado.
+// O HTML vem da rede primeiro (senÃ£o um deploy novo demoraria a chegar em
+// quem jÃ¡ instalou) e cai no cache sÃ³ quando nÃ£o hÃ¡ conexÃ£o. Imagens e
 // fontes, que quase nunca mudam, saem direto do cache.
-// A API e as prévias de áudio nunca passam pelo cache.
-const CACHE_NAME = 'myk7-v7';
+// A API e as prÃ©vias de Ã¡udio nunca passam pelo cache.
+const CACHE_NAME = 'myk7-v8';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest', 'favicon.svg',
   'icon-192.png', 'icon-512.png', 'apple-touch-icon.png', 'img/cassette.jpg', 'js/qrcode.min.js',
@@ -13,7 +13,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(SHELL))
-      .catch(() => {}) // offline na instalação não pode impedir o SW de subir
+      .catch(() => {}) // offline na instalaÃ§Ã£o nÃ£o pode impedir o SW de subir
   );
   self.skipWaiting();
 });

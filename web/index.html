@@ -416,7 +416,7 @@
   }
   .feed-card .fc-disc{
     width:min(78vw,300px);aspect-ratio:298/188;height:auto;border-radius:10px;position:relative;
-    box-shadow:0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 3px rgba(0,0,0,0.3);
+    box-shadow:var(--k7-edge), 0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 3px rgba(0,0,0,0.3);
     margin-bottom:22px;overflow:hidden;
   }
   .fc-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;opacity:0.55;margin-bottom:6px;}
@@ -567,8 +567,8 @@
 
   /* ---------- fita "viva" enquanto toca (feed) ---------- */
   @keyframes discGlowPulse{
-    0%,100%{ box-shadow:0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 3px rgba(0,0,0,0.3), 0 0 0 0 rgba(216,145,58,0.45); }
-    50%{ box-shadow:0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 3px rgba(0,0,0,0.3), 0 0 0 16px rgba(216,145,58,0); }
+    0%,100%{ box-shadow:var(--k7-edge), 0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 3px rgba(0,0,0,0.3), 0 0 0 0 rgba(216,145,58,0.45); }
+    50%{ box-shadow:var(--k7-edge), 0 20px 50px rgba(0,0,0,0.5), inset 0 0 0 3px rgba(0,0,0,0.3), 0 0 0 16px rgba(216,145,58,0); }
   }
   .feed-card .fc-disc.spinning{ animation: discGlowPulse 1.4s ease-in-out infinite; }
   .fc-eq{
@@ -846,7 +846,7 @@
   .disc{
     width:100%;aspect-ratio:298/188;border-radius:7px;
     position:relative;overflow:hidden;
-    box-shadow:0 6px 16px rgba(21,18,13,0.22), inset 0 0 0 2px rgba(0,0,0,0.18);
+    box-shadow:var(--k7-edge), 0 6px 16px rgba(21,18,13,0.22), inset 0 0 0 2px rgba(0,0,0,0.18);
     transition:transform .2s ease;
   }
   .card:hover .disc{transform:translateY(-4px) rotate(-2deg);}
@@ -894,7 +894,7 @@
 
   /* ---------- DETALHES DA MÚSICA (fita cassete ampliada, aberta a partir das resenhas) ---------- */
   .item-detail-disc-wrap{max-width:260px;margin:0 auto;}
-  .item-detail-disc-wrap .disc{box-shadow:0 8px 20px rgba(21,18,13,0.28), inset 0 0 0 2px rgba(0,0,0,0.2);}
+  .item-detail-disc-wrap .disc{box-shadow:var(--k7-edge), 0 8px 20px rgba(21,18,13,0.28), inset 0 0 0 2px rgba(0,0,0,0.2);}
   .item-detail-close-player{
     display:none;margin:10px auto 0;
     font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:0.05em;
@@ -1023,7 +1023,7 @@
   .turntable .disc-preview.open{margin-top:2px;}
   .tt-disc{
     width:128px;height:81px;border-radius:8px;flex:none;position:relative;overflow:hidden;
-    box-shadow:inset 0 0 0 2px rgba(0,0,0,0.4);
+    box-shadow:var(--k7-edge), inset 0 0 0 2px rgba(0,0,0,0.4);
   }
   .tt-disc.paused{filter:grayscale(0.7) brightness(0.55);}
   .tt-disc .disc-play{width:22px;height:22px;bottom:4px;}
@@ -1048,7 +1048,7 @@
     .drawer{border-radius:10px;}
   }
   .drawer-head{display:flex;gap:16px;align-items:center;margin-bottom:18px;}
-  .drawer-disc{width:72px;height:45px;border-radius:6px;flex:none;box-shadow:inset 0 0 0 2px rgba(0,0,0,0.3);position:relative;overflow:hidden;}
+  .drawer-disc{width:72px;height:45px;border-radius:6px;flex:none;box-shadow:var(--k7-edge), inset 0 0 0 2px rgba(0,0,0,0.3);position:relative;overflow:hidden;}
   .drawer h3{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:18px;margin:0;}
   .drawer .sub{font-size:13px;opacity:0.7;margin-top:2px;}
   .field-label{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;opacity:0.6;margin:18px 0 8px;}
@@ -1813,7 +1813,7 @@
     background-image:radial-gradient(ellipse at 50% 42%, rgba(255,250,236,0) 50%, rgba(92,64,30,.16) 100%), var(--grain);
   }
   .feed-card.daily-card{background-image:linear-gradient(180deg,#F4E2B8 0%,rgba(239,229,207,0) 55%), radial-gradient(ellipse at 50% 42%, rgba(255,250,236,0) 50%, rgba(92,64,30,.16) 100%), var(--grain);}
-  .feed-card .fc-disc{box-shadow:0 20px 50px rgba(40,24,10,.45), 0 0 0 2px rgba(201,205,210,.55), inset 0 0 0 3px rgba(0,0,0,.3);}
+  .feed-card .fc-disc{box-shadow:var(--k7-edge), 0 20px 50px rgba(40,24,10,.45), 0 0 0 2px rgba(201,205,210,.55), inset 0 0 0 3px rgba(0,0,0,.3);}
   .fc-rail button{box-shadow:inset 0 1px 0 rgba(255,255,255,.5);}
 
   /* ---------- SENSAÇÃO (resposta, gavetas, materiais, tipografia) ----------
@@ -1902,8 +1902,22 @@
     .bottom-nav{background:#120E0B padding-box, var(--chrome-ring) border-box;}
   }
   /* ---------- FITA QUE INCLINA (como um cartão na mão) ---------- */
-  .k7-tilt{will-change:transform;transition:transform .55s cubic-bezier(.2,.8,.2,1);}
-  .k7-tilt.tilting{transition:transform .12s ease-out;}
+  /* fita grossa: a lateral de plástico é um empilhado de sombras sem desfoque,
+     uma por camada; --dx/--dy dizem pra que lado a lateral aparece (em repouso,
+     vista um pouco de cima: só embaixo) e a inclinação muda isso */
+  .fc-disc, .disc, .tt-disc, .drawer-disc{
+    --k7-s:1.3px;--dx:0;--dy:1;
+    --k7-edge:
+      calc(var(--dx)*var(--k7-s)*1) calc(var(--dy)*var(--k7-s)*1) 0 #3b322b,
+      calc(var(--dx)*var(--k7-s)*2) calc(var(--dy)*var(--k7-s)*2) 0 #352d27,
+      calc(var(--dx)*var(--k7-s)*3) calc(var(--dy)*var(--k7-s)*3) 0 #2f2823,
+      calc(var(--dx)*var(--k7-s)*4) calc(var(--dy)*var(--k7-s)*4) 0 #29231f,
+      calc(var(--dx)*var(--k7-s)*5) calc(var(--dy)*var(--k7-s)*5) 0 #231e1a,
+      calc(var(--dx)*var(--k7-s)*6) calc(var(--dy)*var(--k7-s)*6) 0 #1b1714;
+  }
+  .tt-disc, .drawer-disc, .fav-slot .disc{--k7-s:.6px;}
+  .k7-tilt{will-change:transform;transition:transform .55s cubic-bezier(.2,.8,.2,1), box-shadow .55s cubic-bezier(.2,.8,.2,1);}
+  .k7-tilt.tilting{transition:transform .12s ease-out, box-shadow .12s ease-out;}
   .tilt-glare{
     position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:inherit;
     background:radial-gradient(circle at var(--gx,50%) var(--gy,50%), rgba(255,255,255,.45), rgba(255,255,255,0) 60%);
@@ -10286,6 +10300,8 @@ document.addEventListener('touchend', (e)=>{
     if(!active) return;
     active.classList.remove('tilting');
     active.style.transform = '';
+    active.style.removeProperty('--dx');
+    active.style.removeProperty('--dy');
     active = rect = last = null;
   }
   function paint(){
@@ -10297,6 +10313,8 @@ document.addEventListener('touchend', (e)=>{
     active.style.transform = `perspective(${PERSPECTIVE}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) scale(${SCALE})`;
     active.style.setProperty('--gx', (px * 100).toFixed(1) + '%');
     active.style.setProperty('--gy', (py * 100).toFixed(1) + '%');
+    active.style.setProperty('--dx', ((0.5 - px) * 3.2).toFixed(2));
+    active.style.setProperty('--dy', (1 + (0.5 - py) * 3.2).toFixed(2));
   }
   function track(e){
     last = { x: e.clientX, y: e.clientY };
