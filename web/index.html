@@ -1901,6 +1901,16 @@
     :root[data-theme="light"]{--line:rgba(42,36,32,.45);--ink-soft:#3E362E;}
     .bottom-nav{background:#120E0B padding-box, var(--chrome-ring) border-box;}
   }
+  /* ---------- FITA QUE INCLINA (como um cartão na mão) ---------- */
+  .k7-tilt{will-change:transform;transition:transform .55s cubic-bezier(.2,.8,.2,1);}
+  .k7-tilt.tilting{transition:transform .12s ease-out;}
+  .tilt-glare{
+    position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:inherit;
+    background:radial-gradient(circle at var(--gx,50%) var(--gy,50%), rgba(255,255,255,.45), rgba(255,255,255,0) 60%);
+    mix-blend-mode:soft-light;opacity:0;transition:opacity .4s ease;
+  }
+  .k7-tilt.tilting .tilt-glare{opacity:1;}
+  @media (prefers-reduced-motion: reduce){ .k7-tilt{transition:none;} .tilt-glare{display:none;} }
 </style>
 </head>
 <body>
@@ -10248,6 +10258,72 @@ document.addEventListener('touchend', (e)=>{
       ov.style.backgroundColor = '';
     };
   }
+})();
+</script>
+<script>
+// ---------- FITA QUE INCLINA ----------
+// a fita grande inclina na direção do ponteiro (ou do dedo, enquanto ele
+// está apoiado), cresce um pouco e ganha um brilho que acompanha — como um
+// cartão na mão. Ao sair, volta pro lugar devagar. Se a página rolar, solta.
+(function(){
+  const TILT_SEL = '.fc-disc, .item-detail-disc-wrap .disc, .drawer-disc, .tt-disc';
+  const TILT_LIMIT = 10, SCALE = 1.05, PERSPECTIVE = 1200;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let active = null, rect = null, last = null, frame = 0;
+
+  function grab(el){
+    active = el;
+    el.style.transform = '';
+    rect = el.getBoundingClientRect(); // medido sem inclinação, senão a conta treme
+    if(!el.querySelector(':scope > .tilt-glare')){
+      const glare = document.createElement('span');
+      glare.className = 'tilt-glare';
+      el.prepend(glare); // antes dos botões, que continuam por cima
+    }
+    el.classList.add('k7-tilt', 'tilting');
+  }
+  function release(){
+    if(!active) return;
+    active.classList.remove('tilting');
+    active.style.transform = '';
+    active = rect = last = null;
+  }
+  function paint(){
+    frame = 0;
+    if(!active || !last) return;
+    const px = Math.min(Math.max((last.x - rect.left) / rect.width, 0), 1);
+    const py = Math.min(Math.max((last.y - rect.top) / rect.height, 0), 1);
+    const rx = (0.5 - py) * 2 * TILT_LIMIT, ry = (px - 0.5) * 2 * TILT_LIMIT;
+    active.style.transform = `perspective(${PERSPECTIVE}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) scale(${SCALE})`;
+    active.style.setProperty('--gx', (px * 100).toFixed(1) + '%');
+    active.style.setProperty('--gy', (py * 100).toFixed(1) + '%');
+  }
+  function track(e){
+    last = { x: e.clientX, y: e.clientY };
+    if(!frame) frame = requestAnimationFrame(paint);
+  }
+
+  // mouse/caneta: inclina só de passar por cima
+  document.addEventListener('pointermove', e => {
+    if(reduceMotion.matches || e.pointerType === 'touch') return;
+    const el = e.target.closest ? e.target.closest(TILT_SEL) : null;
+    if(el !== active){ release(); if(el) grab(el); }
+    if(active) track(e);
+  }, { passive: true });
+  document.addEventListener('pointerout', e => { if(!e.relatedTarget) release(); });
+
+  // dedo: inclina enquanto está apoiado; quando o navegador assume a
+  // rolagem ele cancela o ponteiro e a fita volta
+  document.addEventListener('pointerdown', e => {
+    if(reduceMotion.matches || e.pointerType !== 'touch') return;
+    const el = e.target.closest ? e.target.closest(TILT_SEL) : null;
+    if(!el) return;
+    release(); grab(el); track(e);
+  }, { passive: true });
+  document.addEventListener('pointermove', e => { if(e.pointerType === 'touch' && active) track(e); }, { passive: true });
+  ['pointerup', 'pointercancel'].forEach(t => document.addEventListener(t, e => { if(e.pointerType === 'touch') release(); }));
+
+  document.addEventListener('scroll', release, { passive: true, capture: true });
 })();
 </script>
 </body>
