@@ -1,6 +1,18 @@
-# Netlify: publica a pasta web/ sem build. O proxy da API (_redirects) e os
-# cabeçalhos de cache (_headers) ficam dentro dela.
+# Netlify: publica a pasta web/ sem build. Os cabeçalhos (_headers) ficam
+# dentro dela; o proxy da API fica aqui embaixo.
 [build]
   base = "web"
   publish = "."
   command = ""
+
+# repassa /api/* pro backend no Render, fazendo a API parecer "o mesmo site"
+# pro navegador (evita o bloqueio de cookies entre domínios do Safari/iPhone).
+# "signed" assina cada requisição (cabeçalho x-nf-sign) com a variável
+# NETLIFY_PROXY_SECRET — o backend, com o mesmo valor, passa a confiar no IP
+# real de quem acessa (senão todo mundo pareceria ter o IP do Netlify).
+[[redirects]]
+  from = "/api/*"
+  to = "https://cassete.onrender.com/api/:splat"
+  status = 200
+  force = true
+  signed = "NETLIFY_PROXY_SECRET"
