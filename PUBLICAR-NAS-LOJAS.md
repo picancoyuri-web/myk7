@@ -13,7 +13,7 @@ npx cap sync         # depois de mexer em web/
 | ID do app (não muda nunca depois de publicar) | `br.com.ntech.myk7` |
 | Nome | MyK7 |
 | Versão | 1.0 (build 1) |
-| Backend usado pelo app | `https://myk7.onrender.com/api` |
+| Backend usado pelo app | `https://cassete.onrender.com/api` |
 
 ---
 
@@ -196,7 +196,7 @@ pra todo mundo).
    `web/index.html` e rode `npx cap sync`.
 4. No Render: `REVENUECAT_SECRET_KEY` (chave secreta v1, `sk_...`) e `REVENUECAT_WEBHOOK_AUTH`
    (um texto aleatório). Na RevenueCat → *Integrations → Webhooks*: URL
-   `https://myk7.onrender.com/api/billing/webhook` e o mesmo texto no campo *Authorization*.
+   `https://cassete.onrender.com/api/billing/webhook` e o mesmo texto no campo *Authorization*.
 5. Teste com conta *Sandbox* (Apple) e *testadores de licença* (Google) — não cobra de verdade.
 
 O servidor nunca confia no app: o MyK7+ só vale depois que ele confirma com a RevenueCat

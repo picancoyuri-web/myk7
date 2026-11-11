@@ -30,7 +30,7 @@
     var isLocalDevServer = location.protocol === 'file:' ||
       ((location.hostname === 'localhost' || location.hostname === '127.0.0.1') && /^55\d\d$/.test(location.port));
     window.CASSETE_API_BASE = isNativeApp
-      ? 'https://myk7.onrender.com/api'
+      ? 'https://cassete.onrender.com/api'
       : isLocalDevServer ? 'http://localhost:3001/api' : '/api';
     // o Render (plano grátis) dorme sem uso e leva vários segundos pra
     // acordar — esse "cutucão" sai antes do resto da página carregar, então
