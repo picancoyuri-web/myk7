@@ -76,8 +76,8 @@ Momento), só retrato no iPhone, idioma pt-BR e `ITSAppUsesNonExemptEncryption =
   Google (LGPD/GDPR) e botão "privacidade dos anúncios" no Perfil. Classificação de anúncios: Teen.
 - **Assinatura** (Apple 3.1.1 / 3.1.2): compra só pela loja, botão "restaurar compras", preço e
   período vindos da loja, texto de renovação automática e links de Termos/Privacidade na tela.
-- No app das lojas o botão “conectar Spotify” fica escondido (o retorno do login do Spotify
-  cai no site, não no app). Dá pra ligar depois com deep link.
+- O "ouvindo agora" do Spotify saiu do app (11/11/2026): a API do Spotify só libera acesso
+  amplo pra apps com muitos usuários. Não declare nada de Spotify nas lojas.
 
 ### Conta de teste para os revisores
 As duas lojas pedem um login que funcione. Crie no app publicado uma conta tipo
