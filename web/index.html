@@ -3903,13 +3903,13 @@ async function generateWrappedShareCard(data){
   const { canvas, ctx } = newCard();
   const W = CARD_W;
   const hue = data.best ? hueForItem(data.best.a) : 30;
-  drawStoryBackground(ctx, hue, 0.36);
+  await drawAmbientBackground(ctx, hue, 0.36);
   drawStoryHeader(ctx, `retrospectiva ${data.periodLabel}${currentUser ? ` · @${currentUser.username}` : ''}`);
   ctx.textAlign = 'center';
   ctx.font = '120px sans-serif';
   ctx.fillText(data.persona.icon, W / 2, 485);
   ctx.fillStyle = 'rgba(246,239,227,0.7)';
-  ctx.font = '600 26px \"Inter\", sans-serif';
+  ctx.font = '600 30px "Inter", sans-serif';
   ctx.letterSpacing = '0px';
   ctx.fillText('Minha personalidade musical', W / 2, 550);
   ctx.letterSpacing = '0px';
@@ -3925,7 +3925,7 @@ async function generateWrappedShareCard(data){
   y += 70;
   const tiles = [
     [String(data.entries.length), 'fitas'],
-    [data.avg.toFixed(1), 'nota média'],
+    [data.avg.toFixed(1).replace('.', ','), 'nota média'],
     [String(data.days), data.days === 1 ? 'dia' : 'dias'],
   ];
   const tw = 260, gap = 30, tx = W / 2 - (tw * 3 + gap * 2) / 2;
@@ -3934,11 +3934,11 @@ async function generateWrappedShareCard(data){
     ctx.fillStyle = 'rgba(246,239,227,0.08)';
     ctxRoundRect(ctx, x, y, tw, 160, 26); ctx.fill();
     ctx.fillStyle = '#F6EFE3';
-    ctx.font = '800 74px \"Inter\", sans-serif';
+    ctx.font = '800 74px "Inter", sans-serif';
     ctx.fillText(v, x + tw / 2, y + 92);
     ctx.fillStyle = 'rgba(246,239,227,0.65)';
-    ctx.font = '400 22px \"Inter\", sans-serif';
-    ctx.fillText(k, x + tw / 2, y + 132);
+    ctx.font = '500 26px "Inter", sans-serif';
+    ctx.fillText(k, x + tw / 2, y + 134);
   });
   y += 160;
   ctx.textAlign = 'left';
@@ -3952,7 +3952,7 @@ async function generateWrappedShareCard(data){
   y += rowH * 0.42;
   rows.forEach(([k, v]) => {
     ctx.fillStyle = '#D6B26E';
-    ctx.font = '600 22px \"Inter\", sans-serif';
+    ctx.font = '600 26px "Inter", sans-serif';
     ctx.fillText(k, 130, y);
     ctx.fillStyle = '#F6EFE3';
     const f = fitLines(ctx, v, s => `600 ${s}px "Inter", sans-serif`, 42, 28, W - 260, 1);
@@ -6942,7 +6942,7 @@ function drawAppCTA(ctx, W, y){
   ctx.fillStyle = '#0D0B09';
   ctx.font = '700 27px "Anton", sans-serif';
   ctx.fillText(appDomainLabel(), W/2, y + 3);
-  ctx.font = '600 15px \"Inter\", sans-serif';
+  ctx.font = '600 15px "Inter", sans-serif';
   ctx.fillStyle = 'rgba(23,22,26,0.7)';
   ctx.fillText('▸ baixe grátis e registre o que você ouve', W/2, y + 26);
 }
@@ -7222,6 +7222,53 @@ function drawStoryBackground(ctx, hue, glowY = 0.33){
   }
 }
 
+// fundo "ambiente": a própria fita (ou a foto do momento) borrada e
+// esticada no card inteiro, como nos cards do Apple Music — a cor do card
+// vem do disco. Escurece embaixo pro texto e pro rodapé lerem bem. Sem
+// ctx.filter (Safari antigo) fica só o degradê de drawStoryBackground.
+async function drawAmbientBackground(ctx, hue, glowY = 0.33, photo = null){
+  const W = CARD_W, H = CARD_H;
+  drawStoryBackground(ctx, hue, glowY);
+  const src = photo || await loadCassettePhoto();
+  if(!src || !('filter' in ctx)) return;
+  ctx.save();
+  ctx.filter = `${photo ? '' : `hue-rotate(${hue}deg) `}saturate(2.4) brightness(0.55) blur(110px)`;
+  // da fita usa só a etiqueta (a parte colorida); o plástico cinza deixaria o card apagado
+  const sr = photo ? { x: 0, y: 0, w: src.width, h: src.height } : { x: 80, y: 40, w: 740, h: 240 };
+  const s = Math.max(W / sr.w, H / sr.h) * 1.3;
+  const dw = sr.w * s, dh = sr.h * s;
+  ctx.globalAlpha = 0.9;
+  ctx.drawImage(src, sr.x, sr.y, sr.w, sr.h, (W - dw) / 2, H * glowY - dh / 2, dw, dh);
+  ctx.restore();
+  ctx.filter = 'none';
+
+  const shade = ctx.createLinearGradient(0, 0, 0, H);
+  shade.addColorStop(0, 'rgba(13,11,9,0.5)');
+  shade.addColorStop(0.42, 'rgba(13,11,9,0.36)');
+  shade.addColorStop(0.72, 'rgba(13,11,9,0.72)');
+  shade.addColorStop(1, 'rgba(13,11,9,0.94)');
+  ctx.fillStyle = shade;
+  ctx.fillRect(0, 0, W, H);
+  const vign = ctx.createRadialGradient(W / 2, H * 0.45, H * 0.3, W / 2, H * 0.45, H * 0.8);
+  vign.addColorStop(0, 'rgba(0,0,0,0)');
+  vign.addColorStop(1, 'rgba(0,0,0,0.5)');
+  ctx.fillStyle = vign;
+  ctx.fillRect(0, 0, W, H);
+  for(let i = 0; i < 3200; i++){
+    ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.03})`;
+    ctx.fillRect(Math.random() * W, Math.random() * H, 1.5, 1.5);
+  }
+}
+
+// o miolo do card é desenhado numa camada transparente e depois
+// centralizado entre o cabeçalho e o rodapé (sem sobrar um vão embaixo)
+async function drawCenteredContent(ctx, draw){
+  const layer = newCard();
+  const bottom = await draw(layer.ctx, STORY_TOP + 10);
+  const dy = Math.max(0, Math.round((STORY_FOOTER_Y - 56 - bottom) / 2));
+  ctx.drawImage(layer.canvas, 0, dy);
+}
+
 // Área segura do story: o Instagram cobre ~220px em cima (barra de progresso,
 // foto e nome) e ~230px embaixo (campo de resposta). Nada importante fica ali.
 // O conteúdo de cada card vai de STORY_TOP até STORY_FOOTER_Y.
@@ -7247,15 +7294,15 @@ function drawStoryHeader(ctx, kicker){
   drawBrandWordmark(ctx, x0 + total - markW / 2, cy + markSize * 0.36, markSize);
   ctx.textAlign = 'center';
   if(kicker){
-    ctx.font = '600 25px \"Inter\", sans-serif';
-    const w = ctx.measureText(kicker).width + 52;
-    ctx.fillStyle = 'rgba(246,239,227,0.09)';
-    ctxRoundRect(ctx, W / 2 - w / 2, 284, w, 50, 25);
+    ctx.font = '600 28px "Inter", sans-serif';
+    const w = ctx.measureText(kicker).width + 60;
+    ctx.fillStyle = 'rgba(13,11,9,0.38)';
+    ctxRoundRect(ctx, W / 2 - w / 2, 280, w, 56, 28);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(246,239,227,0.14)';
+    ctx.strokeStyle = 'rgba(246,239,227,0.16)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
-    ctx.fillStyle = 'rgba(246,239,227,0.72)';
+    ctx.fillStyle = 'rgba(246,239,227,0.85)';
     ctx.fillText(kicker, W / 2, 318);
   }
 }
@@ -7305,7 +7352,7 @@ function drawStoryFooter(ctx, line, username){
   const textX = tx + tile + 34, textW = x + w - 36 - textX;
   ctx.textAlign = 'left';
   ctx.fillStyle = '#D6B26E';
-  ctx.font = '600 22px \"Inter\", sans-serif';
+  ctx.font = '600 22px "Inter", sans-serif';
   ctx.letterSpacing = '0px';
   ctx.fillText('Escaneie ou acesse', textX, y + 54);
   ctx.letterSpacing = '0px';
@@ -7358,7 +7405,18 @@ async function drawPhotoCassette(ctx, cx, cy, w, hue, angleDeg, handwritten){
     ctx.fillStyle = `hsl(${hue}deg,30%,20%)`;
     ctx.fillRect(-w / 2, -h / 2, w, h);
   }
+  // brilho de vidro na diagonal, como a capa plástica da fita
+  const gl = ctx.createLinearGradient(-w / 2, -h / 2, w / 2, h / 2);
+  gl.addColorStop(0, 'rgba(255,255,255,0.16)');
+  gl.addColorStop(0.35, 'rgba(255,255,255,0)');
+  ctx.fillStyle = gl;
+  ctx.fillRect(-w / 2, -h / 2, w, h);
   ctx.restore();
+  // o mesmo fio dourado das fitas do app
+  ctx.strokeStyle = 'rgba(214,178,110,0.6)';
+  ctx.lineWidth = Math.max(2, w * 0.003);
+  ctxRoundRect(ctx, -w / 2, -h / 2, w, h, w * 0.03);
+  ctx.stroke();
 
   if(handwritten){
     ctx.save();
@@ -7367,7 +7425,9 @@ async function drawPhotoCassette(ctx, cx, cy, w, hue, angleDeg, handwritten){
     ctx.globalCompositeOperation = 'multiply';
     ctx.fillStyle = '#16110A';
     ctx.textAlign = 'center';
-    const fit = fitLines(ctx, handwritten, s => `700 ${s}px "Caveat", cursive`, Math.round(w * 0.075), Math.round(w * 0.04), w * 0.5, 2);
+    const hand = s => `700 ${s}px "Caveat", cursive`;
+    let fit = fitLines(ctx, handwritten, hand, Math.round(w * 0.075), Math.round(w * 0.05), w * 0.52, 1);
+    if(fit.lines[0].endsWith('…')) fit = fitLines(ctx, handwritten, hand, Math.round(w * 0.06), Math.round(w * 0.04), w * 0.52, 2);
     const lh = fit.size * 0.95;
     fit.lines.forEach((l, i) => ctx.fillText(l, 0, (i - (fit.lines.length - 1) / 2) * lh + fit.size * 0.32));
     ctx.restore();
@@ -7402,60 +7462,76 @@ async function generateSongShareCard({ title, artist, rating, hue, note, usernam
   await ensureCardFonts();
   const { canvas, ctx } = newCard();
   const W = CARD_W;
-  drawStoryBackground(ctx, hue, 0.30);
+  await drawAmbientBackground(ctx, hue, 0.3);
   drawStoryHeader(ctx, username ? `@${username} registrou · ${cardDate()}` : `ouvindo agora · ${cardDate()}`);
 
-  // com resenha a fita encolhe um pouco pra sobrar espaço pro texto
-  const tapeW = note ? 640 : 860, tapeY = note ? 590 : 680;
-  const tapeH = await drawPhotoCassette(ctx, W / 2, tapeY, tapeW, hue, -3, title);
-  let y = tapeY + tapeH / 2 + 86;
+  await drawCenteredContent(ctx, async (c, top) => {
+    // com resenha a fita encolhe um pouco pra sobrar espaço pro texto
+    const tapeW = note ? 500 : 900;
+    const tapeH = tapeW * 542 / 858;
+    const tapeY = top + 24 + tapeH / 2;
+    await drawPhotoCassette(c, W / 2, tapeY, tapeW, hue, -3, title);
+    let y = tapeY + tapeH / 2 + (note ? 80 : 104);
 
-  ctx.textAlign = 'center';
-  const eyebrow = [kind, year, genre].filter(Boolean).join(' · ');
-  if(eyebrow){
-    ctx.fillStyle = '#D6B26E';
-    ctx.font = '600 25px \"Inter\", sans-serif';
-    ctx.letterSpacing = '0px';
-    ctx.fillText(eyebrow, W / 2, y);
-    ctx.letterSpacing = '0px';
-    y += 28;
-  }
-
-  ctx.fillStyle = '#F6EFE3';
-  const t = fitLines(ctx, title, s => `800 ${s}px "Inter", sans-serif`, 96, 56, W - 160, 2);
-  t.lines.forEach(l => { y += t.size * 1.02; ctx.fillText(l, W / 2, y); });
-
-  ctx.fillStyle = 'rgba(246,239,227,0.78)';
-  const a = fitLines(ctx, artist || '', s => `500 ${s}px "Inter", sans-serif`, 44, 30, W - 200, 1);
-  y += a.size + 20;
-  ctx.fillText(a.lines[0] || '', W / 2, y);
-
-  if(rating){
-    y += 74;
-    drawStars(ctx, W / 2, y - 18, rating, 56);
-  }
-
-  if(note){
-    y += rating ? 44 : 50;
-    // a resenha num "papel" com um filete dourado — quantas linhas cabem
-    // depende do quanto o título e as estrelas já ocuparam
-    const boxX = 100, boxW = W - 200, pad = 34, size = 36, lh = size * 1.36;
-    const maxLines = Math.min(5, Math.floor((STORY_FOOTER_Y - 44 - y - pad * 2) / lh));
-    if(maxLines >= 1){
-      const q = fitLines(ctx, `“${note}”`, s => `500 ${s}px "Inter", sans-serif`, size, 28, boxW - 100, maxLines);
-      const qlh = q.size * 1.36;
-      const boxH = q.lines.length * qlh + pad * 2 - (qlh - q.size);
-      ctx.fillStyle = 'rgba(246,239,227,0.07)';
-      ctxRoundRect(ctx, boxX, y, boxW, boxH, 26);
-      ctx.fill();
-      ctx.fillStyle = '#D6B26E';
-      ctxRoundRect(ctx, boxX, y + 22, 5, boxH - 44, 3);
-      ctx.fill();
-      ctx.fillStyle = '#F6EFE3';
-      ctx.font = `500 ${q.size}px "Inter", sans-serif`;
-      q.lines.forEach((l, i) => ctx.fillText(l, W / 2, y + pad + q.size * 0.8 + i * qlh));
+    c.textAlign = 'center';
+    const eyebrow = [kind, year, genre].filter(Boolean).join(' · ');
+    if(eyebrow){
+      c.fillStyle = '#D6B26E';
+      c.font = '700 30px "Inter", sans-serif';
+      c.letterSpacing = '1px';
+      c.fillText(eyebrow, W / 2, y);
+      c.letterSpacing = '0px';
+      y += 26;
     }
-  }
+
+    c.fillStyle = '#F6EFE3';
+    c.letterSpacing = '-3px';
+    const t = fitLines(c, title, s => `800 ${s}px "Inter", sans-serif`, note ? 88 : 112, 56, W - 140, 2);
+    t.lines.forEach(l => { y += t.size * 1.0; c.fillText(l, W / 2, y); });
+    c.letterSpacing = '0px';
+
+    c.fillStyle = 'rgba(246,239,227,0.74)';
+    const a = fitLines(c, artist || '', s => `500 ${s}px "Inter", sans-serif`, note ? 40 : 46, 30, W - 180, 1);
+    y += a.size + 22;
+    c.fillText(a.lines[0] || '', W / 2, y);
+
+    if(rating){
+      y += note ? 76 : 92;
+      drawStars(c, W / 2, y - 26, rating, note ? 52 : 60);
+    }
+
+    if(note){
+      y += 40;
+      // a resenha num cartão de vidro, com uma aspa dourada grande
+      const boxX = 90, boxW = W - 180, pad = 44, size = 36, lh = size * 1.38;
+      const maxLines = Math.min(5, Math.floor((STORY_FOOTER_Y - 70 - y - pad * 2 - 40) / lh));
+      if(maxLines >= 1){
+        c.textAlign = 'left';
+        const q = fitLines(c, note, s => `500 ${s}px "Inter", sans-serif`, size, 28, boxW - pad * 2, maxLines);
+        const qlh = q.size * 1.38;
+        const boxH = pad + 30 + q.lines.length * qlh + pad - (qlh - q.size);
+        c.save();
+        c.shadowColor = 'rgba(0,0,0,0.35)'; c.shadowBlur = 40; c.shadowOffsetY = 14;
+        c.fillStyle = 'rgba(13,11,9,0.5)';
+        ctxRoundRect(c, boxX, y, boxW, boxH, 36);
+        c.fill();
+        c.restore();
+        c.strokeStyle = 'rgba(246,239,227,0.13)';
+        c.lineWidth = 1.5;
+        ctxRoundRect(c, boxX, y, boxW, boxH, 36);
+        c.stroke();
+        c.fillStyle = '#D6B26E';
+        c.font = '800 110px "Inter", sans-serif';
+        c.fillText('“', boxX + pad - 6, y + pad + 70);
+        c.fillStyle = 'rgba(246,239,227,0.94)';
+        c.font = `500 ${q.size}px "Inter", sans-serif`;
+        q.lines.forEach((l, i) => c.fillText(l, boxX + pad, y + pad + 30 + q.size * 0.8 + i * qlh));
+        c.textAlign = 'center';
+        y += boxH;
+      }
+    }
+    return y;
+  });
 
   drawStoryFooter(ctx, 'registre o que você ouve · grátis', username);
   return cardToBlob(canvas);
@@ -7466,11 +7542,11 @@ async function generatePlaylistShareCard({ tracks, label, hue, username }){
   await ensureCardFonts();
   const { canvas, ctx } = newCard();
   const W = CARD_W;
-  drawStoryBackground(ctx, hue, 0.2);
+  await drawAmbientBackground(ctx, hue, 0.22);
   drawStoryHeader(ctx, username ? `a fita de @${username}` : cardDate());
 
-  const tapeH = await drawPhotoCassette(ctx, W / 2, 565, 560, hue, -2.5, `playlist ${label}`);
-  let y = 565 + tapeH / 2 + 56;
+  const tapeH = await drawPhotoCassette(ctx, W / 2, 590, 640, hue, -2.5, `playlist ${label}`);
+  let y = 590 + tapeH / 2 + 56;
 
   // até 8 faixas; se tiver mais, mostra 7 e uma linha "+ N faixas"
   const shown = tracks.length > 8 ? tracks.slice(0, 7) : tracks.slice(0, 8);
@@ -7480,13 +7556,13 @@ async function generatePlaylistShareCard({ tracks, label, hue, username }){
   shown.forEach((tr, i) => {
     const rowY = y + i * rowH;
     ctx.fillStyle = '#D6B26E';
-    ctx.font = '800 44px \"Inter\", sans-serif';
+    ctx.font = '800 44px "Inter", sans-serif';
     ctx.fillText(String(i + 1).padStart(2, '0'), 120, rowY + rowH * 0.56);
     ctx.fillStyle = '#F6EFE3';
-    const tl = fitLines(ctx, tr.item.title, s => `600 ${s}px "Inter", sans-serif`, 36, 26, 740, 1);
+    const tl = fitLines(ctx, tr.item.title, s => `700 ${s}px "Inter", sans-serif`, 40, 28, 740, 1);
     ctx.fillText(tl.lines[0], 215, rowY + rowH * 0.36);
     ctx.fillStyle = 'rgba(246,239,227,0.6)';
-    const al = fitLines(ctx, tr.item.artist || '', s => `500 ${s}px "Inter", sans-serif`, 22, 17, 740, 1);
+    const al = fitLines(ctx, tr.item.artist || '', s => `500 ${s}px "Inter", sans-serif`, 26, 20, 740, 1);
     ctx.fillText(al.lines[0] || '', 215, rowY + rowH * 0.72);
     if(i < shown.length - 1){
       ctx.fillStyle = 'rgba(246,239,227,0.08)';
@@ -7496,7 +7572,7 @@ async function generatePlaylistShareCard({ tracks, label, hue, username }){
   if(extra){
     ctx.textAlign = 'center';
     ctx.fillStyle = 'rgba(246,239,227,0.6)';
-    ctx.font = '400 24px \"Inter\", sans-serif';
+    ctx.font = '400 24px "Inter", sans-serif';
     ctx.fillText(`+ ${extra} faixas na fita`, W / 2, y + shown.length * rowH + 36);
   }
 
@@ -7629,7 +7705,7 @@ async function generateStreakShareCard(streak, tier){
   await ensureCardFonts();
   const { canvas, ctx } = newCard();
   const W = CARD_W;
-  drawStoryBackground(ctx, 30, 0.38);
+  await drawAmbientBackground(ctx, 30, 0.38);
   drawStoryHeader(ctx, currentUser ? `@${currentUser.username} · ${cardDate()}` : cardDate());
 
   const cx = W / 2, cy = 720, R = 300;
@@ -7666,10 +7742,10 @@ async function generateStreakShareCard(streak, tier){
   ctx.fillText(String(streak), cx, cy + numSize * 0.36);
 
   ctx.fillStyle = '#F6EFE3';
-  ctx.font = '800 84px \"Inter\", sans-serif';
+  ctx.font = '800 84px "Inter", sans-serif';
   ctx.fillText(`${streak} ${streak === 1 ? 'dia seguido' : 'dias seguidos'}`, cx, cy + R + 135);
   ctx.fillStyle = 'rgba(246,239,227,0.75)';
-  ctx.font = '500 40px \"Inter\", sans-serif';
+  ctx.font = '500 40px "Inter", sans-serif';
   ctx.fillText(`${tier.icon} registrando o que eu ouço, todo dia`, cx, cy + R + 200);
 
   const milestones = [7, 30, 100, 365];
@@ -7686,11 +7762,11 @@ async function generateStreakShareCard(streak, tier){
     ctx.fillStyle = fg;
     ctxRoundRect(ctx, barX, barY, Math.max(barH, barW * pct), barH, barH / 2); ctx.fill();
     ctx.fillStyle = 'rgba(246,239,227,0.7)';
-    ctx.font = '600 26px \"Inter\", sans-serif';
+    ctx.font = '600 26px "Inter", sans-serif';
     ctx.fillText(`próximo marco: ${next} dias · faltam ${next - streak}`, W / 2, barY + 80);
   } else {
     ctx.fillStyle = '#D6B26E';
-    ctx.font = '600 28px \"Inter\", sans-serif';
+    ctx.font = '600 28px "Inter", sans-serif';
     ctx.fillText('todos os marcos conquistados', W / 2, barY + 30);
   }
 
@@ -9569,7 +9645,7 @@ async function generateMomentShareCard(p, item){
   const { canvas, ctx } = newCard();
   const W = CARD_W;
   const hue = hueForItem(item);
-  drawStoryBackground(ctx, hue, 0.36);
+  await drawAmbientBackground(ctx, hue, 0.36, photo);
   drawStoryHeader(ctx, `@${p.username} · ${cardDate(new Date(p.createdAt))}`);
 
   // a foto vira uma polaroid torta, com a legenda (ou a música) escrita à mão
@@ -9600,7 +9676,7 @@ async function generateMomentShareCard(p, item){
   let y = top + fh + 84;
   ctx.textAlign = 'center';
   ctx.fillStyle = '#D6B26E';
-  ctx.font = '600 25px \"Inter\", sans-serif';
+  ctx.font = '600 25px "Inter", sans-serif';
   ctx.letterSpacing = '0px';
   ctx.fillText('Tocando nessa foto', W / 2, y);
   ctx.letterSpacing = '0px';
