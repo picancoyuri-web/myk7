@@ -17,3 +17,4 @@ ios/DerivedData/
 *.keystore
 *.jks
 keystore.properties
+.superpowers/
