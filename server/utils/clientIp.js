@@ -14,10 +14,21 @@ function clientIp(req){
   if(secret && sign && forwarded){
     try{
       jwt.verify(sign, secret, { algorithms: ['HS256'] });
+      logOnce('ok', '[proxy] requisições do Netlify chegando assinadas — limites contam pelo IP real');
       return forwarded.trim();
-    }catch(e){ /* assinatura inválida — usa o IP da conexão */ }
+    }catch(e){
+      logOnce('bad', '[proxy] assinatura do Netlify não confere — confira NETLIFY_PROXY_SECRET nos dois lados');
+    }
   }
   return req.ip || 'unknown';
+}
+
+// avisa no log só na primeira vez (pra dar pra conferir a configuração)
+const logged = new Set();
+function logOnce(key, msg){
+  if(logged.has(key)) return;
+  logged.add(key);
+  console.log(msg);
 }
 
 module.exports = clientIp;
