@@ -1,27 +1,27 @@
-/* páginas de Termos e Privacidade — mesmas cores do app */
+/* páginas de Termos e Privacidade — mesmo visual do app (Noite dourada / fita marfim) */
 :root{
-  --ink:#EFE5CF; --ink-soft:#B9AC94; --paper:#15110E; --line:#3A3029; --mustard:#D8913A;
+  --ink:#F6EFE3; --ink-soft:rgba(246,239,227,.62); --paper:#0D0B09; --line:rgba(214,178,110,.18); --gold:#D6B26E;
   color-scheme:dark;
 }
 @media (prefers-color-scheme: light){
-  :root{ --ink:#2A2420; --ink-soft:#574E43; --paper:#F3ECDA; --line:#D8CCAE; --mustard:#9A6F22; color-scheme:light; }
+  :root{ --ink:#1A140D; --ink-soft:rgba(26,20,13,.68); --paper:#F7F1E6; --line:rgba(156,122,60,.28); --gold:#86672F; color-scheme:light; }
 }
 *{box-sizing:border-box;}
 body{
   margin:0;background:var(--paper);color:var(--ink);
-  font:16px/1.6 Georgia, 'Times New Roman', serif;
+  font:16px/1.65 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   -webkit-text-size-adjust:100%;
 }
 .legal{
   max-width:680px;margin:0 auto;
   padding:calc(24px + env(safe-area-inset-top)) 16px calc(48px + env(safe-area-inset-bottom));
 }
-h1{font:700 30px/1.15 Impact, 'Arial Narrow', sans-serif;letter-spacing:.01em;margin:18px 0 4px;}
-h2{font:700 15px/1.3 ui-monospace, Menlo, Consolas, monospace;text-transform:uppercase;letter-spacing:.06em;margin:30px 0 8px;color:var(--mustard);}
+h1{font:800 32px/1.15 'Inter', system-ui, sans-serif;letter-spacing:-0.03em;margin:18px 0 4px;}
+h2{font:700 18px/1.3 'Inter', system-ui, sans-serif;letter-spacing:-0.015em;margin:32px 0 8px;padding-top:20px;border-top:1px solid var(--line);}
 p, li{color:var(--ink);}
 ul{padding-left:20px;}
 li{margin-bottom:6px;}
-a{color:var(--mustard);}
-.updated{font:12px ui-monospace, Menlo, Consolas, monospace;color:var(--ink-soft);margin:0 0 22px;}
-.back{font:12px ui-monospace, Menlo, Consolas, monospace;color:var(--ink-soft);text-decoration:none;}
+a{color:var(--gold);font-weight:500;}
+.updated{font-size:13px;color:var(--ink-soft);margin:0 0 22px;}
+.back{font-size:14px;font-weight:500;color:var(--ink-soft);text-decoration:none;}
 .back:hover{color:var(--ink);}
