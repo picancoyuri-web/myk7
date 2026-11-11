@@ -14,6 +14,8 @@ function userFromRequest(req){
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(payload.uid);
     if(!user) return null;
     if((payload.sv || 0) !== (user.session_version || 0)) return null;
+    // saiu da conta nesse aparelho (botão "sair") — o token não vale mais
+    if(payload.jti && db.prepare('SELECT 1 FROM revoked_sessions WHERE jti = ?').get(payload.jti)) return null;
     return user;
   }catch(e){
     return null; // token inválido ou expirado

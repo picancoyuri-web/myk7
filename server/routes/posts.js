@@ -8,7 +8,7 @@ const { findUserByUsername, avatarUrl } = require('../utils/serialize');
 const { sendDataImage } = require('../utils/image');
 const rateLimit = require('../utils/rateLimit');
 const { cleanString, isValidDataImage, isHttpsUrl, parseId } = require('../utils/validate');
-const { notBlockedSql, isBlockedEither } = require('../utils/blocks');
+const { notBlockedSql, isBlockedEither, blockedIdsFor } = require('../utils/blocks');
 
 // MOMENTOS — a pessoa posta uma foto junto com a música que estava ouvindo.
 // Mesma receita das resenhas: a foto fica no banco em base64 e sai por URL
@@ -217,7 +217,10 @@ router.get('/:postId/comments', optionalAuth, (req, res) => {
   const post = findPost(req.params.postId);
   if(!post) return res.status(404).json({ error: 'momento não encontrado.' });
   const viewerId = req.user ? req.user.id : null;
-  const rows = db.prepare(`${COMMENT_SELECT} WHERE c.post_id = ? ORDER BY c.id ASC LIMIT 300`).all(post.id);
+  if(viewerId && isBlockedEither(viewerId, post.user_id)) return res.status(404).json({ error: 'momento não encontrado.' });
+  const blocked = blockedIdsFor(viewerId);
+  const rows = db.prepare(`${COMMENT_SELECT} WHERE c.post_id = ? ORDER BY c.id ASC LIMIT 300`).all(post.id)
+    .filter(r => !blocked.has(r.user_id));
   res.json({ comments: rows.map(r => serializeComment(r, viewerId, post.user_id)) });
 });
 

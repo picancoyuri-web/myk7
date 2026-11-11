@@ -22,9 +22,7 @@ services:
         sync: false
       - key: DISCOGS_TOKEN
         sync: false
-      - key: SPOTIFY_CLIENT_ID
-        sync: false
-      - key: SPOTIFY_CLIENT_SECRET
+      - key: NETLIFY_PROXY_SECRET
         sync: false
       - key: SMTP_HOST
         sync: false

@@ -21,7 +21,6 @@ const notificationRoutes = require('./routes/notifications');
 const creditsRoutes = require('./routes/credits');
 const artistInfoRoutes = require('./routes/artistinfo');
 const reportRoutes = require('./routes/reports');
-const spotifyRoutes = require('./routes/spotify');
 const postRoutes = require('./routes/posts');
 const billingRoutes = require('./routes/billing');
 const forYouRoutes = require('./routes/foryou');
@@ -62,6 +61,21 @@ app.use(
   })
 );
 
+// CSRF: o cookie de sessão é SameSite=None (o app nativo fala com a API de
+// outro domínio), então qualquer site poderia mandar um formulário pra cá
+// usando a sessão de quem está logado (ex: seguir alguém sem querer). O
+// navegador sempre manda "Origin" nesses envios — se veio de uma origem que
+// não é nossa, recusa. Sem Origin (app nativo, webhook, curl) segue normal:
+// aí não tem cookie de navegador nenhum sendo usado por terceiros.
+app.use('/api', (req, res, next) => {
+  if(req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') return next();
+  const origin = req.get('origin');
+  if(origin && !allowedOrigins.has(origin)){
+    return res.status(403).json({ error: 'origem não permitida.' });
+  }
+  next();
+});
+
 // cabeçalhos básicos de segurança (sem precisar do pacote helmet)
 app.use((req, res, next) => {
   res.set('X-Content-Type-Options', 'nosniff');
@@ -94,7 +108,6 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/credits', creditsRoutes);
 app.use('/api/artist-info', artistInfoRoutes);
 app.use('/api/reports', reportRoutes);
-app.use('/api/spotify', spotifyRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/foryou', forYouRoutes);

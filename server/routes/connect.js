@@ -18,6 +18,13 @@ const router = express.Router();
    ============================================================ */
 
 const matchLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 20, message: 'muitas buscas de contatos — tente de novo mais tarde.' });
+// por conta também: sem isso dava pra testar listas enormes de e-mails e
+// telefones (trocando de IP) e descobrir o @ de cada um
+const accountMatchLimiter = rateLimit({
+  windowMs: 24 * 60 * 60 * 1000, max: 10, message: 'muitas buscas de contatos hoje — tente de novo amanhã.',
+  key: req => req.user && 'conta:' + req.user.id,
+});
+const MATCH_MAX_HASHES = 2000;
 const HASH_RE = /^[a-f0-9]{64}$/;
 const NEARBY_KM = 60;
 
@@ -103,11 +110,13 @@ router.delete('/location', requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
-// o próprio telefone, já em hash (pra quem tem você nos contatos te achar)
+// o próprio telefone, já em hash (pra quem tem você nos contatos te achar).
+// Salvar o telefone é pedir pra ser achado, então liga o "me encontrar".
 router.put('/phone', requireAuth, (req, res) => {
   const h = (req.body || {}).phoneHash;
   if(h !== null && !HASH_RE.test(String(h))) return res.status(400).json({ error: 'telefone inválido.' });
-  db.prepare('UPDATE users SET phone_hash = ? WHERE id = ?').run(h, req.user.id);
+  if(h === null) db.prepare('UPDATE users SET phone_hash = NULL WHERE id = ?').run(req.user.id);
+  else db.prepare('UPDATE users SET phone_hash = ?, discoverable = 1 WHERE id = ?').run(h, req.user.id);
   res.json({ ok: true });
 });
 
@@ -117,10 +126,10 @@ router.put('/discoverable', requireAuth, (req, res) => {
 });
 
 // recebe só hashes, devolve quem já está no MyK7 e guarda o vínculo
-router.post('/contacts/match', requireAuth, matchLimiter, (req, res) => {
+router.post('/contacts/match', requireAuth, matchLimiter, accountMatchLimiter, (req, res) => {
   const list = Array.isArray((req.body || {}).hashes) ? req.body.hashes : null;
   if(!list) return res.status(400).json({ error: 'faltou a lista de contatos.' });
-  const hashes = [...new Set(list.map(String).filter(h => HASH_RE.test(h)))].slice(0, 5000);
+  const hashes = [...new Set(list.map(String).filter(h => HASH_RE.test(h)))].slice(0, MATCH_MAX_HASHES);
   ensureEmailHashes();
   const me = req.user.id;
   const found = new Map();

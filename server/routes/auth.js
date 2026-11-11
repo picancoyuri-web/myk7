@@ -19,6 +19,12 @@ const PASSWORD_MIN = 8;
 const PASSWORD_MAX = 72; // o bcrypt ignora o que passar de 72 bytes
 
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, message: 'muitas tentativas de login — espere uns minutos e tente de novo.' });
+// mesmo trocando de IP, uma conta só aguenta um tanto de tentativas por hora
+const accountLoginLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, max: 20,
+  message: 'muitas tentativas nessa conta — espere um pouco e tente de novo.',
+  key: req => typeof (req.body || {}).identifier === 'string' ? 'conta:' + req.body.identifier.trim().toLowerCase() : null,
+});
 const signupLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 10, message: 'muitos cadastros a partir daqui — tente de novo mais tarde.' });
 const emailLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, message: 'muitos pedidos de e-mail — espere um pouco antes de pedir de novo.' });
 
@@ -28,7 +34,7 @@ function startSession(req, res, user){
   const token = jwt.sign(
     { uid: user.id, sv: user.session_version || 0 },
     process.env.JWT_SECRET,
-    { expiresIn: '30d' }
+    { expiresIn: '30d', jwtid: crypto.randomBytes(16).toString('hex') }
   );
   res.cookie(COOKIE_NAME, token, { ...cookieOpts(req), maxAge: SESSION_MAX_AGE });
 }
@@ -77,7 +83,7 @@ router.post('/signup', signupLimiter, async (req, res, next) => {
 
     const hash = await bcrypt.hash(password, 10);
     const info = db.prepare(
-      "INSERT INTO users (username, email, password_hash, nationality, genres, terms_accepted_at) VALUES (?,?,?,?,?,datetime('now'))"
+      "INSERT INTO users (username, email, password_hash, nationality, genres, terms_accepted_at, discoverable) VALUES (?,?,?,?,?,datetime('now'),0)"
     ).run(username, email, hash, nationality, JSON.stringify(genres));
 
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
@@ -93,7 +99,7 @@ router.post('/signup', signupLimiter, async (req, res, next) => {
 // demora o mesmo tanto e não dá pra descobrir quais contas existem pelo tempo
 const DUMMY_HASH = bcrypt.hashSync('cassete-dummy-password', 10);
 
-router.post('/login', loginLimiter, async (req, res, next) => {
+router.post('/login', loginLimiter, accountLoginLimiter, async (req, res, next) => {
   try{
     const { identifier, password } = req.body || {};
     if(typeof identifier !== 'string' || typeof password !== 'string' || !identifier.trim() || !password){
@@ -117,6 +123,18 @@ router.post('/login', loginLimiter, async (req, res, next) => {
 });
 
 router.post('/logout', (req, res) => {
+  // invalida o token desta sessão no servidor (não só apaga o cookie), pra
+  // uma cópia dele não continuar valendo até vencer
+  const token = req.cookies && req.cookies[COOKIE_NAME];
+  if(token){
+    try{
+      const payload = jwt.verify(token, process.env.JWT_SECRET);
+      if(payload.jti && payload.exp){
+        db.prepare('INSERT OR IGNORE INTO revoked_sessions (jti, expires_at) VALUES (?, ?)').run(payload.jti, payload.exp * 1000);
+      }
+    }catch(e){ /* token inválido ou vencido — não tem o que revogar */ }
+    db.prepare('DELETE FROM revoked_sessions WHERE expires_at < ?').run(Date.now());
+  }
   // sem maxAge aqui: no Express 4, passar maxAge pro clearCookie recria o
   // cookie com validade nova em vez de apagar
   res.clearCookie(COOKIE_NAME, cookieOpts(req));

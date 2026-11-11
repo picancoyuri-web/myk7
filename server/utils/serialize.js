@@ -61,7 +61,6 @@ function serializeUser(row){
     avatar: avatarUrl(row),
     followers,
     following,
-    spotifyConnected: !!db.prepare('SELECT 1 FROM spotify_tokens WHERE user_id = ?').get(row.id),
     premium: isPremium(row),
     premiumUntil: isPremium(row) ? row.premium_until : null,
     // id fixo usado na loja (RevenueCat) — o nome de usuário pode mudar

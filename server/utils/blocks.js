@@ -7,6 +7,14 @@ function isBlockedEither(a, b){
   ).get(a, b, b, a);
 }
 
+// ids de quem bloqueou ou foi bloqueado por userId (vazio sem login)
+function blockedIdsFor(userId){
+  if(!userId) return new Set();
+  return new Set(db.prepare(
+    'SELECT blocked_id AS id FROM blocks WHERE blocker_id = ? UNION SELECT blocker_id FROM blocks WHERE blocked_id = ?'
+  ).all(userId, userId).map(r => r.id));
+}
+
 // trecho de SQL que exclui quem bloqueou ou foi bloqueado por @me
 // (usa o parâmetro nomeado @me e a coluna informada)
 function notBlockedSql(column){
@@ -14,4 +22,4 @@ function notBlockedSql(column){
     UNION SELECT blocker_id FROM blocks WHERE blocked_id = @me)`;
 }
 
-module.exports = { isBlockedEither, notBlockedSql };
+module.exports = { isBlockedEither, notBlockedSql, blockedIdsFor };

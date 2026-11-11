@@ -4,6 +4,7 @@ const requireAuth = require('../middleware/requireAuth');
 const requireAdmin = require('../middleware/requireAdmin');
 const rateLimit = require('../utils/rateLimit');
 const { cleanString } = require('../utils/validate');
+const { findUserByUsername } = require('../utils/serialize');
 
 const router = express.Router();
 
@@ -18,8 +19,15 @@ router.post('/', requireAuth, reportLimiter, (req, res) => {
   const { targetType, targetId, reason } = req.body || {};
   if(!TARGET_TYPES.has(targetType)) return res.status(400).json({ error: 'tipo de denúncia inválido.' });
   if(!REASONS.has(reason)) return res.status(400).json({ error: 'escolha um motivo.' });
-  const id = cleanString(targetId, 64);
+  let id = cleanString(targetId, 64);
   if(!id) return res.status(400).json({ error: 'denúncia sem alvo.' });
+  // pessoa: o app manda o nome de usuário, mas guardamos o id (o nome pode
+  // mudar, e um nome só de números se confundiria com o id de outra conta)
+  if(targetType === 'user'){
+    const target = findUserByUsername(id);
+    if(!target) return res.status(404).json({ error: 'pessoa não encontrada.' });
+    id = String(target.id);
+  }
 
   db.prepare('INSERT INTO reports (reporter_id, target_type, target_id, reason) VALUES (?,?,?,?)')
     .run(req.user.id, targetType, id, reason);
@@ -41,8 +49,10 @@ const TARGET_TABLES = {
 router.get('/', requireAuth, requireAdmin, (req, res) => {
   const rows = db.prepare(`
     SELECT r.id, r.target_type AS targetType, r.target_id AS targetId, r.reason,
-           r.created_at AS createdAt, u.username AS reporter
+           r.created_at AS createdAt, u.username AS reporter,
+           t.username AS targetUsername
     FROM reports r LEFT JOIN users u ON u.id = r.reporter_id
+    LEFT JOIN users t ON r.target_type = 'user' AND t.id = CAST(r.target_id AS INTEGER)
     ORDER BY r.id DESC LIMIT 200
   `).all();
   res.json({ reports: rows });
@@ -59,7 +69,7 @@ router.post('/:id/resolve', requireAuth, requireAdmin, (req, res) => {
   db.transaction(() => {
     if(action === 'remove'){
       if(report.target_type === 'user'){
-        db.prepare('DELETE FROM users WHERE username = ? COLLATE NOCASE OR id = ?').run(report.target_id, report.target_id);
+        db.prepare('DELETE FROM users WHERE id = ?').run(Number(report.target_id));
       }else if(TARGET_TABLES[report.target_type]){
         db.prepare(`DELETE FROM ${TARGET_TABLES[report.target_type]} WHERE id = ?`).run(report.target_id);
       }

@@ -8,7 +8,7 @@ const { findUserByUsername, avatarUrl, commentPhotoUrl } = require('../utils/ser
 const { sendDataImage } = require('../utils/image');
 const rateLimit = require('../utils/rateLimit');
 const { cleanString, isValidDataImage, isHttpsUrl, cleanSpotifyRef, parseId } = require('../utils/validate');
-const { notBlockedSql } = require('../utils/blocks');
+const { notBlockedSql, isBlockedEither, blockedIdsFor } = require('../utils/blocks');
 
 const router = express.Router();
 
@@ -46,6 +46,7 @@ function serializeEntries(rows, viewerId, { withUser = false } = {}){
   if(!rows.length) return [];
   const ids = rows.map(r => r.id);
   const ph = placeholders(ids);
+  const blocked = blockedIdsFor(viewerId);
 
   const comments = db.prepare(`
     SELECT c.id, c.entry_id, c.user_id, c.text, c.created_at, (c.photo IS NOT NULL) AS has_photo, u.username
@@ -53,7 +54,7 @@ function serializeEntries(rows, viewerId, { withUser = false } = {}){
     JOIN users u ON u.id = c.user_id
     WHERE c.entry_id IN (${ph})
     ORDER BY c.created_at ASC, c.id ASC
-  `).all(...ids);
+  `).all(...ids).filter(c => !blocked.has(c.user_id));
 
   const commentIds = comments.map(c => c.id);
   const likeCounts = new Map();
@@ -252,6 +253,7 @@ router.get('/user/:username', optionalAuth, (req, res) => {
   if(!user) return res.status(404).json({ error: 'pessoa não encontrada.' });
 
   const viewerId = req.user ? req.user.id : null;
+  if(viewerId && isBlockedEither(viewerId, user.id)) return res.json({ entries: [] });
   const rows = db.prepare('SELECT * FROM diary_entries WHERE user_id = ? ORDER BY id DESC LIMIT 200').all(user.id);
   res.json({ entries: serializeEntries(rows, viewerId) });
 });
@@ -293,6 +295,7 @@ router.delete('/comments/:commentId', requireAuth, (req, res) => {
 router.post('/comments/:commentId/like', requireAuth, (req, res) => {
   const comment = findComment(req.params.commentId);
   if(!comment) return res.status(404).json({ error: 'comentário não encontrado.' });
+  if(isBlockedEither(req.user.id, comment.user_id)) return res.status(403).json({ error: 'não dá pra interagir com essa pessoa.' });
 
   const already = db.prepare('SELECT 1 FROM comment_likes WHERE comment_id = ? AND user_id = ?')
     .get(comment.id, req.user.id);
@@ -343,6 +346,7 @@ router.delete('/:entryId', requireAuth, (req, res) => {
 router.post('/:entryId/comments', requireAuth, writeLimiter, (req, res) => {
   const entry = findEntry(req.params.entryId);
   if(!entry) return res.status(404).json({ error: 'escuta não encontrada.' });
+  if(isBlockedEither(req.user.id, entry.user_id)) return res.status(403).json({ error: 'não dá pra interagir com essa pessoa.' });
 
   const { photo } = req.body || {};
   const text = cleanString((req.body || {}).text, COMMENT_MAX);
@@ -366,6 +370,7 @@ router.post('/:entryId/comments', requireAuth, writeLimiter, (req, res) => {
 router.post('/:entryId/react', requireAuth, (req, res) => {
   const entry = findEntry(req.params.entryId);
   if(!entry) return res.status(404).json({ error: 'escuta não encontrada.' });
+  if(isBlockedEither(req.user.id, entry.user_id)) return res.status(403).json({ error: 'não dá pra interagir com essa pessoa.' });
 
   const { emoji } = req.body || {};
   if(!ALLOWED_REACTIONS.has(emoji)) return res.status(400).json({ error: 'reação inválida.' });

@@ -172,7 +172,7 @@ CREATE INDEX IF NOT EXISTS idx_messages_unread ON messages(to_id, read_at);
 CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows(follower_id);
 `);
 
-// bloqueios, denúncias e a conexão com o Spotify
+// bloqueios e denúncias
 db.exec(`
 CREATE TABLE IF NOT EXISTS blocks (
   blocker_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -202,13 +202,6 @@ CREATE TABLE IF NOT EXISTS listen_later (
   item_preview_url TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   PRIMARY KEY (user_id, item_id)
-);
-
-CREATE TABLE IF NOT EXISTS spotify_tokens (
-  user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-  access_token TEXT NOT NULL,
-  refresh_token TEXT NOT NULL,
-  expires_at INTEGER NOT NULL -- em ms (Date.now())
 );
 `);
 
@@ -282,5 +275,49 @@ CREATE TABLE IF NOT EXISTS contact_links (
 );
 CREATE INDEX IF NOT EXISTS idx_contact_links_contact ON contact_links(contact_user_id);
 `);
+
+// sessões encerradas antes de vencer (botão "sair"): o id do token fica
+// aqui até a data em que ele venceria de qualquer jeito
+db.exec(`
+CREATE TABLE IF NOT EXISTS revoked_sessions (
+  jti TEXT PRIMARY KEY,
+  expires_at INTEGER NOT NULL -- em ms (Date.now())
+);
+CREATE TABLE IF NOT EXISTS app_migrations (
+  name TEXT PRIMARY KEY,
+  ran_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+`);
+
+// ajustes que rodam uma única vez no banco
+function runOnce(name, fn){
+  if(db.prepare('SELECT 1 FROM app_migrations WHERE name = ?').get(name)) return;
+  db.transaction(() => {
+    fn();
+    db.prepare('INSERT INTO app_migrations (name) VALUES (?)').run(name);
+  })();
+}
+
+// "me achar pelos contatos" passou a ser escolha da pessoa: antes vinha
+// ligado pra todo mundo e dava pra descobrir o @ de alguém pelo e-mail.
+// Quem já salvou o próprio telefone pediu pra ser achado, então continua.
+runOnce('2026-11-11-discoverable-opt-in', () => {
+  db.exec('UPDATE users SET discoverable = 0 WHERE phone_hash IS NULL');
+});
+
+// denúncia de pessoa guardava o nome de usuário; agora guarda o id (o nome
+// pode mudar, e um nome só de números se confundia com o id de outra conta)
+runOnce('2026-11-11-reports-user-id', () => {
+  db.exec(`
+    UPDATE reports SET target_id = (SELECT CAST(u.id AS TEXT) FROM users u WHERE u.username = reports.target_id COLLATE NOCASE)
+    WHERE target_type = 'user' AND EXISTS (SELECT 1 FROM users u WHERE u.username = reports.target_id COLLATE NOCASE)
+  `);
+});
+
+// "ouvindo agora" do Spotify saiu do app: os tokens guardados não servem
+// mais pra nada e não devem ficar no banco
+runOnce('2026-11-11-drop-spotify', () => {
+  db.exec('DROP TABLE IF EXISTS spotify_tokens');
+});
 
 module.exports = db;

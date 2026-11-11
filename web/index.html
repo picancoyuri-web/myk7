@@ -739,43 +739,6 @@
   }
   .compat-shared{font-size:12.5px;color:var(--ink-soft);margin-top:8px;}
 
-  /* ---------- INTEGRAÇÃO COM SPOTIFY ---------- */
-  .spotify-card{
-    max-width:420px;margin:0 0 20px;padding:16px 18px;border-radius:10px;
-    background:var(--paper-dim);border:1px solid var(--line);
-  }
-  .spotify-connect{
-    width:100%;padding:12px;border-radius:8px;border:1px solid #1DB954;background:#1DB954;
-    color:#000;font-family:var(--f-ui);font-size:13px;font-weight:700;cursor:pointer;
-  }
-  .spotify-connect:hover{background:#1ed760;border-color:#1ed760;}
-  .spotify-status{
-    display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft);
-  }
-  .spotify-dot{
-    width:8px;height:8px;border-radius:50%;background:#1DB954;flex:none;
-    box-shadow:0 0 0 3px rgba(29,185,84,0.25);
-  }
-  .now-playing-badge{
-    margin-top:10px;padding:8px 12px;border-radius:8px;font-size:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
-    width:100%;font-family:inherit;color:inherit;text-align:left;
-  }
-  .now-playing-badge.on{
-    background:rgba(29,185,84,0.14);border:1px solid rgba(29,185,84,0.4);cursor:pointer;
-    transition:background .15s ease,transform .1s ease;
-  }
-  .now-playing-badge.on:hover{background:rgba(29,185,84,0.22);}
-  .now-playing-badge.on:active{transform:scale(0.98);}
-  .now-playing-badge.off{background:transparent;border:none;color:var(--ink-soft);opacity:0.7;cursor:default;}
-  .np-dot{
-    width:7px;height:7px;border-radius:50%;background:#1DB954;flex:none;
-    animation:npPulse 1.6s ease-in-out infinite;
-  }
-  @keyframes npPulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
-  .np-text b{color:var(--ink);}
-  .np-source{font-family:var(--f-ui);font-size:9.5px;opacity:0.55;margin-left:auto;}
-  .np-hint{font-family:var(--f-ui);font-size:9px;opacity:0.5;width:100%;margin-top:2px;}
-
   /* ---------- NOTIFICAÇÃO DE MEMÓRIA ---------- */
   .notif-row.memory{background:rgba(214,178,110,0.14);}
 
@@ -4080,10 +4043,6 @@ let notifPollInterval = null;
 let resetTokenFromUrl = new URLSearchParams(location.search).get('reset');
 if(resetTokenFromUrl) gateAuthMode = 'reset';
 const verifyTokenFromUrl = new URLSearchParams(location.search).get('verify');
-const spotifyStatusFromUrl = new URLSearchParams(location.search).get('spotify');
-// Spotify fora do app por enquanto (conectar, "ouvindo agora", links). O
-// backend continua pronto: pra religar é só voltar isto pra true.
-const SPOTIFY_ENABLED = false;
 // quem chega por um card compartilhado (QR/link do story) vem com ?u=usuario:
 // já logado abre o perfil dessa pessoa; sem conta, cai direto no cadastro
 const sharedProfileFromUrl = new URLSearchParams(location.search).get('u');
@@ -4183,87 +4142,6 @@ async function verifyEmailFromUrl(){
   history.replaceState(null, '', location.pathname);
 }
 
-// trata a volta do fluxo de "conectar Spotify" (o backend redireciona pra
-// cá com ?spotify=connected|error|expired depois da autorização)
-function handleSpotifyRedirect(){
-  if(!SPOTIFY_ENABLED || !spotifyStatusFromUrl) return;
-  if(spotifyStatusFromUrl === 'connected'){
-    showToast('Spotify conectado! agora as pessoas podem ver o que você está ouvindo.');
-    if(currentUser) currentUser.spotifyConnected = true;
-  } else if(spotifyStatusFromUrl === 'expired'){
-    showToast('essa conexão com o Spotify expirou, tenta de novo.', true);
-  } else {
-    showToast('não deu pra conectar com o Spotify agora.', true);
-  }
-  history.replaceState(null, '', location.pathname);
-}
-
-// tenta carregar a sessão, com algumas re-tentativas: o backend do Render
-// (plano free) "dorme" depois de inativo e pode demorar até uns 50s pra
-// acordar na primeira chamada — sem isso, a pessoa aparecia como
-// "deslogada" só por lentidão, mesmo com o cookie de sessão válido.
-let ownNowPlayingInterval = null;
-let personNowPlayingInterval = null;
-
-// busca (e mantém atualizado) o "ouvindo agora" do Spotify de alguém, e
-// injeta num elemento da tela. Devolve o id do setInterval, pra quem
-// chamou poder limpar depois (ex: ao sair da tela de perfil).
-// clicou no selo "ouvindo agora" de alguém — busca essa faixa na iTunes
-// (pra ter prévia de verdade) e abre a tela de detalhe, que já tem os
-// botões de tocar e "★ registrar essa escuta" prontos
-async function openNowPlayingItem(title, artist, btn){
-  if(btn) btn.disabled = true;
-  try{
-    const results = await itunesSearchJSONP(`${title} ${artist}`, 'song');
-    const item = results.length ? mapItunesResult(results[0]) : null;
-    if(!item){
-      showToast('não achei essa música pra ouvir/registrar agora.', true);
-      return;
-    }
-    if(!allItems.some(x => x.id === item.id)) allItems.push(item);
-    openItemDetail(item.id);
-  }catch(e){
-    console.error('não deu pra abrir a música que está tocando agora:', e.message);
-    showToast('não deu pra abrir essa música agora.', true);
-  }finally{
-    if(btn) btn.disabled = false;
-  }
-}
-
-async function mountNowPlaying(username, containerId, { showEmpty = false } = {}){
-  if(!SPOTIFY_ENABLED) return null;
-  async function refresh(){
-    const el = document.getElementById(containerId);
-    if(!el) return; // saiu da tela — não insiste
-    try{
-      const data = await apiFetch(`/spotify/now-playing/${encodeURIComponent(username)}`);
-      if(!data.connected){ el.innerHTML = ''; return; }
-      if(data.playing && data.playing.isPlaying){
-        el.innerHTML = `
-          <button type="button" class="now-playing-badge on" id="npBtn-${containerId}">
-            <span class="np-dot"></span>
-            <span class="np-text">ouvindo agora: <b>${escapeHtml(data.playing.title)}</b> — ${escapeHtml(data.playing.artist)}</span>
-            <span class="np-source">via Spotify</span>
-            <span class="np-hint">toque pra ouvir a prévia e registrar</span>
-          </button>
-        `;
-        const npBtn = document.getElementById(`npBtn-${containerId}`);
-        if(npBtn){
-          npBtn.addEventListener('click', ()=> openNowPlayingItem(data.playing.title, data.playing.artist, npBtn));
-        }
-      } else if(showEmpty){
-        el.innerHTML = `<div class="now-playing-badge off">🎧 Spotify conectado — nada tocando agora</div>`;
-      } else {
-        el.innerHTML = '';
-      }
-    }catch(e){
-      // falha silenciosa — não quebra o perfil por causa de uma checagem que falhou
-    }
-  }
-  await refresh();
-  return setInterval(refresh, 25000);
-}
-
 // troca entre modo escuro (padrão) e modo claro, salvando a escolha
 // pra continuar valendo da próxima vez que a pessoa abrir o app
 function toggleAppTheme(){
@@ -4282,6 +4160,10 @@ function toggleAppTheme(){
   if(currentUser) renderProfile(); // atualiza o texto do botão (☀️/🌙)
 }
 
+// tenta carregar a sessão, com algumas re-tentativas: o backend do Render
+// (plano free) "dorme" depois de inativo e pode demorar até uns 50s pra
+// acordar na primeira chamada — sem isso, a pessoa aparecia como
+// "deslogada" só por lentidão, mesmo com o cookie de sessão válido.
 async function loadSession(){
   const delays = [0, 2500, 6000, 12000]; // total ~20s de tolerância
 
@@ -4821,8 +4703,6 @@ async function renderPersonProfileView(id){
       </div>
     ` : ''}
 
-    ${p.isReal ? `<div id="nowPlayingPerson"></div>` : ''}
-
     ${statsHtml}
     <div class="pp-follow-row" style="max-width:420px;margin-bottom:20px;">${followBtnHtml(p.id)} ${messageBtnHtml(p.id)}</div>
 
@@ -4887,10 +4767,7 @@ async function renderPersonProfileView(id){
   const reportBtn = document.getElementById('ppReportBtn');
   if(reportBtn) reportBtn.addEventListener('click', ()=> openReportModal('user', reportBtn.dataset.username));
 
-  if(personNowPlayingInterval){ clearInterval(personNowPlayingInterval); personNowPlayingInterval = null; }
   if(p.isReal){
-    mountNowPlaying(p.id, 'nowPlayingPerson', { showEmpty: false })
-      .then(interval => { personNowPlayingInterval = interval; });
     mountMomentsGrid(p.username, 'personMoments');
   }
 
@@ -6298,6 +6175,12 @@ function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 }
 
+// URL de fora (Discogs etc.) pronta pra href/src: só https, já escapada;
+// qualquer outra coisa (javascript:, data:...) vira vazio
+function safeUrl(url){
+  try{ return new URL(String(url)).protocol === 'https:' ? escapeHtml(url) : ''; }catch(e){ return ''; }
+}
+
 // escapa o texto e transforma @usuario em um link clicável pro perfil
 // (o clique é tratado por um listener global, então vale pra comentários
 // adicionados dinamicamente também)
@@ -6784,9 +6667,9 @@ async function loadItemCredits(item){
     container.innerHTML = `
       <div class="item-credits-title">
         ficha técnica
-        ${data.discogsUrl ? `<a href="${data.discogsUrl}" target="_blank" rel="noopener">via Discogs ↗</a>` : ''}
+        ${safeUrl(data.discogsUrl) ? `<a href="${safeUrl(data.discogsUrl)}" target="_blank" rel="noopener">via Discogs ↗</a>` : ''}
       </div>
-      ${data.artistPhoto ? `<img class="item-credits-artist-photo" src="${data.artistPhoto}" alt="foto de ${escapeHtml(data.mainArtist || item.artist)}">` : ''}
+      ${safeUrl(data.artistPhoto) ? `<img class="item-credits-artist-photo" src="${safeUrl(data.artistPhoto)}" alt="foto de ${escapeHtml(data.mainArtist || item.artist)}">` : ''}
       ${allCredits.length ? `
         <ul class="item-credits-list">
           ${allCredits.map(c => `<li><b>${escapeHtml(c.role)}:</b> ${escapeHtml(c.name)}</li>`).join('')}
@@ -6794,7 +6677,7 @@ async function loadItemCredits(item){
       ` : `<div class="item-credits-empty">sem créditos detalhados de instrumentos disponíveis pra essa faixa.</div>`}
       ${data.images && data.images.length ? `
         <div class="item-credits-gallery">
-          ${data.images.map(src => `<img src="${src}" loading="lazy" alt="imagem do lançamento">`).join('')}
+          ${data.images.map(safeUrl).filter(Boolean).map(src => `<img src="${src}" loading="lazy" alt="imagem do lançamento">`).join('')}
         </div>
       ` : ''}
     `;
@@ -8205,7 +8088,6 @@ function renderPlaylistForPeriod(days){
             <div class="playlist-track-actions">
               ${t.item.previewUrl ? `<button class="playlist-play-btn" data-idx="${i}" aria-label="Tocar prévia">▶</button>` : ''}
               <a href="https://music.apple.com/search?term=${q}" target="_blank" rel="noopener" aria-label="Buscar no Apple Music" title="Apple Music">🍎</a>
-              ${SPOTIFY_ENABLED ? `<a href="https://open.spotify.com/search/${q}" target="_blank" rel="noopener" aria-label="Buscar no Spotify" title="Spotify">♫</a>` : ''}
             </div>
           </div>
         `;
@@ -8507,20 +8389,6 @@ async function renderProfile(){
       <span class="cx-cta-icon">📍</span>
       <span><b>cidade e contatos</b><br><span>pra o Pra Você mostrar o que seus amigos e quem está perto curtem</span></span>
     </button>
-    ${SPOTIFY_ENABLED ? `<div class="spotify-card">
-      ${currentUser.spotifyConnected ? `
-        <div class="spotify-status">
-          <span class="spotify-dot"></span>
-          <span>Spotify conectado — outras pessoas veem o que você está ouvindo</span>
-        </div>
-        <div id="nowPlayingOwn"></div>
-        <button class="ghost" id="spotifyDisconnectBtn" style="margin-top:10px;">desconectar Spotify</button>
-      ` : IS_NATIVE_APP ? '' : `
-        <button class="spotify-connect" id="spotifyConnectBtn">🎧 conectar com Spotify</button>
-        <p class="db-note" style="opacity:0.6;margin-top:8px;margin-bottom:0;">conecta sua conta pra mostrar pras pessoas o que você está ouvindo agora.</p>
-      `}
-    </div>` : ''}
-
     <div class="stat-row" style="max-width:420px;">
       <button type="button" class="stat stat-clickable" id="statFollowers"><div class="num">${(currentUser.followers||[]).length}</div><div class="lbl">seguidores</div></button>
       <button type="button" class="stat stat-clickable" id="statFollowing"><div class="num">${(currentUser.following||[]).length}</div><div class="lbl">seguindo</div></button>
@@ -8668,42 +8536,9 @@ async function renderProfile(){
   const deleteAccBtn = document.getElementById('deleteAccountBtn');
   if(deleteAccBtn) deleteAccBtn.addEventListener('click', openDeleteAccountModal);
 
-  const spotifyConnectBtn = document.getElementById('spotifyConnectBtn');
-  if(spotifyConnectBtn){
-    spotifyConnectBtn.addEventListener('click', async ()=>{
-      spotifyConnectBtn.disabled = true;
-      try{
-        const { url } = await apiFetch('/spotify/login');
-        window.location.href = url;
-      }catch(e){
-        showToast(e.message, true);
-        spotifyConnectBtn.disabled = false;
-      }
-    });
-  }
-  const spotifyDisconnectBtn = document.getElementById('spotifyDisconnectBtn');
-  if(spotifyDisconnectBtn){
-    spotifyDisconnectBtn.addEventListener('click', async ()=>{
-      spotifyDisconnectBtn.disabled = true;
-      try{
-        await apiFetch('/spotify/disconnect', { method: 'POST' });
-        currentUser.spotifyConnected = false;
-        if(ownNowPlayingInterval){ clearInterval(ownNowPlayingInterval); ownNowPlayingInterval = null; }
-        renderProfile();
-      }catch(e){
-        showToast(e.message, true);
-        spotifyDisconnectBtn.disabled = false;
-      }
-    });
-  }
   mountMomentsGrid(currentUser.username, 'ownMoments', { own: true });
-  if(ownNowPlayingInterval){ clearInterval(ownNowPlayingInterval); ownNowPlayingInterval = null; }
   const cxProfileBtn = document.getElementById('cxOpenFromProfile');
   if(cxProfileBtn) cxProfileBtn.addEventListener('click', openConnections);
-  if(SPOTIFY_ENABLED && currentUser.spotifyConnected){
-    mountNowPlaying(currentUser.username, 'nowPlayingOwn', { showEmpty: true })
-      .then(interval => { ownNowPlayingInterval = interval; });
-  }
 
   const resendBtn = document.getElementById('resendVerifyBtn');
   if(resendBtn) resendBtn.addEventListener('click', async ()=>{
@@ -10492,7 +10327,6 @@ document.addEventListener('touchend', (e)=>{
   currentUser = await loadSession();
   initMonetization();
   await verifyEmailFromUrl();
-  handleSpotifyRedirect();
   if(currentUser) loadBlockedUsernames();
   renderAuthGate();
   await loadDiaryFromServer();

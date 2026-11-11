@@ -2,7 +2,9 @@
 // por aqui antes de ir pro banco ou voltar pra outro usuário no HTML.
 
 const USERNAME_RE = /^[a-zA-Z0-9_.]{3,30}$/;
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// só os caracteres comuns de e-mail: aspas, <, >, ; e vírgula confundem o
+// leitor de endereços do nodemailer e podiam desviar o e-mail pra outro lugar
+const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
 // só aceitamos imagem embutida em base64 (é o que o front gera com <canvas>),
 // nunca URL arbitrária — evita injeção em style="background-image:url(...)"
 const DATA_IMAGE_RE = /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/]+=*$/;

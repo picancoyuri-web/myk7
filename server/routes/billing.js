@@ -10,6 +10,7 @@
 //   REVENUECAT_WEBHOOK_AUTH — o mesmo texto cadastrado como "Authorization"
 //                             no webhook da RevenueCat
 //   REVENUECAT_ENTITLEMENT  — nome do entitlement (padrão: premium)
+const crypto = require('crypto');
 const express = require('express');
 const db = require('../db');
 const requireAuth = require('../middleware/requireAuth');
@@ -29,6 +30,13 @@ function status(row){
 function userIdFromBillingId(billingId){
   const m = /^u(\d+)$/.exec(String(billingId || ''));
   return m ? Number(m[1]) : null;
+}
+
+// compara em tempo constante (não dá pra ir adivinhando o segredo pela demora)
+function sameSecret(a, b){
+  const ha = crypto.createHash('sha256').update(String(a)).digest();
+  const hb = crypto.createHash('sha256').update(String(b)).digest();
+  return crypto.timingSafeEqual(ha, hb);
 }
 
 function setPremiumUntil(userId, until){
@@ -74,7 +82,7 @@ router.post('/refresh', requireAuth, refreshLimiter, async (req, res, next) => {
 // POST /api/billing/webhook — a RevenueCat avisa compras, renovações e fins
 router.post('/webhook', (req, res) => {
   const auth = process.env.REVENUECAT_WEBHOOK_AUTH;
-  if(!auth || req.get('authorization') !== auth) return res.status(401).json({ error: 'não autorizado.' });
+  if(!auth || !sameSecret(req.get('authorization') || '', auth)) return res.status(401).json({ error: 'não autorizado.' });
 
   const event = (req.body && req.body.event) || {};
   const ids = [event.app_user_id, event.original_app_user_id, ...(event.aliases || [])];
