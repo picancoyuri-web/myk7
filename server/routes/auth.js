@@ -88,7 +88,6 @@ router.post('/signup', signupLimiter, async (req, res, next) => {
 
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
     startSession(req, res, user);
-    sendVerificationEmail(user).catch(e => console.error('não deu pra mandar e-mail de verificação:', e.message));
     res.status(201).json({ user: serializeUser(user) });
   }catch(e){
     next(e);
@@ -176,60 +175,6 @@ function getMailTransport(){
     auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined,
   });
 }
-
-async function sendVerificationEmail(user){
-  const token = crypto.randomBytes(32).toString('hex');
-  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // válido por 24h
-
-  db.prepare('DELETE FROM email_verifications WHERE user_id = ?').run(user.id);
-  db.prepare('INSERT INTO email_verifications (user_id, token_hash, expires_at) VALUES (?,?,?)')
-    .run(user.id, hashToken(token), expiresAt);
-
-  const verifyUrl = `${frontendUrl()}/?verify=${token}`;
-  const transport = getMailTransport();
-
-  if(transport){
-    await transport.sendMail({
-      from: process.env.SMTP_FROM || process.env.SMTP_USER,
-      to: user.email,
-      subject: 'Confirme seu e-mail no Cassete',
-      text:
-        `Oi, ${user.username}! Só falta confirmar seu e-mail pra sua conta no Cassete.\n\n` +
-        `Clique no link abaixo (válido por 24 horas):\n${verifyUrl}\n\n` +
-        'Se você não criou essa conta, pode ignorar esse e-mail.',
-    });
-  } else {
-    // sem SMTP configurado — o link vai só pro log do servidor, útil em desenvolvimento
-    console.log('[verificação de e-mail] SMTP não configurado — link pra', user.email, ':', verifyUrl);
-  }
-}
-
-router.post('/verify-email', (req, res) => {
-  const { token } = req.body || {};
-  if(typeof token !== 'string' || !token) return res.status(400).json({ error: 'link inválido.' });
-
-  const row = db.prepare('SELECT * FROM email_verifications WHERE token_hash = ?').get(hashToken(token));
-  if(!row || new Date(row.expires_at).getTime() < Date.now()){
-    return res.status(400).json({ error: 'link inválido ou expirado — peça um novo.' });
-  }
-
-  db.prepare('UPDATE users SET email_verified = 1 WHERE id = ?').run(row.user_id);
-  db.prepare('DELETE FROM email_verifications WHERE user_id = ?').run(row.user_id);
-
-  res.json({ ok: true, message: 'e-mail confirmado!' });
-});
-
-router.post('/resend-verification', requireAuth, emailLimiter, async (req, res) => {
-  if(req.user.email_verified){
-    return res.json({ ok: true, message: 'seu e-mail já tá confirmado.' });
-  }
-  try{
-    await sendVerificationEmail(req.user);
-  }catch(e){
-    console.error('não deu pra reenviar o e-mail de verificação:', e.message);
-  }
-  res.json({ ok: true, message: 'se o envio de e-mail estiver configurado, um novo link foi mandado.' });
-});
 
 router.post('/forgot-password', emailLimiter, async (req, res, next) => {
   try{

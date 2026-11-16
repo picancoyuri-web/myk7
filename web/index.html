@@ -1173,15 +1173,6 @@
   }
 
   /* ---------- banner de confirmação de e-mail ---------- */
-  .verify-banner{
-    display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
-    background:#fdf1e0;border:1px solid #e8c88a;border-radius:6px;padding:12px 14px;margin-bottom:20px;
-    font-size:12.5px;color:#3a2f1f;
-  }
-  .verify-banner button{
-    background:none;border:none;text-decoration:underline;cursor:pointer;
-    font-family:var(--f-ui);font-size:11px;color:#3a2f1f;flex:none;
-  }
 
   /* ---------- INSTALL BANNER ---------- */
   .install-banner{
@@ -2191,8 +2182,6 @@
   .plus-badge{font-size:11px;font-weight:700;letter-spacing:-0.01em;color:#1A140D;background:linear-gradient(180deg,#E3C68C,#C29A52);border-radius:999px;padding:2px 8px;}
   /* cartões que eram papel creme viram superfícies do tema */
   .turntable, .account-card{background:var(--surface);color:var(--ink);border:1px solid var(--hair);border-radius:20px;}
-  .verify-banner{background:rgba(214,178,110,.12);border:1px solid var(--line);border-radius:14px;color:var(--ink);font-size:14px;}
-  .verify-banner a, .verify-banner button{color:var(--gold);font-weight:600;}
   .empty{border:1px dashed var(--line);border-radius:18px;font-size:14px;}
   /* texto miúdo do tempo da fonte mono: sobe pro mínimo legível */
   .section-sub, .stats-sub, .db-note, .legal-links, .streak-caption{font-size:12.5px;}
@@ -2814,7 +2803,7 @@ async function openPaywall(reason){
   title.textContent = 'MyK7+';
 
   if(!IS_NATIVE_APP){
-    body.innerHTML = `<div class="paywall"><p class="pw-lead">o MyK7+ é assinado pelo app do MyK7 na App Store ou na Play Store. quem assina lá fica com os benefícios aqui no site também.</p></div>`;
+    body.innerHTML = `<div class="paywall"><p class="pw-lead">o MyK7+ é assinado pelo app do MyK7 na App Store ou na Play Store.</p></div>`;
     overlay.classList.add('active');
     return;
   }
@@ -4042,7 +4031,6 @@ let gateSignupGenres = new Set();
 let notifPollInterval = null;
 let resetTokenFromUrl = new URLSearchParams(location.search).get('reset');
 if(resetTokenFromUrl) gateAuthMode = 'reset';
-const verifyTokenFromUrl = new URLSearchParams(location.search).get('verify');
 // quem chega por um card compartilhado (QR/link do story) vem com ?u=usuario:
 // já logado abre o perfil dessa pessoa; sem conta, cai direto no cadastro
 const sharedProfileFromUrl = new URLSearchParams(location.search).get('u');
@@ -4125,21 +4113,6 @@ function showToast(message, isError=false){
   el.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=> el.classList.remove('show'), 3500);
-}
-
-async function verifyEmailFromUrl(){
-  if(!verifyTokenFromUrl) return;
-  try{
-    const { message } = await apiFetch('/auth/verify-email', {
-      method: 'POST',
-      body: JSON.stringify({ token: verifyTokenFromUrl }),
-    });
-    showToast(message);
-    if(currentUser) currentUser.emailVerified = true;
-  }catch(e){
-    showToast(e.message, true);
-  }
-  history.replaceState(null, '', location.pathname);
 }
 
 // troca entre modo escuro (padrão) e modo claro, salvando a escolha
@@ -8350,12 +8323,6 @@ async function renderProfile(){
   const lastAlbum = last ? getItem(last.itemId) : null;
 
   body.innerHTML = `
-    ${!currentUser.emailVerified ? `
-      <div class="verify-banner">
-        <span>confirme seu e-mail (${escapeHtml(currentUser.email)}) pra garantir o acesso à sua conta.</span>
-        <button id="resendVerifyBtn">reenviar link</button>
-      </div>
-    ` : ''}
     ${renderStreakDisc()}
     ${wrappedEntryHtml()}
     <div class="account-card">
@@ -8540,17 +8507,6 @@ async function renderProfile(){
   const cxProfileBtn = document.getElementById('cxOpenFromProfile');
   if(cxProfileBtn) cxProfileBtn.addEventListener('click', openConnections);
 
-  const resendBtn = document.getElementById('resendVerifyBtn');
-  if(resendBtn) resendBtn.addEventListener('click', async ()=>{
-    resendBtn.disabled = true;
-    try{
-      const { message } = await apiFetch('/auth/resend-verification', { method: 'POST' });
-      showToast(message);
-    }catch(e){
-      showToast(e.message, true);
-    }
-    resendBtn.disabled = false;
-  });
   document.getElementById('tutorialBtn').addEventListener('click', ()=> startTutorial());
   document.getElementById('logoutBtn').addEventListener('click', async ()=>{
     await doLogout();
@@ -10326,7 +10282,6 @@ document.addEventListener('touchend', (e)=>{
   fetchLiveFeed();
   currentUser = await loadSession();
   initMonetization();
-  await verifyEmailFromUrl();
   if(currentUser) loadBlockedUsernames();
   renderAuthGate();
   await loadDiaryFromServer();
