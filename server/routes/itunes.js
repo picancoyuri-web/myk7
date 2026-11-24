@@ -26,6 +26,25 @@ async function fetchFromItunes(url){
 
 // o navegador não pode chamar itunes.apple.com direto por causa de CORS,
 // então esse endpoint só repassa a busca pro iTunes e devolve o resultado
+// uma fita pelo id do iTunes (link compartilhado /f?i=it123 num aparelho
+// que ainda não conhece essa fita)
+router.get('/lookup', async (req, res) => {
+  const id = String(req.query.id || '').trim();
+  if(!/^\d{1,15}$/.test(id)) return res.status(400).json({ error: 'id inválido.' });
+  const url = 'https://itunes.apple.com/lookup?' + new URLSearchParams({ id });
+  res.set('Cache-Control', 'public, max-age=86400');
+  const cached = cache.get(url);
+  if(cached && cached.expiresAt > Date.now()) return res.json({ results: cached.results });
+  try{
+    const results = await fetchFromItunes(url);
+    remember(url, results);
+    res.json({ results });
+  }catch(e){
+    console.error('lookup iTunes falhou:', e.message);
+    res.status(502).json({ error: 'não deu pra buscar essa fita agora.' });
+  }
+});
+
 router.get('/search', async (req, res) => {
   const term = String(req.query.term || '').trim().slice(0, 200);
   const entity = VALID_ENTITIES.has(req.query.entity) ? req.query.entity : 'album';

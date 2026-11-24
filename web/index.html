@@ -2050,6 +2050,10 @@
   .feed-filter-drawer .ftbtn{flex:1;min-height:44px;}
   .feed-filter-drawer .genre-bar{flex-wrap:wrap;overflow:visible;padding:0;border-bottom:none;background:none;}
   .feed-filter-drawer .gchip{min-height:40px;}
+  .feed-filter-drawer .gchip.has-subs::after{content:' ›';opacity:.6;}
+  .subgenre-box{flex-basis:100%;padding:12px;margin-bottom:6px;border-radius:16px;background:var(--surface, rgba(214,178,110,.08));border:1px solid var(--line);}
+  .subgenre-k{font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px;}
+  .subgenre-row{display:flex;flex-wrap:wrap;gap:8px;}
   .feed-filter-drawer .feed-refresh{display:block;width:100%;margin:22px 0 0;min-height:48px;font-size:14px;font-weight:600;border-radius:999px;}
 
   /* disco do dia: cabeçalho numa linha só e o play fora da fita */
@@ -3166,7 +3170,65 @@ const GENRE_SEARCH_TERMS = {
   "World Music": "world music", "Emo": "emo", "Grunge": "grunge", "Amapiano": "amapiano",
 };
 function searchTermForGenre(genre){
-  return GENRE_SEARCH_TERMS[genre] || genre.replace(/\//g, ' ');
+  return GENRE_SEARCH_TERMS[genre] || SUBGENRE_SEARCH_TERMS[genre] || genre.replace(/\//g, ' ').toLowerCase();
+}
+
+/* ---------- SUBGÊNEROS ----------
+   Cada gênero grande abre os estilos de dentro dele na gaveta de filtros.
+   A busca do iTunes é por texto, então cada subgênero tem o termo que
+   devolve resultado de verdade (ex: "mandelão" acha funk mandelão). */
+const SUBGENRES = {
+  "Hip-Hop/Rap": ["Rap Geek", "Rap Nacional", "Trap", "Drill", "Boom Bap", "Lo-fi Hip-Hop", "Phonk", "Grime", "Rap Gospel"],
+  "Funk": ["Funk Mandelão", "Funk Melody", "Funk Consciente", "Brega Funk", "Funk 150 BPM", "Funk Paulista", "Funk Proibidão"],
+  "Sertanejo": ["Sertanejo Universitário", "Modão", "Feminejo", "Arrocha", "Sertanejo Raiz"],
+  "Pop": ["Indie Pop", "Pop Rock", "Synthpop", "Dance Pop", "Hyperpop", "Pop Latino", "Pop Nacional"],
+  "Rock": ["Rock Nacional", "Pop Punk", "Emo", "Grunge", "Hard Rock", "Rock Clássico", "Shoegaze", "Post-Punk", "Punk"],
+  "Metal": ["Heavy Metal", "Metalcore", "Thrash Metal", "Nu Metal", "Black Metal", "Death Metal"],
+  "Eletrônica": ["House", "Techno", "Trance", "Dubstep", "Drum & Bass", "EDM", "Synthwave", "Tech House", "Amapiano"],
+  "R&B": ["Soul", "Neo-Soul", "R&B Alternativo", "R&B Nacional"],
+  "Reggaeton": ["Dembow", "Perreo", "Latin Trap", "Salsa", "Bachata", "Cumbia"],
+  "Samba": ["Samba de Raiz", "Samba-Enredo", "Samba Rock", "Bossa Nova"],
+  "Pagode": ["Pagode Anos 90", "Pagode Baiano", "Pagodão"],
+  "Forró": ["Piseiro", "Forró Pé de Serra", "Xote", "Forró Eletrônico"],
+  "Indie/Alternativo": ["Indie Rock", "Indie Folk", "Bedroom Pop", "Dream Pop", "Lo-fi"],
+  "K-Pop": ["J-Pop", "J-Rock", "Anime", "City Pop"],
+  "Gospel/Cristã": ["Louvor", "Worship", "Gospel Pentecostal", "Rap Gospel"],
+  "Jazz": ["Bossa Nova", "Smooth Jazz", "Jazz Fusion", "Blues"],
+  "Trilhas": ["Anime", "Games", "Filmes e Séries", "Musicais"],
+};
+const SUBGENRE_SEARCH_TERMS = {
+  "Rap Geek": "rap geek", "Rap Nacional": "rap nacional", "Lo-fi Hip-Hop": "lofi hip hop", "Rap Gospel": "rap gospel",
+  "Funk Mandelão": "mandelão", "Funk Melody": "funk melody", "Funk Consciente": "funk consciente", "Brega Funk": "brega funk",
+  "Funk 150 BPM": "funk 150 bpm", "Funk Paulista": "funk sp", "Funk Proibidão": "proibidão",
+  "Sertanejo Universitário": "sertanejo universitario", "Modão": "modão sertanejo", "Feminejo": "feminejo",
+  "Arrocha": "arrocha", "Sertanejo Raiz": "sertanejo raiz",
+  "Indie Pop": "indie pop", "Pop Rock": "pop rock", "Synthpop": "synthpop", "Dance Pop": "dance pop", "Hyperpop": "hyperpop",
+  "Pop Latino": "pop latino", "Pop Nacional": "pop brasil",
+  "Rock Nacional": "rock nacional", "Pop Punk": "pop punk", "Hard Rock": "hard rock", "Rock Clássico": "classic rock",
+  "Shoegaze": "shoegaze", "Post-Punk": "post punk",
+  "Heavy Metal": "heavy metal", "Metalcore": "metalcore", "Thrash Metal": "thrash metal", "Nu Metal": "nu metal",
+  "Black Metal": "black metal", "Death Metal": "death metal",
+  "Drum & Bass": "drum and bass", "EDM": "edm", "Tech House": "tech house",
+  "Neo-Soul": "neo soul", "R&B Alternativo": "alternative r&b", "R&B Nacional": "r&b brasil",
+  "Dembow": "dembow", "Perreo": "perreo", "Latin Trap": "latin trap",
+  "Samba de Raiz": "samba de raiz", "Samba-Enredo": "samba enredo", "Samba Rock": "samba rock",
+  "Pagode Anos 90": "pagode anos 90", "Pagode Baiano": "pagode baiano", "Pagodão": "pagodão",
+  "Forró Pé de Serra": "forró pé de serra", "Xote": "xote", "Forró Eletrônico": "forró eletrônico",
+  "Indie Rock": "indie rock", "Indie Folk": "indie folk", "Bedroom Pop": "bedroom pop", "Dream Pop": "dream pop",
+  "Anime": "anime opening", "City Pop": "city pop",
+  "Louvor": "louvor", "Worship": "worship", "Gospel Pentecostal": "gospel pentecostal",
+  "Smooth Jazz": "smooth jazz", "Jazz Fusion": "jazz fusion",
+  "Trilhas": "soundtrack", "Games": "video game soundtrack", "Filmes e Séries": "original motion picture soundtrack", "Musicais": "musical cast recording",
+};
+// gênero grande de um subgênero (o primeiro em que ele aparece)
+function parentGenre(chip){
+  if(SUBGENRES[chip]) return chip;
+  return Object.keys(SUBGENRES).find(k => SUBGENRES[k].includes(chip)) || null;
+}
+// gêneros que aparecem na linha principal da gaveta (os subgêneros ficam dentro do pai)
+function mainGenres(){
+  const subs = new Set(Object.values(SUBGENRES).flat());
+  return famousGenres.filter(g => !subs.has(g) || SUBGENRES[g]).concat(Object.keys(SUBGENRES).filter(k => !famousGenres.includes(k)));
 }
 
 /* ---------- PAÍSES ---------- */
@@ -3250,9 +3312,37 @@ function trendingFor(country, genre){
 // país usado pra buscar "em alta" — o da pessoa logada, ou "Global" se
 // a gente não tiver dados curados pro país dela ainda
 function trendCountryForUser(){
-  return (currentUser && currentUser.nationality && trendingByCountry[currentUser.nationality])
+  return (currentUser && currentUser.nationality && CHART_STOREFRONTS[currentUser.nationality])
     ? currentUser.nationality
     : 'Global';
+}
+
+// país do chart da Apple pra cada nacionalidade (sem chart: o dos EUA, como "Global")
+const CHART_STOREFRONTS = {
+  "Brasil": "br", "Estados Unidos": "us", "Portugal": "pt", "Reino Unido": "gb", "Espanha": "es",
+  "França": "fr", "Alemanha": "de", "Itália": "it", "Argentina": "ar", "México": "mx", "Colômbia": "co",
+  "Japão": "jp", "Coreia do Sul": "kr", "Índia": "in", "Canadá": "ca", "Austrália": "au",
+};
+function chartStorefront(){
+  return (currentUser && CHART_STOREFRONTS[currentUser.nationality]) || 'us';
+}
+// gênero do chart (em português, inglês ou espanhol, depende do país) → chip do app
+const CHART_GENRE_CHIPS = {
+  'sertanejo': 'Sertanejo', 'pop': 'Pop', 'k-pop': 'K-Pop', 'j-pop': 'J-Pop', 'rock': 'Rock', 'hard rock': 'Rock',
+  'metal': 'Metal', 'heavy metal': 'Metal', 'hip-hop/rap': 'Hip-Hop/Rap', 'rap': 'Hip-Hop/Rap', 'hip-hop': 'Hip-Hop/Rap',
+  'baile funk': 'Funk', 'funk': 'Funk', 'r&b/soul': 'R&B', 'r&b': 'R&B', 'soul': 'R&B',
+  'música latina': 'Reggaeton', 'latin': 'Reggaeton', 'latina': 'Reggaeton', 'urbano latino': 'Reggaeton', 'música urbana latina': 'Reggaeton',
+  'dance': 'Eletrônica', 'electronic': 'Eletrônica', 'eletrônica': 'Eletrônica', 'electrónica': 'Eletrônica', 'house': 'Eletrônica',
+  'alternativo': 'Indie/Alternativo', 'alternative': 'Indie/Alternativo', 'indie pop': 'Indie/Alternativo', 'indie rock': 'Indie/Alternativo',
+  'country': 'Country', 'jazz': 'Jazz', 'samba': 'Samba', 'pagode': 'Pagode', 'mpb': 'MPB', 'forró': 'Forró', 'axé': 'Axé',
+  'gospel': 'Gospel/Cristã', 'christian': 'Gospel/Cristã', 'cristã e gospel': 'Gospel/Cristã', 'cristã': 'Gospel/Cristã',
+  'afrobeats': 'Afrobeats', 'afro-beat': 'Afrobeats', 'afropop': 'Afrobeats', 'african': 'Afrobeats', 'reggae': 'Reggae',
+  'trilha sonora': 'Trilhas', 'soundtrack': 'Trilhas', 'anime': 'Anime', 'música do mundo': 'World Music', 'world': 'World Music',
+};
+function chartChipFor(r){
+  const names = [r.primaryGenreName].concat(r.chartGenres || []).filter(Boolean);
+  for(const n of names){ const chip = CHART_GENRE_CHIPS[normKey(n)]; if(chip) return chip; }
+  return names.find(n => !/^(música|music|musique|musik|musica)$/i.test(n)) || 'Música';
 }
 
 const reviewers = [
@@ -4154,6 +4244,7 @@ if(resetTokenFromUrl) gateAuthMode = 'reset';
 // quem chega por um card compartilhado (QR/link do story) vem com ?u=usuario:
 // já logado abre o perfil dessa pessoa; sem conta, cai direto no cadastro
 const sharedProfileFromUrl = new URLSearchParams(location.search).get('u');
+const sharedItemFromUrl = parseMyk7Link(location.href).item;
 if(sharedProfileFromUrl && !resetTokenFromUrl) gateAuthMode = 'cadastro';
 let currentUser = null;
 let blockedUsernames = new Set();
@@ -4220,7 +4311,7 @@ function absolutizeApiPaths(v){
 }
 
 let toastTimer = null;
-function showToast(message, isError=false){
+function showToast(message, isError=false, ms=3500){
   let el = document.getElementById('toast');
   if(!el){
     el = document.createElement('div');
@@ -4232,7 +4323,7 @@ function showToast(message, isError=false){
   el.classList.toggle('err', !!isError);
   el.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(()=> el.classList.remove('show'), 3500);
+  toastTimer = setTimeout(()=> el.classList.remove('show'), ms);
 }
 
 // troca entre modo escuro (padrão) e modo claro, salvando a escolha
@@ -5783,7 +5874,66 @@ function fetchLiveFeed(){
   renderFeed(); // mostra o estado de "buscando..." na hora
 
   if(feedMode === 'trending'){
-    const country = trendCountryForUser();
+    fetchWeeklyTrending(mySeq);
+    return;
+  }
+
+  const entity = feedMode === 'album' ? 'album' : 'song';
+  const wantedType = feedMode === 'album' ? 'album' : 'single';
+  fetchForYouFeed(mySeq, entity, wantedType);
+}
+
+// "Em alta": top 100 da semana no Apple Music do seu país (o servidor renova
+// toda segunda). Na frente, o que gente do seu país está curtindo no MyK7.
+function fetchWeeklyTrending(mySeq){
+  Promise.all([loadForYouSignals(), apiFetch(`/trending?country=${chartStorefront()}`).catch(() => null)])
+    .then(async ([, chart]) => {
+      if(mySeq !== feedFetchSeq) return;
+      const rows = chart && chart.results ? chart.results : [];
+      if(!rows.length){ fetchCuratedTrending(mySeq); return; }
+      let found = rows.map(r => {
+        const it = mapItunesResult(r);
+        if(it){ it.genre = chartChipFor(r); it.chartRank = r.rank; }
+        return it;
+      }).filter(it => it && it.previewUrl);
+      if(activeGenre !== 'all'){
+        found = found.filter(it => genreMatchesChip(it.genre, activeGenre) || normKey(it.genre) === normKey(activeGenre));
+        // subgênero quase nunca tem nome no chart: completa com a busca do estilo
+        if(found.length < 8){
+          const extra = (await itunesSearchJSONP(searchTermForGenre(activeGenre), 'song')).map(mapItunesResult)
+            .filter(it => it && it.type === 'single' && !found.some(f => f.id === it.id));
+          if(mySeq !== feedFetchSeq) return;
+          found = found.concat(extra.slice(0, 20 - found.length));
+        }
+      }
+      finishTrending(mySeq, found);
+    }).catch((err) => {
+      console.error('[Feed] erro ao buscar em alta:', err);
+      if(mySeq !== feedFetchSeq) return;
+      fetchCuratedTrending(mySeq);
+    });
+}
+
+function finishTrending(mySeq, found){
+  const seen = new Set(found.map(it => it.id));
+  const nearby = (forYouSignals ? forYouSignals.items : [])
+    .filter(s => s.why.nearbyCount > 0 && s.type !== 'album' && s.type !== 'playlist')
+    .filter(s => activeGenre === 'all' || genreMatchesChip(s.genre, activeGenre))
+    .sort((x, y) => y.why.nearbyCount - x.why.nearbyCount).slice(0, 10)
+    .map(s => ({ id: parseItemId(String(s.itemId)), title: s.title, artist: s.artist || '', genre: s.genre || 'Música',
+                 year: s.year || '', type: 'single', previewUrl: s.previewUrl || null, external: true }))
+    .filter(it => !seen.has(it.id));
+  found = nearby.concat(found);
+  feedLoading = false;
+  liveFeedItems = found;
+  found.forEach(item => { if(!allItems.some(x => x.id === item.id)) allItems.push(item); });
+  renderFeed();
+}
+
+// reserva: a lista curada à mão, se o chart não responder
+function fetchCuratedTrending(mySeq){
+  {
+    const country = trendingByCountry[trendCountryForUser()] ? trendCountryForUser() : 'Global';
     const genresForCountry = Object.keys(trendingByCountry[country]);
     // gênero específico escolhido na barra, ou todos os gêneros curados do país
     const wanted = (activeGenre !== 'all' && genresForCountry.includes(activeGenre))
@@ -5819,12 +5969,10 @@ function fetchLiveFeed(){
         feedLoading = false;
         renderFeed();
       });
-    return;
   }
+}
 
-  const entity = feedMode === 'album' ? 'album' : 'song';
-  const wantedType = feedMode === 'album' ? 'album' : 'single';
-
+function fetchForYouFeed(mySeq, entity, wantedType){
   (async () => {
     const sig = await loadForYouSignals();
     if(mySeq !== feedFetchSeq) return;
@@ -5900,6 +6048,7 @@ async function loadForYouSignals(force = false){
 function invalidateForYou(){ forYouAt = 0; }
 
 function genreMatchesChip(itemGenre, chip){
+  if(SUBGENRES[chip] && SUBGENRES[chip].some(sub => normKey(sub) === normKey(itemGenre))) return true;
   const g = normKey(itemGenre), t = normKey(searchTermForGenre(chip)), c = normKey(chip);
   if(!g) return false;
   return g.includes(t) || t.includes(g) || g.includes(c) || c.includes(g) || g.includes(t.split(' ')[0]);
@@ -5995,17 +6144,23 @@ function feedList(){
 
 function renderGenreBar(){
   const bar = document.getElementById('genreBar');
-  const genres = famousGenres;
-  bar.innerHTML = [`<button class="gchip ${activeGenre==='all'?'active':''}" data-genre="all">Todos</button>`]
-    .concat(genres.map(g => `<button class="gchip ${activeGenre===g?'active':''}" data-genre="${g}">${g}</button>`))
-    .join('');
+  const parent = activeGenre === 'all' ? null : parentGenre(activeGenre);
+  const chip = g => `<button class="gchip ${activeGenre===g?'active':''}" data-genre="${escapeHtml(g)}">${escapeHtml(g)}</button>`;
+  const subs = parent ? SUBGENRES[parent] : null;
+  bar.innerHTML = (subs ? `<div class="subgenre-box"><div class="subgenre-k">dentro de ${escapeHtml(parent)}</div><div class="subgenre-row">${[parent].concat(subs).map(chip).join('')}</div></div>` : '')
+    + [`<button class="gchip ${activeGenre==='all'?'active':''}" data-genre="all">Todos</button>`]
+      .concat(mainGenres().map(g => `<button class="gchip ${activeGenre===g || (parent===g && activeGenre!==g) ? 'active' : ''}${SUBGENRES[g] ? ' has-subs' : ''}" data-genre="${escapeHtml(g)}">${escapeHtml(g)}</button>`))
+      .join('');
   bar.querySelectorAll('.gchip').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      activeGenre = btn.dataset.genre;
+      const picked = btn.dataset.genre;
+      const opensSubs = SUBGENRES[picked] && !btn.closest('.subgenre-box') && activeGenre !== picked;
+      activeGenre = picked;
       renderGenreBar();
       fetchLiveFeed();
       updateFeedFilterDot();
-      closeFeedFilter();
+      if(opensSubs) document.getElementById('genreBar').scrollIntoView({ block: 'nearest' });
+      else closeFeedFilter();
     });
   });
 }
@@ -6068,7 +6223,7 @@ function renderFeed(){
     const promo = adsActive() && i > 0 && i % MONETIZATION.promoEvery === 0 ? promoCardHtml() : '';
     return promo + `
     <div class="feed-card" data-item-id="${a.id}" style="${discGradient(a)}">
-      ${feedMode === 'trending' ? `<div class="fc-trending">🔥 Em alta · ${escapeHtml(trendCountryForUser())}</div>` : (trendingIds.includes(a.id) ? '<div class="fc-trending">🔥 Em alta</div>' : (whyTag ? `<div class="fc-trending fc-why">✦ ${whyTag}</div>` : ''))}
+      ${feedMode === 'trending' ? `<div class="fc-trending">🔥 ${a.chartRank ? `#${a.chartRank} ` : ''}em alta · ${escapeHtml(trendCountryForUser())}</div>` : (trendingIds.includes(a.id) ? '<div class="fc-trending">🔥 Em alta</div>' : (whyTag ? `<div class="fc-trending fc-why">✦ ${whyTag}</div>` : ''))}
       <div class="fc-eyebrow">${typeLabel(a)} · ${escapeHtml(a.genre)}</div>
       <div class="fc-disc" style="${discGradient(a)}">
         <div class="hole"></div>
@@ -6878,6 +7033,43 @@ function appShareLink(username){
   return username ? `${APP_URL}/?u=${encodeURIComponent(username)}` : `${APP_URL}/`;
 }
 
+// link de uma fita: quem tem o app abre direto nela (App Links), quem não tem
+// cai no site, que abre a mesma fita e oferece baixar o app
+function itemShareLink(item, username){
+  const q = new URLSearchParams({ i: String(item.id) });
+  if(username) q.set('u', username);
+  return `${APP_URL}/f?${q}`;
+}
+
+// lê um link do MyK7 (/f?i=...&u=...) e diz o que abrir
+function parseMyk7Link(href){
+  try{
+    const u = new URL(href, APP_URL);
+    return { item: u.pathname.replace(/\/+$/, '') === '/f' ? u.searchParams.get('i') : null, user: u.searchParams.get('u') };
+  }catch(e){ return { item: null, user: null }; }
+}
+
+// fita que ainda não está na memória do aparelho: busca no iTunes pelo id
+async function ensureItem(rawId){
+  const id = parseItemId(String(rawId));
+  const known = getItem(id);
+  if(known) return known;
+  const m = /^it(\d+)$/.exec(String(rawId));
+  if(!m) return null;
+  try{
+    const { results } = await apiFetch(`/itunes/lookup?id=${m[1]}`);
+    const found = (results || []).map(mapItunesResult).find(x => x && x.id === rawId);
+    if(found && !getItem(found.id)) allItems.push(found);
+    return found || null;
+  }catch(e){ return null; }
+}
+
+async function openSharedItem(rawId){
+  const item = await ensureItem(rawId);
+  if(item) openItemDetail(item.id);
+  else showToast('não deu pra abrir essa fita agora.', true);
+}
+
 // a marca MyK7 desenhada no canvas: o nome inteiro em Inter 800 com
 // tracking negativo (o lockup novo), centralizada em cx com a linha de base em y
 function brandWordmarkFont(size){ return `800 ${size}px "Inter", sans-serif`; }
@@ -7288,7 +7480,7 @@ function drawStoryHeader(ctx, kicker){
 
 // rodapé: o "call to action" de quem vê o story — QR code que abre o MyK7
 // (no perfil de quem postou), o endereço bem grande e uma frase do card
-function drawStoryFooter(ctx, line, username){
+function drawStoryFooter(ctx, line, username, link){
   const W = CARD_W;
   const x = 80, y = STORY_FOOTER_Y, w = W - 160, h = 184, r = 40;
 
@@ -7324,7 +7516,7 @@ function drawStoryFooter(ctx, line, username){
   ctx.fillStyle = '#F6EFE3';
   ctxRoundRect(ctx, tx, ty, tile, tile, 24);
   ctx.fill();
-  if(!drawQrCode(ctx, appShareLink(username), tx + 14, ty + 14, tile - 28)){
+  if(!drawQrCode(ctx, link || appShareLink(username), tx + 14, ty + 14, tile - 28)){
     drawAppIcon(ctx, tx + 14, ty + 14, tile - 28);
   }
 
@@ -7437,7 +7629,7 @@ function cardDate(d = new Date()){
 }
 
 // card de uma música/álbum (com nota e resenha, se tiver)
-async function generateSongShareCard({ title, artist, rating, hue, note, username, typeLabel: kind, year, genre }){
+async function generateSongShareCard({ title, artist, rating, hue, note, username, typeLabel: kind, year, genre, link }){
   await ensureCardFonts();
   const { canvas, ctx } = newCard();
   const W = CARD_W;
@@ -7512,7 +7704,7 @@ async function generateSongShareCard({ title, artist, rating, hue, note, usernam
     return y;
   });
 
-  drawStoryFooter(ctx, 'registre o que você ouve · grátis', username);
+  drawStoryFooter(ctx, 'registre o que você ouve · grátis', username, link);
   return cardToBlob(canvas);
 }
 
@@ -7776,6 +7968,7 @@ async function shareImageBlob(blob, { filename, shareTitle, shareText, link }){
   // app das lojas: o WebView do Android não tem navigator.share — usa a
   // folha de compartilhar nativa (grava a imagem no cache e manda o arquivo)
   const plugins = IS_NATIVE_APP && window.Capacitor.Plugins;
+  if(copied) showToast('link copiado 🔗 no story, toque no sticker "Link" e cole — quem tocar abre essa fita no MyK7.', false, 7000);
   if(plugins && plugins.Share && plugins.Filesystem){
     try{
       const data = await new Promise((resolve, reject) => {
@@ -7786,7 +7979,6 @@ async function shareImageBlob(blob, { filename, shareTitle, shareText, link }){
       });
       const { uri } = await plugins.Filesystem.writeFile({ path: filename, data, directory: 'CACHE' });
       await plugins.Share.share({ title: shareTitle, text: `${shareText}\n${link}`, files: [uri], dialogTitle: shareTitle });
-      if(copied) showToast('link do MyK7 copiado — no story, cole no sticker "Link" pra levar a galera pro app.');
     }catch(e){
       // cancelou a folha de compartilhar — sem problema
       if(!/cancel/i.test(String(e && e.message))) console.warn('compartilhar falhou:', e);
@@ -7797,7 +7989,6 @@ async function shareImageBlob(blob, { filename, shareTitle, shareText, link }){
   if(navigator.canShare && navigator.canShare({ files: [file] })){
     try{
       await navigator.share({ files: [file], title: shareTitle, text: `${shareText}\n${link}` });
-      if(copied) showToast('link do MyK7 copiado — no story, cole no sticker "Link" pra levar a galera pro app.');
     }catch(e){
       // usuário cancelou a folha de compartilhamento — sem problema
     }
@@ -7821,15 +8012,16 @@ async function shareSongCard(item, rating, btn, { note, username } = {}){
   if(btn) btn.disabled = true;
   try{
     const hue = hueForItem(item);
+    const link = itemShareLink(item, username);
     const blob = await generateSongShareCard({
-      title: item.title, artist: item.artist, rating: rating || 0, hue, note, username,
+      title: item.title, artist: item.artist, rating: rating || 0, hue, note, username, link,
       typeLabel: typeLabel(item), year: item.year ? String(item.year) : '', genre: item.genre && item.genre !== 'Música' ? item.genre : '',
     });
     await shareImageBlob(blob, {
       filename: 'myk7.png',
       shareTitle: `${item.title} — ${item.artist}`,
       shareText: `Ouvindo "${item.title}" de ${item.artist} 🎧 via MyK7`,
-      link: appShareLink(username),
+      link,
     });
   }catch(e){
     console.error('não deu pra gerar o card de compartilhamento:', e.message);
@@ -9629,7 +9821,7 @@ async function generateMomentShareCard(p, item){
     ctx.fillText(a.lines[0] || '', W / 2, y);
   }
 
-  drawStoryFooter(ctx, 'poste o seu momento · grátis', p.username);
+  drawStoryFooter(ctx, 'poste o seu momento · grátis', p.username, item.id != null ? itemShareLink(item, p.username) : null);
   return cardToBlob(canvas);
 }
 
@@ -9644,7 +9836,7 @@ async function shareMoment(id, btn){
       filename: 'myk7-momento.png',
       shareTitle: 'Um momento no MyK7',
       shareText: `📷🎧 ouvindo "${item.title}"${item.artist ? ` de ${item.artist}` : ''} — via MyK7`,
-      link: appShareLink(p.username),
+      link: item.id != null ? itemShareLink(item, p.username) : appShareLink(p.username),
     });
   }catch(e){
     console.error('[Momentos] card:', e);
@@ -10456,11 +10648,30 @@ document.addEventListener('touchend', (e)=>{
   };
   viewFromHash();
   window.addEventListener('hashchange', viewFromHash);
-  if(currentUser && sharedProfileFromUrl){
+  if(currentUser && sharedItemFromUrl){
+    history.replaceState(null, '', '/' + location.hash);
+    openSharedItem(sharedItemFromUrl);
+  } else if(currentUser && sharedProfileFromUrl){
     history.replaceState(null, '', location.pathname + location.hash);
     if(sharedProfileFromUrl !== currentUser.username) openPersonProfile(sharedProfileFromUrl);
   } else if(currentUser){
     maybeStartTutorial();
+  }
+
+  // app das lojas aberto por um link do MyK7 (story, WhatsApp, QR):
+  // abre a fita ou o perfil do link, com o app frio ou já aberto
+  const AppPlugin = nativePlugin('App');
+  if(AppPlugin){
+    let lastLink = null; // no app frio o link chega pelos dois caminhos
+    const openLink = (url) => {
+      if(!url || !currentUser || url === lastLink) return;
+      lastLink = url;
+      const link = parseMyk7Link(url);
+      if(link.item) openSharedItem(link.item);
+      else if(link.user && link.user !== currentUser.username) openPersonProfile(link.user);
+    };
+    AppPlugin.addListener('appUrlOpen', (e) => openLink(e && e.url));
+    if(AppPlugin.getLaunchUrl) AppPlugin.getLaunchUrl().then(r => openLink(r && r.url)).catch(() => {});
   }
 })();
 </script>

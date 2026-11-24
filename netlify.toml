@@ -16,3 +16,11 @@
   status = 200
   force = true
   signed = "NETLIFY_PROXY_SECRET"
+
+# link de uma fita compartilhada (/f?i=...): o próprio app abre a fita.
+# No celular com o MyK7 instalado, o Android abre o app em vez do site
+# (App Links, ver web/.well-known/assetlinks.json).
+[[redirects]]
+  from = "/f"
+  to = "/index.html"
+  status = 200
