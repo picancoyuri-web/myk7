@@ -999,7 +999,7 @@
 
   /* ---------- DRAWER ---------- */
   .overlay{
-    position:fixed;inset:0;background:rgba(21,18,13,0.45);display:none;
+    position:fixed;inset:0;bottom:var(--ad-h, 0px);background:rgba(21,18,13,0.45);display:none;
     align-items:flex-end;justify-content:center;z-index:800;
   }
   .overlay.active{display:flex;}
@@ -2667,10 +2667,38 @@ async function initAds(){
     await AdMob.initialize({ initializeForTesting: MONETIZATION.adsTestMode, maxAdContentRating: 'Teen' });
     AdMob.addListener('bannerAdSizeChanged', (size) => setAdHeight(monet.bannerOn ? size.height : 0));
     AdMob.addListener('bannerAdFailedToLoad', () => setAdHeight(0));
+    watchKeyboardForBanner(AdMob);
     monet.adsReady = true;
   }catch(e){
     console.warn('anúncios indisponíveis:', e);
   }
+}
+
+// o banner é nativo e fica colado em cima do teclado, cobrindo o campo de
+// digitar (chat, comentários, resenha). Some enquanto o teclado está aberto.
+function isTypingField(el){
+  return el && (el.tagName === 'TEXTAREA' || el.isContentEditable ||
+    (el.tagName === 'INPUT' && !/^(checkbox|radio|button|submit|range|file|color)$/i.test(el.type)));
+}
+function watchKeyboardForBanner(AdMob){
+  let hidden = false, adH = '0px';
+  document.addEventListener('focusin', async (e) => {
+    if(!monet.bannerOn || hidden || !isTypingField(e.target)) return;
+    hidden = true;
+    adH = getComputedStyle(document.documentElement).getPropertyValue('--ad-h') || '0px';
+    document.documentElement.style.setProperty('--ad-h', '0px');
+    try{ await AdMob.hideBanner(); }catch(err){}
+  });
+  document.addEventListener('focusout', () => {
+    // espera o foco ir pro próximo campo antes de decidir se o teclado fechou
+    setTimeout(async () => {
+      if(!hidden || isTypingField(document.activeElement)) return;
+      hidden = false;
+      if(!monet.bannerOn) return;
+      document.documentElement.style.setProperty('--ad-h', adH);
+      try{ await AdMob.resumeBanner(); }catch(err){}
+    }, 150);
+  });
 }
 
 async function refreshBanner(){
