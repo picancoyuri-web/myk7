@@ -7044,7 +7044,7 @@ function itemShareLink(item, username){
 // lê um link do MyK7 (/f?i=...&u=...) e diz o que abrir
 function parseMyk7Link(href){
   try{
-    const u = new URL(href, APP_URL);
+    const u = new URL(href, location.href); // roda antes de APP_URL existir (leitura do link na abertura)
     return { item: u.pathname.replace(/\/+$/, '') === '/f' ? u.searchParams.get('i') : null, user: u.searchParams.get('u') };
   }catch(e){ return { item: null, user: null }; }
 }
