@@ -56,8 +56,9 @@ router.post('/', requireAuth, async (req, res) => {
     const r = await fetch('https://api.audd.io/', { method: 'POST', body: form, signal: AbortSignal.timeout(25000) });
     const data = await r.json().catch(() => null);
     if(!data || data.status !== 'success'){
-      console.warn('[identificar] AudD:', data && data.error ? data.error.error_message : r.status);
-      return res.status(502).json({ error: 'não deu pra identificar agora — tenta de novo.' });
+      const why = data && data.error ? `${data.error.error_code}: ${data.error.error_message}` : `HTTP ${r.status}`;
+      console.warn('[identificar] AudD:', why);
+      return res.status(502).json({ error: 'não deu pra identificar agora — tenta de novo.', detail: why });
     }
     // conta só o que chegou ao AudD (é o que custa)
     db.prepare(`
@@ -81,7 +82,7 @@ router.post('/', requireAuth, async (req, res) => {
     });
   }catch(e){
     console.warn('[identificar] falhou:', e.message);
-    res.status(502).json({ error: 'não deu pra identificar agora — tenta de novo.' });
+    res.status(502).json({ error: 'não deu pra identificar agora — tenta de novo.', detail: e.message });
   }
 });
 
