@@ -49,6 +49,9 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- "que música é essa?": grava alguns segundos pra identificar a música -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <!-- "Cidade e contatos" (opcional, a pessoa escolhe na tela): só a localização
          APROXIMADA (nunca a precisa) e leitura dos contatos pra achar amigos no MyK7 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />

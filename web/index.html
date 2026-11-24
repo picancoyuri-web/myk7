@@ -2040,6 +2040,28 @@
   .fc-artist-band{font-size:13px;font-weight:500;}
   .fc-artist-photo-wrap{background:linear-gradient(135deg,#3A2F22,#1A140D);box-shadow:0 0 0 1px var(--line), 0 24px 60px rgba(0,0,0,.45);}
 
+  /* identificar música */
+  .identify-btn{
+    display:flex;align-items:center;gap:14px;width:100%;margin:4px 0 16px;padding:14px 16px;text-align:left;cursor:pointer;
+    border-radius:18px;border:1px solid rgba(214,178,110,.4);background:linear-gradient(160deg, rgba(214,178,110,.16), rgba(214,178,110,.04));color:var(--ink);
+  }
+  .identify-btn b{display:block;font-size:16px;font-weight:800;letter-spacing:-0.01em;}
+  .identify-btn small{display:block;font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+  .identify-ic{flex:none;width:46px;height:46px;border-radius:50%;background:var(--gold);color:#0D0B09;display:flex;align-items:center;justify-content:center;}
+  .identify-ic svg{width:22px;height:22px;}
+  .idf{display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 0 6px;gap:12px;}
+  .idf-orb{width:120px;height:120px;border-radius:50%;background:var(--gold);color:#0D0B09;display:flex;align-items:center;justify-content:center;position:relative;}
+  .idf-orb svg{width:46px;height:46px;}
+  .idf-orb.listening::before, .idf-orb.listening::after{content:'';position:absolute;inset:0;border-radius:50%;border:2px solid var(--gold);animation:idfPulse 1.8s ease-out infinite;}
+  .idf-orb.listening::after{animation-delay:.9s;}
+  @keyframes idfPulse{from{transform:scale(1);opacity:.7;}to{transform:scale(1.7);opacity:0;}}
+  @media (prefers-reduced-motion: reduce){ .idf-orb.listening::before, .idf-orb.listening::after{animation:none;} }
+  .idf-t{font-size:17px;font-weight:700;color:var(--ink);}
+  .idf-s{font-size:13.5px;color:var(--ink-soft);max-width:300px;}
+  .idf-bar{width:200px;height:4px;border-radius:2px;background:var(--line);overflow:hidden;}
+  .idf-bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .25s linear;}
+  .idf .primary, .idf .ghost{min-width:200px;}
+
   /* filtros do feed (gaveta) */
   .feed-filter-btn{display:none;}
   body.view-foryou .feed-filter-btn{display:flex;}
@@ -2382,6 +2404,10 @@
   <section id="buscar" class="view">
     <h2 class="section-title">Buscar</h2>
     <p class="section-sub">procure músicas, álbuns e artistas</p>
+    <button type="button" class="identify-btn" id="identifyBtn">
+      <span class="identify-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>
+      <span><b>Que música é essa?</b><small>o MyK7 escuta uns segundos e descobre</small></span>
+    </button>
     <div class="search-box">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" id="searchInput" placeholder="nome da música ou álbum...">
@@ -2845,6 +2871,112 @@ async function sendPushToken(){
     await apiFetch('/notifications/push-token', { method: 'POST', body: JSON.stringify({ token: push.token, platform: NATIVE_PLATFORM }) });
   }catch(e){ /* tenta de novo na próxima abertura */ }
 }
+
+/* ============================================================
+   QUE MÚSICA É ESSA? — grava ~9 s pelo microfone, o servidor pergunta ao
+   AudD e o app abre a fita encontrada (pronta pra dar nota). Quem não é
+   MyK7+ tem algumas por dia (o servidor conta).
+   ============================================================ */
+const IDENTIFY_SECONDS = 9;
+const MIC_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+
+function identifyScreen(html){
+  const overlay = document.getElementById('followListOverlay');
+  document.getElementById('followListTitle').textContent = 'Que música é essa?';
+  document.getElementById('followListBody').innerHTML = `<div class="idf">${html}</div>`;
+  overlay.classList.add('active');
+  return document.getElementById('followListBody');
+}
+function identifyOpen(){ return document.getElementById('followListOverlay').classList.contains('active'); }
+
+function blobToBase64(blob){
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).split(',')[1] || '');
+    r.onerror = reject;
+    r.readAsDataURL(blob);
+  });
+}
+
+async function identifySong(){
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder){
+    showToast('esse aparelho não deixa gravar áudio aqui.', true);
+    return;
+  }
+  identifyScreen(`<div class="idf-orb">${MIC_SVG}</div><div class="idf-t">pedindo o microfone…</div>`);
+  let stream;
+  try{
+    // sem filtros de voz: eles "limpam" a música e atrapalham o reconhecimento
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+  }catch(e){
+    identifyScreen(`<div class="idf-orb">${MIC_SVG}</div><div class="idf-t">o MyK7 precisa do microfone</div>
+      <div class="idf-s">libere o microfone nas permissões do app pra identificar músicas. o áudio só é usado pra descobrir a música e não fica guardado.</div>`);
+    return;
+  }
+
+  const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'].find(m => MediaRecorder.isTypeSupported(m)) || '';
+  const rec = new MediaRecorder(stream, mime ? { mimeType: mime, audioBitsPerSecond: 64000 } : {});
+  const chunks = [];
+  rec.ondataavailable = (e) => { if(e.data && e.data.size) chunks.push(e.data); };
+  const body = identifyScreen(`<div class="idf-orb listening">${MIC_SVG}</div><div class="idf-t">ouvindo…</div>
+    <div class="idf-s">aproxime o celular de onde a música está tocando</div><div class="idf-bar"><i id="idfBar"></i></div>`);
+  const started = Date.now();
+  stopFeedAutoplay();
+  rec.start();
+  await new Promise((done) => {
+    rec.onstop = done;
+    const tick = setInterval(() => {
+      const bar = document.getElementById('idfBar');
+      const frac = Math.min(1, (Date.now() - started) / (IDENTIFY_SECONDS * 1000));
+      if(bar) bar.style.width = `${Math.round(frac * 100)}%`;
+      // fechou a gaveta = desistiu; terminou o tempo = manda
+      if(!identifyOpen() || frac >= 1){ clearInterval(tick); if(rec.state !== 'inactive') rec.stop(); }
+    }, 250);
+  });
+  stream.getTracks().forEach(t => t.stop());
+  if(!identifyOpen()) return;
+
+  identifyScreen(`<div class="idf-orb">${MIC_SVG}</div><div class="idf-t">procurando a música…</div>`);
+  try{
+    const blob = new Blob(chunks, { type: (rec.mimeType || mime || 'audio/webm') });
+    const audio = await blobToBase64(blob);
+    const { match, remaining } = await apiFetch('/identify', { method: 'POST', body: JSON.stringify({ audio, mime: blob.type }) });
+    if(!identifyOpen()) return;
+    const left = remaining == null ? '' : ` · ${remaining} ${remaining === 1 ? 'identificação restante' : 'identificações restantes'} hoje`;
+    if(!match){
+      const b = identifyScreen(`<div class="idf-orb">${MIC_SVG}</div><div class="idf-t">não reconheci essa</div>
+        <div class="idf-s">tenta mais perto do som, num trecho com menos conversa${escapeHtml(left)}</div>
+        <button type="button" class="primary" id="idfAgain">tentar de novo</button>`);
+      b.querySelector('#idfAgain').addEventListener('click', identifySong);
+      return;
+    }
+    let item = match.itunesId ? await ensureItem('it' + match.itunesId) : null;
+    if(!item){
+      const found = (await itunesSearchJSONP(`${match.title} ${match.artist}`, 'song')).map(mapItunesResult).filter(Boolean);
+      item = found[0] || null;
+      if(item && !getItem(item.id)) allItems.push(item);
+    }
+    document.getElementById('followListOverlay').classList.remove('active');
+    if(item){
+      openItemDetail(item.id);
+      showToast(`achei: ${match.title} — ${match.artist}${left}`, false, 5000);
+    }else{
+      showToast(`é ${match.title} — ${match.artist}${left}`, false, 6000);
+    }
+  }catch(e){
+    if(!identifyOpen()) return;
+    const b = identifyScreen(`<div class="idf-orb">${MIC_SVG}</div><div class="idf-t">${escapeHtml(e.message)}</div>
+      ${e.status === 429 ? '<button type="button" class="primary" id="idfPlus">conhecer o MyK7+</button>' : '<button type="button" class="primary" id="idfAgain">tentar de novo</button>'}`);
+    const plus = b.querySelector('#idfPlus');
+    if(plus) plus.addEventListener('click', () => openPaywall('identifique músicas sem limite com o MyK7+'));
+    const again = b.querySelector('#idfAgain');
+    if(again) again.addEventListener('click', identifySong);
+  }
+}
+document.getElementById('identifyBtn').addEventListener('click', () => {
+  if(!currentUser){ showToast('entre na sua conta pra identificar músicas.', true); return; }
+  identifySong();
+});
 
 async function initPush(){
   const P = nativePlugin('PushNotifications');
