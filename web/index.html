@@ -5897,7 +5897,9 @@ function fetchWeeklyTrending(mySeq){
         return it;
       }).filter(it => it && it.previewUrl);
       if(activeGenre !== 'all'){
-        found = found.filter(it => genreMatchesChip(it.genre, activeGenre) || normKey(it.genre) === normKey(activeGenre));
+        // subgênero (Rap Geek, Funk Mandelão...) não aparece com esse nome no chart: só a busca do estilo
+        const isSub = !SUBGENRES[activeGenre] && parentGenre(activeGenre);
+        found = isSub ? [] : found.filter(it => genreMatchesChip(it.genre, activeGenre) || normKey(it.genre) === normKey(activeGenre));
         // subgênero quase nunca tem nome no chart: completa com a busca do estilo
         if(found.length < 8){
           const extra = (await itunesSearchJSONP(searchTermForGenre(activeGenre), 'song')).map(mapItunesResult)
