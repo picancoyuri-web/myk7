@@ -89,7 +89,7 @@
     background:var(--rust);color:#F6EFE3;padding:6px 14px;border-radius:20px;margin-bottom:12px;
     box-shadow:0 4px 14px rgba(214,178,110,.35);
   }
-  .feed-card.daily-card{height:auto;min-height:calc(100vh - 212px - var(--ad-h, 0px));padding:22px 20px 112px;justify-content:flex-start;}
+  .feed-card.daily-card{height:auto;min-height:calc(100vh - var(--feed-top, 212px) - var(--ad-h, 0px));padding:22px 20px 112px;justify-content:flex-start;}
   .feed-card.daily-card .fc-disc{width:min(60vw,240px);margin-bottom:12px;}
   .feed-card.daily-card.rated .fc-disc{width:min(42vw,160px);margin-bottom:8px;}
   .feed-card.daily-card.rated .fc-artist{margin-bottom:10px;}
@@ -405,13 +405,13 @@
   }
   .gchip.active{background:var(--teal);color:#F6EFE3;border-color:var(--teal);}
   .feed-scroll{
-    height:calc(100vh - 212px - var(--ad-h, 0px));
+    height:calc(100vh - var(--feed-top, 212px) - var(--ad-h, 0px));
     overflow-y:scroll;scroll-snap-type:y mandatory;
     scrollbar-width:none;
   }
   .feed-scroll::-webkit-scrollbar{display:none;}
   .feed-card{
-    height:calc(100vh - 212px - var(--ad-h, 0px));
+    height:calc(100vh - var(--feed-top, 212px) - var(--ad-h, 0px));
     scroll-snap-align:start;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     position:relative;padding:20px;cursor:pointer;
@@ -2040,6 +2040,33 @@
   .fc-artist-band{font-size:13px;font-weight:500;}
   .fc-artist-photo-wrap{background:linear-gradient(135deg,#3A2F22,#1A140D);box-shadow:0 0 0 1px var(--line), 0 24px 60px rgba(0,0,0,.45);}
 
+  /* filtros do feed (gaveta) */
+  .feed-filter-btn{display:none;}
+  body.view-foryou .feed-filter-btn{display:flex;}
+  .filter-dot, .nav-dot{position:absolute;top:7px;right:7px;width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 2px var(--paper);}
+  .filter-dot[hidden], .nav-dot[hidden]{display:none;}
+  .bottom-nav button{position:relative;}
+  .feed-filter-drawer .feed-toggle{padding:0;justify-content:stretch;background:none;}
+  .feed-filter-drawer .ftbtn{flex:1;min-height:44px;}
+  .feed-filter-drawer .genre-bar{flex-wrap:wrap;overflow:visible;padding:0;border-bottom:none;background:none;}
+  .feed-filter-drawer .gchip{min-height:40px;}
+  .feed-filter-drawer .feed-refresh{display:block;width:100%;margin:22px 0 0;min-height:48px;font-size:14px;font-weight:600;border-radius:999px;}
+
+  /* disco do dia: cabeçalho numa linha só e o play fora da fita */
+  .daily-head{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;font-size:13px;margin-bottom:14px;}
+  .daily-head b{color:var(--gold);font-weight:700;}
+  .daily-head span{color:var(--ink-soft);}
+  .daily-meta{display:flex;align-items:center;gap:14px;width:min(100%,340px);margin:6px auto 16px;text-align:left;}
+  .daily-meta > div{flex:1;min-width:0;}
+  .daily-title{font-size:21px;font-weight:800;letter-spacing:-0.02em;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .daily-meta .fc-artist{font-size:14px;font-weight:500;color:var(--ink-soft);margin:3px 0 0 !important;}
+  .daily-play{
+    flex:none;width:52px;height:52px;border-radius:50%;cursor:pointer;
+    background:#0D0B09;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;
+    box-shadow:0 6px 18px rgba(0,0,0,.3);
+  }
+  .daily-play svg{width:42%;height:42%;}
+
   /* disco do dia */
   .daily-badge{
     font-size:12.5px;font-weight:700;color:var(--gold);background:rgba(214,178,110,.13);
@@ -2283,6 +2310,10 @@
         </button>
         <div class="tagline">um diário de escuta, não de streams</div>
       </div>
+      <button class="top-notif-btn feed-filter-btn" id="feedFilterBtn" type="button" aria-label="Filtrar o feed">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+        <span class="filter-dot" id="feedFilterDot" hidden></span>
+      </button>
       <button class="top-notif-btn" data-view="notifications" aria-label="Notificações">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         <span class="nav-badge" id="notifBadge" style="display:none;">0</span>
@@ -2297,15 +2328,25 @@
 </header>
 
 <section id="foryou" class="view active feed-view">
-  <div class="feed-toggle">
-    <button class="ftbtn active" data-mode="album">Álbuns</button>
-    <button class="ftbtn" data-mode="single">Músicas</button>
-    <button class="ftbtn" data-mode="trending">🔥 Em Alta</button>
-  </div>
-  <div class="genre-bar" id="genreBar"></div>
-  <button class="feed-refresh" id="feedRefreshBtn" type="button">🔄 buscar novas fitas</button>
   <div class="feed-scroll" id="feedScroll"></div>
 </section>
+
+<!-- filtros do feed: ficam numa gaveta pra deixar o topo limpo -->
+<div class="overlay" id="feedFilterOverlay">
+  <div class="drawer feed-filter-drawer" role="dialog" aria-modal="true" aria-labelledby="feedFilterTitle">
+    <button class="close-x" id="feedFilterCloseX" aria-label="Fechar">✕</button>
+    <h3 id="feedFilterTitle">Filtrar o feed</h3>
+    <div class="field-label">Tipo</div>
+    <div class="feed-toggle">
+      <button class="ftbtn active" data-mode="album">Álbuns</button>
+      <button class="ftbtn" data-mode="single">Músicas</button>
+      <button class="ftbtn" data-mode="trending">🔥 Em Alta</button>
+    </div>
+    <div class="field-label">Gênero</div>
+    <div class="genre-bar" id="genreBar"></div>
+    <button class="feed-refresh" id="feedRefreshBtn" type="button">🔄 buscar novas fitas</button>
+  </div>
+</div>
 
 <div class="wrap">
 
@@ -3581,15 +3622,19 @@ function dailyCardInner(){
   `;
 
   return `
-    <div class="daily-badge">☀️ disco do dia #${dailyNumber()}</div>
-    <div class="fc-eyebrow">todo mundo ouve o mesmo disco hoje</div>
+    <div class="daily-head">☀️ <b>disco do dia #${dailyNumber()}</b><span>· o mesmo pra todo mundo</span></div>
     <div class="fc-disc daily-disc" style="${discGradient(item)}" id="dailyDisc">
       <div class="hole"></div>
       <div class="tape-name">${escapeHtml(item.title)}</div>
       <div class="fc-eq"><span></span><span></span><span></span></div>
-      ${hasPreview(item) ? `<button class="fc-disc-spotify" id="dailyPlayBtn" aria-label="Ouvir um trecho">${PLAY_ICON_SVG}</button>` : ''}
     </div>
-    <div class="fc-artist">${escapeHtml(item.artist)} · ${escapeHtml(String(item.year || ''))}</div>
+    <div class="daily-meta">
+      <div>
+        <div class="daily-title">${escapeHtml(item.title)}</div>
+        <div class="fc-artist">${escapeHtml(item.artist)}${item.year ? ` · ${escapeHtml(String(item.year))}` : ''}</div>
+      </div>
+      ${hasPreview(item) ? `<button class="daily-play" id="dailyPlayBtn" aria-label="Ouvir um trecho">${PLAY_ICON_SVG}</button>` : ''}
+    </div>
     ${reveal}
   `;
 }
@@ -3738,15 +3783,18 @@ function checkNewBadges(){
   fresh.forEach((b, i) => setTimeout(() => showBadgeUnlock(b), 600 + i * 3200));
 }
 
+// conquista nova não flutua mais por cima do feed: acende um ponto no Perfil
+function setProfileDot(on){
+  const btn = document.querySelector('.bottom-nav [data-view="profile"]');
+  if(!btn) return;
+  let dot = btn.querySelector('.nav-dot');
+  if(!dot){ dot = document.createElement('span'); dot.className = 'nav-dot'; btn.appendChild(dot); }
+  dot.hidden = !on;
+  btn.setAttribute('aria-label', on ? 'Perfil, nova conquista' : 'Perfil');
+}
 function showBadgeUnlock(b){
-  const el = document.createElement('div');
-  el.className = 'badge-pop';
-  el.setAttribute('role', 'status');
-  el.innerHTML = `<div class="badge-pop-icon">${b.icon}</div><div><div class="badge-pop-k">conquista desbloqueada</div><div class="badge-pop-n">${escapeHtml(b.name)}</div><div class="badge-pop-d">${escapeHtml(b.desc)}</div></div>`;
-  document.body.appendChild(el);
-  if(navigator.vibrate) try{ navigator.vibrate([30, 40, 30]); }catch(e){}
-  requestAnimationFrame(() => el.classList.add('show'));
-  setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 500); }, 3000);
+  const onProfile = document.getElementById('profile') && document.getElementById('profile').classList.contains('active');
+  if(!onProfile) setProfileDot(true);
 }
 
 function badgesHtml(){
@@ -5911,6 +5959,8 @@ function renderGenreBar(){
       activeGenre = btn.dataset.genre;
       renderGenreBar();
       fetchLiveFeed();
+      updateFeedFilterDot();
+      closeFeedFilter();
     });
   });
 }
@@ -8930,13 +8980,38 @@ document.querySelectorAll('.ftbtn').forEach(btn=>{
     document.querySelectorAll('.ftbtn').forEach(b=>b.classList.toggle('active', b===btn));
     renderGenreBar();
     fetchLiveFeed();
+    updateFeedFilterDot();
   });
 });
 
 document.getElementById('feedRefreshBtn').addEventListener('click', ()=>{
   invalidateForYou(); // "buscar novas fitas" sempre pega os sinais mais novos
   fetchLiveFeed();
+  closeFeedFilter();
 });
+
+// gaveta de filtros: abre pelo ícone do topo, fecha ao escolher um gênero
+function openFeedFilter(){ document.getElementById('feedFilterOverlay').classList.add('active'); }
+function closeFeedFilter(){ document.getElementById('feedFilterOverlay').classList.remove('active'); }
+function updateFeedFilterDot(){
+  const dot = document.getElementById('feedFilterDot');
+  if(dot) dot.hidden = feedMode === 'album' && activeGenre === 'all';
+}
+document.getElementById('feedFilterBtn').addEventListener('click', openFeedFilter);
+document.getElementById('feedFilterCloseX').addEventListener('click', closeFeedFilter);
+document.getElementById('feedFilterOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'feedFilterOverlay') closeFeedFilter();
+});
+
+// o feed ocupa do fim do topo até o fim da tela
+function sizeFeed(){
+  const s = document.getElementById('feedScroll');
+  if(!s || !s.offsetParent) return;
+  const top = Math.round(s.getBoundingClientRect().top + window.scrollY);
+  document.documentElement.style.setProperty('--feed-top', `${top}px`);
+}
+window.addEventListener('resize', sizeFeed);
+window.addEventListener('load', sizeFeed);
 
 /* ============================================================
    MOMENTOS — a pessoa posta uma foto junto com a música que estava
@@ -10079,10 +10154,10 @@ async function afterAuthSuccess(){
 const TUTORIAL_STEPS = [
   { title: 'Bem-vindo ao MyK7',
     text: 'aqui é um diário de escuta: você registra o que ouviu, dá nota e vê o que a galera anda escutando. bora dar uma volta rápida?' },
-  { sel: '.feed-toggle', title: 'O feed de fitas',
-    text: 'cada fita toca uma prévia de 30 s — role pra passar pra próxima. troque entre álbuns, músicas soltas e o que está em alta.' },
-  { sel: '#genreBar', title: 'Filtre por gênero',
-    text: 'toque num gênero pra ver só fitas daquele estilo.' },
+  { sel: '#feedScroll', title: 'O feed de fitas',
+    text: 'cada fita toca uma prévia de 30 s — role pra passar pra próxima.' },
+  { sel: '#feedFilterBtn', title: 'Filtros',
+    text: 'aqui você troca entre álbuns, músicas soltas e o que está em alta, e escolhe um gênero.' },
   { sel: 'nav.tabs', title: 'Momentos e resenhas',
     text: 'em Momentos, a galera posta uma foto com a música que estava tocando. em Resenhas, o que cada um registrou e comentou.' },
   { sel: '.bottom-nav [data-view="buscar"]', title: 'Registre o que ouviu',
@@ -10230,8 +10305,9 @@ function switchView(name){
   }
 
   document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
-  if(name === 'foryou'){ renderFeed(); }
-  if(name === 'profile') renderProfile();
+  document.body.classList.toggle('view-foryou', name === 'foryou');
+  if(name === 'foryou'){ renderFeed(); requestAnimationFrame(sizeFeed); }
+  if(name === 'profile'){ setProfileDot(false); renderProfile(); }
   if(name === 'buscar') renderBuscar();
   if(name === 'pessoas') renderPessoas();
   if(name === 'mensagens') renderMensagens();
@@ -10241,6 +10317,7 @@ function switchView(name){
     try{ history.replaceState(null, '', '#' + name); }catch(e){ /* file:// etc */ }
   }
 }
+document.body.classList.toggle('view-foryou', !!document.querySelector('#foryou.active'));
 document.querySelectorAll('[data-view]').forEach(b=>{
   b.addEventListener('click', ()=> switchView(b.dataset.view));
 });
