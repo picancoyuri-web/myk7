@@ -34,7 +34,8 @@ router.get('/status', requireAuth, (req, res) => {
 });
 
 router.post('/', requireAuth, async (req, res) => {
-  const token = process.env.AUDD_API_TOKEN;
+  // tolera espaço, quebra de linha ou aspas que vêm junto ao colar no Render
+  const token = String(process.env.AUDD_API_TOKEN || '').trim().replace(/^["']|["']$/g, '');
   if(!token) return res.status(503).json({ error: 'identificação de música ainda não está disponível.' });
 
   const remaining = remainingFor(req.user);
