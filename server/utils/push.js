@@ -95,4 +95,21 @@ function pushForNotification({ userId, actorId, type }){
   sendPush(userId, { title: 'MyK7', body: `${who} ${TEXTS[type] || 'interagiu com você'}`, data: { view: 'notifications' } });
 }
 
-module.exports = { sendPush, pushForNotification };
+// diagnóstico sem expor nada: a chave carregou? o Google aceita a chave?
+// o FCM responde ao envio com token falso (prova que projeto e permissão batem)
+async function pushStatus(){
+  if(!process.env.FIREBASE_SERVICE_ACCOUNT) return { push: 'sem variável FIREBASE_SERVICE_ACCOUNT' };
+  if(!account || !account.private_key || !account.client_email || !account.project_id) return { push: 'variável com JSON inválido' };
+  try{ await accessToken(); }catch(e){ return { push: 'Google recusou a chave', detail: e.message }; }
+  const res = await fetch(`https://fcm.googleapis.com/v1/projects/${account.project_id}/messages:send`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await accessToken()}` },
+    body: JSON.stringify({ validate_only: true, message: { token: 'teste-invalido', notification: { title: 't', body: 't' } } }),
+  });
+  if(res.status === 403) return { push: 'chave sem permissão no FCM (API do Cloud Messaging desligada?)' };
+  if(res.status === 404 && !(await res.text()).includes('UNREGISTERED')) return { push: 'projeto não encontrado no FCM' };
+  const devices = db.prepare('SELECT COUNT(*) AS n FROM push_tokens').get().n;
+  return { push: 'ok', project: account.project_id, devices };
+}
+
+module.exports = { sendPush, pushForNotification, pushStatus };
