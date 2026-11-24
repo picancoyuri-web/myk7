@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ícone da barra de notificações: fita cassete em branco (o Android pinta) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M4,5h16a2,2 0,0 1,2 2v10a2,2 0,0 1,-2 2h-2.2l-1.3,-2.6h-9l-1.3,2.6H4a2,2 0,0 1,-2 -2V7a2,2 0,0 1,2 -2zM8.5,9a2,2 0,1 0,0 4a2,2 0,1 0,0 -4zM15.5,9a2,2 0,1 0,0 4a2,2 0,1 0,0 -4z"/>
+</vector>

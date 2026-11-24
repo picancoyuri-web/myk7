@@ -68,4 +68,23 @@ router.post('/read', requireAuth, (req, res) => {
   res.status(204).end();
 });
 
+// aparelho avisa o token do Firebase pra receber notificação no celular
+router.post('/push-token', requireAuth, (req, res) => {
+  const { token, platform } = req.body || {};
+  if(typeof token !== 'string' || token.length < 20 || token.length > 4096) return res.status(400).json({ error: 'token inválido.' });
+  const plat = platform === 'ios' ? 'ios' : 'android';
+  db.prepare(`
+    INSERT INTO push_tokens (token, user_id, platform) VALUES (?,?,?)
+    ON CONFLICT(token) DO UPDATE SET user_id = excluded.user_id, platform = excluded.platform, updated_at = datetime('now')
+  `).run(token, req.user.id, plat);
+  res.status(204).end();
+});
+
+// ao sair da conta, o aparelho para de receber
+router.post('/push-token/remove', requireAuth, (req, res) => {
+  const { token } = req.body || {};
+  if(typeof token === 'string') db.prepare('DELETE FROM push_tokens WHERE token = ? AND user_id = ?').run(token, req.user.id);
+  res.status(204).end();
+});
+
 module.exports = router;

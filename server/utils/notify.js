@@ -1,5 +1,6 @@
 const db = require('../db');
 const { isBlockedEither } = require('./blocks');
+const { pushForNotification } = require('./push');
 
 // registra uma notificação pra userId, causada pela ação de actorId.
 // por padrão nunca notifica a própria pessoa sobre a própria ação —
@@ -13,6 +14,7 @@ function createNotification({ userId, actorId, type, entryId = null, commentId =
     INSERT INTO notifications (user_id, actor_id, type, entry_id, comment_id, post_id)
     VALUES (?,?,?,?,?,?)
   `).run(userId, actorId, type, entryId, commentId, postId);
+  pushForNotification({ userId, actorId, type });
 }
 
 module.exports = { createNotification };

@@ -287,6 +287,14 @@ CREATE TABLE IF NOT EXISTS app_migrations (
   name TEXT PRIMARY KEY,
   ran_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+-- aparelhos que recebem notificação no celular (token do Firebase)
+CREATE TABLE IF NOT EXISTS push_tokens (
+  token TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  platform TEXT,
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_push_tokens_user ON push_tokens(user_id);
 `);
 
 // ajustes que rodam uma única vez no banco

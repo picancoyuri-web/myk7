@@ -2827,6 +2827,50 @@ function onPremiumChanged(){
   if(!feedLoading) renderFeed();
 }
 
+/* ============================================================
+   NOTIFICAÇÃO NO CELULAR (só no app das lojas)
+   O aparelho pega um token no Firebase e manda pro servidor; o servidor
+   usa esse token pra avisar de seguidor novo, comentário, mensagem etc.
+   Tocar na notificação abre a tela certa.
+   ============================================================ */
+const push = { started: false, token: null };
+
+async function sendPushToken(){
+  if(!push.token || !currentUser) return;
+  try{
+    await apiFetch('/notifications/push-token', { method: 'POST', body: JSON.stringify({ token: push.token, platform: NATIVE_PLATFORM }) });
+  }catch(e){ /* tenta de novo na próxima abertura */ }
+}
+
+async function initPush(){
+  const P = nativePlugin('PushNotifications');
+  if(!P || !currentUser) return;
+  if(push.started){ sendPushToken(); return; } // trocou de conta: o token passa pra conta nova
+  push.started = true;
+  try{
+    P.addListener('registration', (t) => { push.token = t.value; sendPushToken(); });
+    P.addListener('registrationError', (e) => console.warn('push: registro falhou', e));
+    P.addListener('pushNotificationActionPerformed', (action) => {
+      const data = (action.notification && action.notification.data) || {};
+      if(data.view === 'mensagens' || data.view === 'notifications') switchView(data.view);
+    });
+    if(NATIVE_PLATFORM === 'android'){
+      await P.createChannel({ id: 'myk7', name: 'MyK7', description: 'seguidores, comentários e mensagens', importance: 4 }).catch(() => {});
+    }
+    let perm = await P.checkPermissions();
+    if(perm.receive === 'prompt' || perm.receive === 'prompt-with-rationale') perm = await P.requestPermissions();
+    if(perm.receive !== 'granted') return;
+    await P.register();
+  }catch(e){
+    console.warn('notificações indisponíveis:', e);
+  }
+}
+
+async function forgetPushToken(){
+  if(!push.token) return;
+  try{ await apiFetch('/notifications/push-token/remove', { method: 'POST', body: JSON.stringify({ token: push.token }) }); }catch(e){}
+}
+
 // chamada depois que a sessão carrega (abrir o app, login, cadastro)
 async function initMonetization(){
   if(!IS_NATIVE_APP || !currentUser) return;
@@ -4271,6 +4315,7 @@ async function doLogin({identifier, password}){
 }
 
 async function doLogout(){
+  await forgetPushToken();
   try{ await apiFetch('/auth/logout', { method: 'POST' }); }
   catch(e){ /* mesmo se der erro, limpamos a sessão localmente */ }
   currentUser = null;
@@ -10135,6 +10180,7 @@ async function renderOnboarding(){
 async function afterAuthSuccess(){
   renderAuthGate();
   initMonetization();
+  initPush();
   await loadDiaryFromServer();
   renderGenreBar();
   fetchLiveFeed();
@@ -10387,6 +10433,7 @@ document.addEventListener('touchend', (e)=>{
   fetchLiveFeed();
   currentUser = await loadSession();
   initMonetization();
+  initPush();
   if(currentUser) loadBlockedUsernames();
   renderAuthGate();
   await loadDiaryFromServer();

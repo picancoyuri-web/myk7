@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../db');
 const requireAuth = require('../middleware/requireAuth');
+const { sendPush } = require('../utils/push');
 const rateLimit = require('../utils/rateLimit');
 const { toIso } = require('../utils/time');
 const { cleanString, parseId } = require('../utils/validate');
@@ -102,6 +103,11 @@ router.post('/:username', requireAuth, sendLimiter, (req, res) => {
   const info = db.prepare('INSERT INTO messages (from_id, to_id, text) VALUES (?,?,?)')
     .run(req.user.id, other.id, text);
   const row = db.prepare('SELECT * FROM messages WHERE id = ?').get(info.lastInsertRowid);
+  sendPush(other.id, {
+    title: req.user.username,
+    body: text.length > 120 ? text.slice(0, 117) + '...' : text,
+    data: { view: 'mensagens', username: req.user.username },
+  });
 
   res.status(201).json({ message: serializeMessage(row, req.user.id) });
 });

@@ -18,3 +18,5 @@ ios/DerivedData/
 *.jks
 keystore.properties
 .superpowers/
+android/app/google-services.json
+*firebase-adminsdk*.json
